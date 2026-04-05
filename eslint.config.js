@@ -2,15 +2,178 @@ import js from '@eslint/js'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 import pluginReact from 'eslint-plugin-react'
+import pluginReactHooks from 'eslint-plugin-react-hooks'
+import pluginReactRefresh from 'eslint-plugin-react-refresh'
+import prettier from 'eslint-config-prettier'
 import { defineConfig } from 'eslint/config'
 
 export default defineConfig([
+  // 全局忽略配置
   {
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    plugins: { js },
-    extends: ['js/recommended'],
-    languageOptions: { globals: globals.browser },
+    ignores: [
+      'dist/**',
+      'dist-electron/**',
+      'node_modules/**',
+      'out/**',
+      '*.log',
+      'docs/**',
+      '.vscode/**',
+      '.husky/**',
+      'release/**',
+      'build/**'
+    ]
   },
-  tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
+
+  // 基础 JS 配置
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module'
+    }
+  },
+
+  // 主进程配置 (Electron Main Process)
+  {
+    files: ['src/main/**/*.{ts,js}'],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended
+    ],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parser: tseslint.parser,
+      parserOptions: {
+        project: './tsconfig.node.json'
+      },
+      globals: {
+        ...globals.node,
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly'
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-console': 'off' // Electron 主进程允许 console
+    }
+  },
+
+  // 预加载脚本配置 (Electron Preload)
+  {
+    files: ['src/preload/**/*.{ts,js}'],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended
+    ],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parser: tseslint.parser,
+      parserOptions: {
+        project: './tsconfig.node.json'
+      },
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly'
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn'
+    }
+  },
+
+  // 渲染进程配置 (Electron Renderer Process)
+  {
+    files: ['src/renderer/**/*.{ts,tsx,js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended
+    ],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parser: tseslint.parser,
+      parserOptions: {
+        project: './tsconfig.app.json',
+        ecmaFeatures: {
+          jsx: true
+        }
+      },
+      globals: {
+        ...globals.browser
+      }
+    },
+    plugins: {
+      'react': pluginReact,
+      'react-hooks': pluginReactHooks,
+      'react-refresh': pluginReactRefresh
+    },
+    settings: {
+      react: {
+        version: 'detect'
+      }
+    },
+    rules: {
+      // React 相关规则
+      'react/react-in-jsx-scope': 'off', // React 17+ 不需要
+      'react/prop-types': 'off', // 使用 TypeScript
+      'react/jsx-uses-react': 'off',
+      'react/jsx-uses-vars': 'error',
+
+      // React Hooks 规则
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+
+      // React Refresh 规则
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true }
+      ],
+
+      // TypeScript 规则
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-unused-vars': 'off' // 由 TS 规则处理
+    }
+  },
+
+  // 配置文件配置
+  {
+    files: [
+      '*.config.{ts,js,mjs}',
+      'vite.config.*',
+      'electron.vite.config.*',
+      'eslint.config.*'
+    ],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended
+    ],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parser: tseslint.parser,
+      globals: {
+        ...globals.node
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-var-requires': 'off',
+      'no-console': 'off'
+    }
+  },
+
+  // Prettier 最后覆盖所有冲突规则
+  prettier
 ])
