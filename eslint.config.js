@@ -31,6 +31,9 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module'
+    },
+    rules: {
+      'no-var': 'error'
     }
   },
 
@@ -56,6 +59,7 @@ export default defineConfig([
       }
     },
     rules: {
+      'no-var': 'error',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
@@ -86,6 +90,7 @@ export default defineConfig([
       }
     },
     rules: {
+      'no-var': 'error',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn'
@@ -125,6 +130,7 @@ export default defineConfig([
     },
     rules: {
       // React 相关规则
+      'no-var': 'error',
       'react/react-in-jsx-scope': 'off', // React 17+ 不需要
       'react/prop-types': 'off', // 使用 TypeScript
       'react/jsx-uses-react': 'off',
