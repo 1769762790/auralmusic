@@ -5,10 +5,20 @@ import { useNavigate } from 'react-router-dom'
 const Back = () => {
   const navigate = useNavigate()
   return (
-    <button className='flex items-center gap-3'>
-      <ArrowLeft className='w-5 h-5' onClick={() => navigate(-1)} />
-      <ArrowRight className='w-5 h-5' onClick={() => navigate(1)} />
-    </button>
+    <div className='flex items-center gap-3'>
+      <div className='hover:bg-primary/5 rounded-lg px-3 py-2'>
+        <ArrowLeft
+          className='h-5 w-5 cursor-pointer'
+          onClick={() => navigate(-1)}
+        />
+      </div>
+      <div className='hover:bg-primary/5 rounded-lg px-3 py-2'>
+        <ArrowRight
+          className='h-5 w-5 cursor-pointer'
+          onClick={() => navigate(1)}
+        />
+      </div>
+    </div>
   )
 }
 

@@ -1,4 +1,4 @@
-import { OnlineChartSummary } from '../CoreRankingCardItem.type'
+import { OnlineChartSummary } from '..//CoreRankings/CoreRankingCardItem.type'
 
 export interface GenreChartsCardProps {
   chart: OnlineChartSummary

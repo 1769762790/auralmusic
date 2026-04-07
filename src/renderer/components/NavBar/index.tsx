@@ -15,7 +15,7 @@ const NavBar = () => {
   // 取根布局的 children 作为菜单数据源（因为根布局 hidden）
   const menuData = routeMenuConfig[0]?.children || []
   return (
-    <nav className='w-full h-full flex items-center justify-center px-4'>
+    <nav className='flex h-full w-full items-center justify-center px-4'>
       <NavigationMenu>
         <NavigationMenuList>
           {menuData.map(
@@ -23,8 +23,10 @@ const NavBar = () => {
               !item.meta.hidden && (
                 <NavigationMenuItem key={item.meta.title}>
                   <NavigationMenuLink asChild>
-                    <Link to={item.path} className='font-bold text-[15px]'>
-                      {item.meta.icon && <Icon name={item.meta.icon} className='w-4 h-4 mr-2' />}
+                    <Link to={item.path} className='px-10 text-xl font-bold'>
+                      {item.meta.icon && (
+                        <Icon name={item.meta.icon} className='mr-2 h-4 w-4' />
+                      )}
                       {item.meta.title}
                     </Link>
                   </NavigationMenuLink>
