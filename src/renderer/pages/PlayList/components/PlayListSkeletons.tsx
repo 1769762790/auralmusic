@@ -4,7 +4,7 @@ export const OnlinePlaylistFeatureSkeleton = () => {
       {Array.from({ length: 2 }).map((_, index) => (
         <div
           key={index}
-          className='relative min-h-[240px] animate-pulse overflow-hidden rounded-[30px] bg-slate-800'
+          className='relative min-h-[240px] animate-pulse overflow-hidden rounded-[15px] bg-slate-800'
         >
           <div className='absolute inset-0 bg-slate-700/80' />
           <div className='relative z-10 flex h-full min-h-[240px] flex-col justify-between p-7'>
@@ -25,10 +25,10 @@ export const OnlinePlaylistFeatureSkeleton = () => {
 
 export const AllPlayListSkeleton = () => {
   return (
-    <div className='grid grid-cols-5 gap-6 xl:grid-cols-6 2xl:grid-cols-8'>
-      {Array.from({ length: 10 }).map((_, index) => (
+    <div className='grid grid-cols-4 gap-6 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6'>
+      {Array.from({ length: 12 }).map((_, index) => (
         <div key={index} className='flex flex-col gap-4'>
-          <div className='aspect-square animate-pulse rounded-[18px] bg-slate-700' />
+          <div className='aspect-square animate-pulse rounded-[15px] bg-slate-700' />
           <div className='space-y-2'>
             <div className='h-4 w-4/5 animate-pulse rounded-full bg-slate-700' />
             <div className='h-3 w-3/5 animate-pulse rounded-full bg-slate-700' />

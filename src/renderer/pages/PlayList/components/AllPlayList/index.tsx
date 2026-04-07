@@ -4,6 +4,7 @@ import CategoriesPanel from './CategoriesPanel'
 import CoverCard from '@/components/CoverCard'
 import { geTopPlayList } from '@/api/list'
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
+import { AllPlayListSkeleton } from '../PlayListSkeletons'
 
 const SHOW_CAT_COUNT = 8
 
@@ -115,15 +116,19 @@ const AllPlaylist = ({
         />
       )}
 
-      <div className='grid grid-cols-5 gap-6 xl:grid-cols-6 2xl:grid-cols-8'>
-        {playLists.map(item => (
-          <CoverCard key={item.id} data={item} onPlay={handlePlay} />
-        ))}
-      </div>
+      {loading ? (
+        <AllPlayListSkeleton />
+      ) : (
+        <div className='grid grid-cols-4 gap-6 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6'>
+          {playLists.map(item => (
+            <CoverCard key={item.id} data={item} onPlay={handlePlay} />
+          ))}
+        </div>
+      )}
 
       {/* 哨兵元素，用于触发加载更多 */}
       <div ref={sentinelRef} className='flex h-20 items-center justify-center'>
-        {loading && <span className='text-muted-foreground'>加载中...</span>}
+        {/* {loading && <span className='text-muted-foreground'>加载中...</span>} */}
       </div>
     </div>
   )

@@ -1,19 +1,16 @@
+import { Link } from 'react-router-dom'
+import { routeMenuConfig } from '@/router/router.config'
+import Icon from '../Icon'
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu'
-import { Link } from 'react-router-dom'
-import React from 'react'
-import { routeMenuConfig } from '../../router/router.config'
-import Icon from '../Icon'
 
 const NavBar = () => {
-  // 取根布局的 children 作为菜单数据源（因为根布局 hidden）
   const menuData = routeMenuConfig[0]?.children || []
+
   return (
     <nav className='flex h-full w-full items-center justify-center px-4'>
       <NavigationMenu>

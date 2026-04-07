@@ -3,6 +3,9 @@
   width: 100%;
 }
 
+* {
+  border: none;
+}
 /* 隐藏全局滚动条 - 兼容所有浏览器 */
 html,
 body {

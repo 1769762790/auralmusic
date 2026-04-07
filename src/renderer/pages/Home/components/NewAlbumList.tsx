@@ -13,7 +13,7 @@ const NewAlbumList = ({ list = [], isLoading = false }: NewAlbumListProps) => {
     <div className='mt-10'>
       <div className='group mb-10 flex items-center justify-between'>
         <div className='text-2xl font-semibold'>新专速递</div>
-        <Link to='/playlist' className='hover:font-bold'>
+        <Link to='/albums' className='hover:font-bold'>
           更多
         </Link>
       </div>

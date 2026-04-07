@@ -1,0 +1,60 @@
+import request from '@/lib/request'
+
+export interface ArtistListParams {
+  area: -1 | 7 | 96 | 8 | 16 | 0
+  type: -1 | 1 | 2 | 3
+  initial: -1 | 0 | string
+  offset?: number
+  limit?: number
+}
+
+export function getArtistList(params: ArtistListParams) {
+  return request.get('/artist/list', {
+    params,
+  })
+}
+
+export interface ArtistDetailParams {
+  id: number | string
+}
+
+export interface ArtistListPageParams extends ArtistDetailParams {
+  limit?: number
+  offset?: number
+}
+
+export function getArtistDetail(params: ArtistDetailParams) {
+  return request.get('/artist/detail', {
+    params,
+  })
+}
+
+export function getArtistTopSongs(params: ArtistDetailParams) {
+  return request.get('/artist/top/song', {
+    params,
+  })
+}
+
+export function getArtistAlbums(params: ArtistListPageParams) {
+  return request.get('/artist/album', {
+    params,
+  })
+}
+
+export function getArtistMvs(params: ArtistListPageParams) {
+  return request.get('/artist/mv', {
+    params,
+  })
+}
+
+export function getSimilarArtists(params: ArtistDetailParams) {
+  return request.get('/simi/artist', {
+    params,
+  })
+}
+
+export function getArtistDesc(params: ArtistDetailParams) {
+  return request.get('/artist/desc', {
+    params,
+  })
+}
