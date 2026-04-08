@@ -19,6 +19,7 @@ import type {
   HomeFmData,
   NewSong,
 } from './home.type'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
   const [featureLoading, setFeatureLoading] = useState(true)
@@ -31,7 +32,7 @@ const Home = () => {
   const [topArtists, setTopArtists] = useState<ArtistSummary[]>([])
   const [albumNewSet, setAlbumNewSet] = useState<AlbumSummary[]>([])
   const [newSongs, setNewSongs] = useState<NewSong[]>([])
-
+  const navigate = useNavigate()
   const fecthTopArtists = useEffectEvent(async () => {
     try {
       setArtistsLoading(true)
@@ -86,6 +87,10 @@ const Home = () => {
 
   const topOneSong = dailyList[0] || {}
 
+  const handleOpenDailySongs = () => {
+    navigate('/daily-songs')
+  }
+
   useEffect(() => {
     void fetchTopData()
     void fecthTopArtists()
@@ -101,6 +106,8 @@ const Home = () => {
           <DailyFeatureCard
             isLoading={featureLoading}
             coverUrl={topOneSong?.al?.picUrl}
+            id={topOneSong?.id || 0}
+            onOpenDailySongs={handleOpenDailySongs}
           />
           <FmFeatureCard
             isLoading={featureLoading}

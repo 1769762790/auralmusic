@@ -4,9 +4,10 @@ import type { AlbumListItem } from '@/pages/Albums/albums.model'
 
 interface AlbumCardProps {
   album: AlbumListItem
+  onToAlbumDetail: (id: number) => void
 }
 
-const AlbumCard = ({ album }: AlbumCardProps) => {
+const AlbumCard = ({ album, onToAlbumDetail }: AlbumCardProps) => {
   const coverUrl = album.picUrl || album.blurPicUrl
   const artistName =
     album.artists
@@ -37,7 +38,10 @@ const AlbumCard = ({ album }: AlbumCardProps) => {
             <div className='from-muted via-muted/80 to-muted/60 size-full bg-gradient-to-br' />
           )}
           <div className='absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(15,23,42,0.08))]' />
-          <div className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
+          <div
+            className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100'
+            onClick={() => onToAlbumDetail(album.id)}
+          >
             <Button
               type='button'
               size='icon'

@@ -1,10 +1,22 @@
+import { useEffect } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import Account from '../Account'
+import LoginDialog from '../LoginDialog'
 import NavBar from '../NavBar'
 import Back from './Back'
+import { useAuthStore } from '@/stores/auth-store'
 
-const Header = ({ className }) => {
+interface HeaderProps {
+  className?: string
+}
+
+const Header = ({ className = '' }: HeaderProps) => {
   const { currentTheme, setDarkTheme, setLightTheme } = useTheme()
+  const hydrateAuth = useAuthStore(state => state.hydrateAuth)
+
+  useEffect(() => {
+    void hydrateAuth()
+  }, [hydrateAuth])
 
   const onToggleTheme = () => {
     if (currentTheme === 'dark') {
@@ -20,6 +32,7 @@ const Header = ({ className }) => {
       <Back />
       <NavBar />
       <Account onToggleTheme={onToggleTheme} currentTheme={currentTheme} />
+      <LoginDialog />
     </header>
   )
 }

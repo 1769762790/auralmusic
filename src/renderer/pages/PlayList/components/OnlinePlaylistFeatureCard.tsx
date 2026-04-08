@@ -12,8 +12,8 @@ export interface OnlinePlaylistFeatureCardData {
 interface OnlinePlaylistFeatureCardProps {
   title: string
   card: OnlinePlaylistFeatureCardData
-  onOpen: () => void
-  onPlay: () => void
+  onOpen: (playlistId: number) => void
+  onPlay: (playlistId: number) => void
 }
 
 export const OnlinePlaylistFeatureCard = ({
@@ -47,7 +47,7 @@ export const OnlinePlaylistFeatureCard = ({
           size='icon'
           disabled={card?.disabled}
           className='size-12 rounded-full border border-white/18 bg-white/12 text-white backdrop-blur-md hover:bg-white/20 disabled:cursor-default disabled:opacity-45'
-          onClick={onPlay}
+          onClick={() => onPlay(card.id)}
         >
           <Play className='ml-0.5 size-4 fill-current' />
         </Button>
@@ -55,7 +55,7 @@ export const OnlinePlaylistFeatureCard = ({
           type='button'
           disabled={card?.disabled}
           className='rounded-full border border-white/12 bg-white/12 px-5 text-[11px] font-semibold tracking-[0.2em] text-white uppercase backdrop-blur-md hover:bg-white/20 disabled:cursor-default disabled:opacity-45'
-          onClick={onOpen}
+          onClick={() => onOpen(card.id)}
         >
           View Collection
         </Button>

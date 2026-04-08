@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import type { AlbumSummary } from '../home.type'
 import { NewAlbumSkeleton } from './HomeSkeletons'
 import AlbumCard from './AlbumCard'
@@ -9,6 +9,11 @@ interface NewAlbumListProps {
 }
 
 const NewAlbumList = ({ list = [], isLoading = false }: NewAlbumListProps) => {
+  const navigate = useNavigate()
+  const navigateToAlbumDetail = (albumId: number) => {
+    if (!albumId) return
+    navigate(`/albums/${albumId}`)
+  }
   return (
     <div className='mt-10'>
       <div className='group mb-10 flex items-center justify-between'>
@@ -28,6 +33,8 @@ const NewAlbumList = ({ list = [], isLoading = false }: NewAlbumListProps) => {
               title={item.name}
               artist={item.artist.name}
               key={item.id}
+              id={item.id}
+              onToAlbumDetail={navigateToAlbumDetail}
             />
           ))}
         </div>

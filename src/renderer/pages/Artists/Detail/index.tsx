@@ -1,5 +1,5 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   getArtistAlbums,
   getArtistDesc,
@@ -120,10 +120,10 @@ function unwrapPayload<T>(
     response.data !== null &&
     'data' in response.data
   ) {
-    return response.data.data ?? null
+    return (response.data as { data?: T }).data ?? null
   }
 
-  return response.data
+  return response.data as T
 }
 
 function normalizeArtistProfile(
@@ -235,6 +235,15 @@ const ArtistDetail = () => {
   const [state, setState] = useState<ArtistDetailPageState>(INITIAL_STATE)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const navigate = useNavigate()
+  const navigateToAlbumDetail = (albumId: number) => {
+    if (!albumId) return
+    navigate(`/albums/${albumId}`)
+  }
+  const navigateToMvDetail = (mvId: number) => {
+    if (!mvId) return
+    navigate(`/mv/${mvId}`)
+  }
 
   const fetchAlbumsPage = useCallback(
     async (offset: number, limit: number) => {
@@ -393,6 +402,8 @@ const ArtistDetail = () => {
         latestRelease={latestRelease}
         albumsLoading={albumsLoading}
         mvsLoading={mvsLoading}
+        onToAlbumDetail={navigateToAlbumDetail}
+        onToMvDetail={navigateToMvDetail}
       />
       <ArtistTopSongs songs={state.topSongs} />
       <ArtistMediaTabs
@@ -404,6 +415,8 @@ const ArtistDetail = () => {
         mvHasMore={mvHasMore}
         albumSentinelRef={albumSentinelRef}
         mvSentinelRef={mvSentinelRef}
+        onToAlbumDetail={navigateToAlbumDetail}
+        onToMvDetail={navigateToMvDetail}
       />
     </section>
   )

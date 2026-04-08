@@ -1,5 +1,6 @@
 import { EllipsisIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CategoriesPanel from './CategoriesPanel'
 import CoverCard from '@/components/CoverCard'
 import { geTopPlayList } from '@/api/list'
@@ -11,6 +12,8 @@ const SHOW_CAT_COUNT = 8
 interface PlayListItem {
   id: string
   name: string
+  coverImgUrl?: string
+  count?: number
 }
 
 interface PlaylistCategoryItem {
@@ -30,6 +33,7 @@ const AllPlaylist = ({
 }: {
   categories?: PlaylistCategories
 }) => {
+  const navigate = useNavigate()
   const [isShow, setIsShow] = useState(false)
   const [cat, setCat] = useState<string | null>(null)
 
@@ -38,7 +42,6 @@ const AllPlaylist = ({
     return [{ name: '全部' }, ...data]
   }, [categories.sub])
 
-  // 创建 API 包装函数，符合 useLoadMore 期望的签名
   const fetchPlayListData = useCallback(
     async (offset: number, limit: number) => {
       const response = await geTopPlayList({
@@ -54,7 +57,6 @@ const AllPlaylist = ({
     [cat]
   )
 
-  // 使用 hook，cat 变化时自动重置
   const {
     data: playLists,
     loading,
@@ -64,20 +66,22 @@ const AllPlaylist = ({
     limit: 50,
   })
 
-  // cat 变化时重置列表
   useEffect(() => {
     reset()
   }, [cat, reset])
 
   const handleCategoryChange = (categoryName: string) => {
-    const newCat = categoryName === '全部' ? null : categoryName
-    setCat(newCat)
+    const nextCategory = categoryName === '全部' ? null : categoryName
+    setCat(nextCategory)
     setIsShow(false)
   }
 
   const handlePlay = () => {
-    // 处理播放逻辑
     console.log('play')
+  }
+
+  const handleOpen = (playlistId: number | string) => {
+    navigate(`/playlist/${playlistId}`)
   }
 
   const onClickMore = () => {
@@ -121,15 +125,20 @@ const AllPlaylist = ({
       ) : (
         <div className='grid grid-cols-4 gap-6 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6'>
           {playLists.map(item => (
-            <CoverCard key={item.id} data={item} onPlay={handlePlay} />
+            <CoverCard
+              key={item.id}
+              data={item}
+              onOpen={handleOpen}
+              onPlay={handlePlay}
+            />
           ))}
         </div>
       )}
 
-      {/* 哨兵元素，用于触发加载更多 */}
-      <div ref={sentinelRef} className='flex h-20 items-center justify-center'>
-        {/* {loading && <span className='text-muted-foreground'>加载中...</span>} */}
-      </div>
+      <div
+        ref={sentinelRef}
+        className='flex h-20 items-center justify-center'
+      />
     </div>
   )
 }

@@ -29,5 +29,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/renderer", "vite-env.d.ts"]
+  "include": ["src/renderer", "src/shared", "vite-env.d.ts"]
 }

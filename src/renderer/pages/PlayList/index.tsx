@@ -4,6 +4,7 @@ import {
   getRecommendPlayList,
 } from '@/api/list'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   OnlinePlaylistFeatureCard,
   type OnlinePlaylistFeatureCardData,
@@ -32,12 +33,14 @@ interface PlaylistData {
 }
 
 const PlayList = () => {
+  const navigate = useNavigate()
   const [playlistData, setPlaylistData] = useState<PlaylistData>({
     recommend: { coverImgUrl: '', id: 0, name: '', picUrl: null },
     hot: { coverImgUrl: '', id: 0, name: '', picUrl: null },
     categories: { sub: [] },
   })
   const [isLoading, setLoading] = useState(false)
+
   useEffect(() => {
     const fetchHotPlayList = async () => {
       setLoading(true)
@@ -60,8 +63,13 @@ const PlayList = () => {
       }
     }
 
-    fetchHotPlayList()
+    void fetchHotPlayList()
   }, [])
+
+  const handleOpenPlaylist = (playlistId: number) => {
+    navigate(`/playlist/${playlistId}`)
+  }
+
   return (
     <div className='w-full'>
       {isLoading ? (
@@ -78,13 +86,13 @@ const PlayList = () => {
               title='每日推荐'
               card={playlistData.recommend}
               onPlay={() => {}}
-              onOpen={() => {}}
+              onOpen={handleOpenPlaylist}
             />
             <OnlinePlaylistFeatureCard
               title='热门歌单'
               card={playlistData.hot}
               onPlay={() => {}}
-              onOpen={() => {}}
+              onOpen={handleOpenPlaylist}
             />
           </div>
           <div>

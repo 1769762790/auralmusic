@@ -4,9 +4,11 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.css'
 import type { ArtistSummary } from '../home.type'
 import { TopArtistsSkeleton } from './HomeSkeletons'
+import { useNavigate } from 'react-router-dom'
 
 interface ArtistCardProps {
   artist: ArtistSummary
+  onToArtistDetail: (id: number) => void
 }
 
 interface TopArtistsProps {
@@ -14,11 +16,8 @@ interface TopArtistsProps {
   isLoading?: boolean
 }
 
-const ArtistCard = memo(({ artist }: ArtistCardProps) => (
-  <div
-    className='flex flex-col items-center text-center'
-    onClick={() => console.log(artist)}
-  >
+const ArtistCard = memo(({ artist, onToArtistDetail }: ArtistCardProps) => (
+  <div className='flex flex-col items-center text-center'>
     <div className='border-border/50 size-[150px] overflow-hidden rounded-full border'>
       <img
         src={artist.picUrl}
@@ -26,7 +25,8 @@ const ArtistCard = memo(({ artist }: ArtistCardProps) => (
         loading='lazy'
         decoding='async'
         draggable={false}
-        className='hover: hover:shadow-black/20d size-full object-cover transition-all duration-300 hover:scale-125 hover:shadow-xl'
+        onClick={() => onToArtistDetail(artist.id)}
+        className='hover: hover:shadow-black/20d size-full cursor-pointer object-cover transition-all duration-300 hover:scale-125 hover:shadow-xl'
       />
     </div>
     <p className='mt-3 truncate text-sm font-medium'>{artist.name}</p>
@@ -34,6 +34,11 @@ const ArtistCard = memo(({ artist }: ArtistCardProps) => (
 ))
 
 const TopArtists = ({ list = [], isLoading = false }: TopArtistsProps) => {
+  const navigate = useNavigate()
+  const handleOpenArtistDetail = (artistId: number) => {
+    if (!artistId) return
+    navigate(`/artists/${artistId}`)
+  }
   return (
     <div className='mt-10'>
       <h3 className='mb-10 text-2xl font-semibold'>热门歌手</h3>
@@ -68,7 +73,10 @@ const TopArtists = ({ list = [], isLoading = false }: TopArtistsProps) => {
         >
           {list.map((artist, index) => (
             <SwiperSlide key={artist.id} virtualIndex={index}>
-              <ArtistCard artist={artist} />
+              <ArtistCard
+                artist={artist}
+                onToArtistDetail={handleOpenArtistDetail}
+              />
             </SwiperSlide>
           ))}
         </Swiper>

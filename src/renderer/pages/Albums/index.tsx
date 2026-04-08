@@ -10,12 +10,14 @@ import {
   type AlbumListItem,
   type NewAlbumsResponse,
 } from './albums.model'
+import { useNavigate } from 'react-router-dom'
 
 const PAGE_SIZE = 30
 
 const Albums = () => {
   const [area, setArea] = useState<AlbumArea>('ALL')
   const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const navigate = useNavigate()
 
   const fetchAlbums = useCallback(
     async (offset: number, limit: number) => {
@@ -63,6 +65,11 @@ const Albums = () => {
     })
   }
 
+  const navigateToAlbumDetail = (albumId: number) => {
+    if (!albumId) return
+    navigate(`/albums/${albumId}`)
+  }
+
   const isEmpty = !isInitialLoading && albums.length === 0
 
   return (
@@ -85,7 +92,11 @@ const Albums = () => {
         ) : (
           <div className='grid grid-cols-2 gap-6 sm:grid-cols-4 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'>
             {albums.map(album => (
-              <AlbumCard key={album.id} album={album} />
+              <AlbumCard
+                key={album.id}
+                album={album}
+                onToAlbumDetail={navigateToAlbumDetail}
+              />
             ))}
           </div>
         )}

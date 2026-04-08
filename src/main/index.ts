@@ -1,6 +1,8 @@
 import { app, BrowserWindow, globalShortcut } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { bootstrapAuthSession } from './auth/store'
+import { registerAuthIpc } from './ipc/auth-ipc'
 import { registerConfigIpc } from './ipc/config-ipc'
 import { applyMusicApiRuntimeEnv } from './music-api-runtime'
 import { startMusicApi } from './server'
@@ -60,10 +62,12 @@ function createWindow() {
 
 app.whenReady().then(async () => {
   registerConfigIpc()
+  registerAuthIpc()
 
   try {
     const runtimeInfo = await startMusicApi()
     applyMusicApiRuntimeEnv(runtimeInfo)
+    await bootstrapAuthSession()
     createWindow()
   } catch (error) {
     console.error('Failed to bootstrap Music API runtime:', error)

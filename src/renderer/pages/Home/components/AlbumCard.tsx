@@ -2,17 +2,26 @@ import { Button } from '@/components/ui/button'
 import { Play } from 'lucide-react'
 
 interface AlbumCardProps {
+  id: number
   coverUrl?: string
   title?: string
   artist?: string
+  onToAlbumDetail: (id: number) => void
 }
 
-const AlbumCard = ({ coverUrl, title, artist }: AlbumCardProps) => {
+const AlbumCard = ({
+  coverUrl,
+  title,
+  artist,
+  id,
+  onToAlbumDetail,
+}: AlbumCardProps) => {
   return (
     <div className='group w-full'>
       <div
         className='flex aspect-square cursor-pointer items-center justify-center rounded-2xl bg-cover bg-center shadow-xl transition-transform duration-500 hover:translate-[-5px] hover:shadow-2xl'
         style={{ backgroundImage: `url("${coverUrl}")` }}
+        onClick={() => onToAlbumDetail(id)}
       >
         <Button
           type='button'

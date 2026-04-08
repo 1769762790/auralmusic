@@ -3,13 +3,15 @@ import { Play } from 'lucide-react'
 import { HomeFeatureCardSkeleton } from './HomeSkeletons'
 
 interface DailyFeatureCardProps {
+  id: number
   isLoading?: boolean
   onPlay?: () => void
   coverUrl?: string
-  onOpenDailySongs?: () => void
+  onOpenDailySongs?: (id: number) => void
 }
 
 const DailyFeatureCard = ({
+  id,
   isLoading,
   onPlay,
   coverUrl,
@@ -31,7 +33,7 @@ const DailyFeatureCard = ({
             }
           : undefined
       }
-      onClick={() => onOpenDailySongs?.()}
+      onClick={() => onOpenDailySongs?.(id)}
     >
       <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(8,8,10,0.6)_0%,rgba(8,8,10,0.4)_38%,rgba(8,8,10,0.36)_72%,rgba(8,8,10,0.56)_100%)]' />
       <div className='pointer-events-none absolute' />

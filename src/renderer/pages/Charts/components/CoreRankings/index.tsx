@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import CoreRankingCardItem from './CoreRankingCardItem'
 import type { OnlineChartSummary } from './CoreRankingCardItem.type'
 
@@ -6,16 +7,18 @@ interface CoreRankingsProps {
 }
 
 const CoreRankings = ({ topList = [] }: CoreRankingsProps) => {
+  const navigate = useNavigate()
+
   return (
     <div className='w-full'>
-      <div className='text-2xl font-bold mb-4'>官方榜单</div>
-      <div className='grid gap-5 grid-cols-4'>
+      <div className='mb-4 text-2xl font-bold'>官方榜单</div>
+      <div className='grid grid-cols-4 gap-5'>
         {topList.map((chart, index) => (
           <CoreRankingCardItem
             key={chart.id}
             chart={chart}
             index={index}
-            onOpen={chartId => console.log('Open chart:', chartId)}
+            onOpen={chartId => navigate(`/playlist/${chartId}`)}
           />
         ))}
       </div>

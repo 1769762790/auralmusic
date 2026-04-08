@@ -9,11 +9,24 @@ export function getTopListDetailById(id: string) {
   return request.get(`/playlist/detail?id=${id}`)
 }
 
+export function getPlaylistDetail(id: number | string) {
+  return request.get('/playlist/detail', {
+    params: { id },
+  })
+}
+
 // 获取推荐歌单
 export function getRecommendPlayList(limit: number = 1) {
   return request.get('/personalized', {
     params: { limit },
   })
+}
+
+export interface TopPlaylistParams {
+  order?: 'new' | 'hot'
+  cat?: string
+  limit?: number
+  offset?: number
 }
 
 /**
@@ -27,8 +40,20 @@ export function getRecommendPlayList(limit: number = 1) {
  * @param {string} params.cat
  * @param {number=} params.limit
  */
-export function geTopPlayList(params) {
+export function geTopPlayList(params: TopPlaylistParams) {
   return request.get('/top/playlist', {
+    params,
+  })
+}
+
+export interface PlaylistTracksParams {
+  id: number | string
+  limit?: number
+  offset?: number
+}
+
+export function getPlaylistTracks(params: PlaylistTracksParams) {
+  return request.get('/playlist/track/all', {
     params,
   })
 }
@@ -46,6 +71,11 @@ export function getRecommendSongs() {
   return request.get('/recommend/songs')
 }
 
+export interface TopArtistsParams {
+  limit?: number
+  offset?: number
+}
+
 /**
  * 热门歌手
  * @param {object} params
@@ -53,7 +83,7 @@ export function getRecommendSongs() {
  * @param {number} params.offset
  * @returns
  */
-export function getTopArtists(params) {
+export function getTopArtists(params: TopArtistsParams) {
   return request.get('/top/artists', {
     params,
   })

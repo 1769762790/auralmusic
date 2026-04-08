@@ -5,12 +5,16 @@ interface ArtistLatestReleaseProps {
   latestRelease: ArtistLatestReleaseData
   albumsLoading?: boolean
   mvsLoading?: boolean
+  onToAlbumDetail: (id: number) => void
+  onToMvDetail: (id: number) => void
 }
 
 const ArtistLatestRelease = ({
   latestRelease,
   albumsLoading = false,
   mvsLoading = false,
+  onToAlbumDetail,
+  onToMvDetail,
 }: ArtistLatestReleaseProps) => {
   return (
     <section className='space-y-5'>
@@ -18,7 +22,13 @@ const ArtistLatestRelease = ({
         最新发布
       </h2>
       <div className='grid grid-cols-2 gap-6'>
-        <article className='border-border/60 bg-card/72 flex min-h-44 gap-5 rounded-[30px] border p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)]'>
+        <article
+          className='border-border/60 bg-card/72 flex min-h-44 gap-5 rounded-[30px] border p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)]'
+          onClick={() =>
+            latestRelease?.album?.id &&
+            onToAlbumDetail(latestRelease?.album?.id)
+          }
+        >
           {latestRelease.album ? (
             <>
               <img
@@ -55,7 +65,12 @@ const ArtistLatestRelease = ({
           )}
         </article>
 
-        <article className='border-border/60 bg-card/72 flex min-h-44 gap-5 rounded-[30px] border p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)]'>
+        <article
+          className='border-border/60 bg-card/72 flex min-h-44 gap-5 rounded-[30px] border p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)]'
+          onClick={() =>
+            latestRelease?.mv?.id && onToMvDetail(latestRelease?.mv?.id)
+          }
+        >
           {latestRelease.mv ? (
             <>
               <img

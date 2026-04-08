@@ -81,7 +81,6 @@ const FmFeatureCard = ({
               <Button
                 type='button'
                 size='icon'
-                variant='ghost'
                 className='size-10 rounded-full bg-transparent text-white/90 hover:bg-white/12 hover:text-white disabled:opacity-50'
                 disabled={isLoading}
                 onClick={() => {
@@ -93,7 +92,7 @@ const FmFeatureCard = ({
               <Button
                 type='button'
                 size='icon'
-                className='size-12 rounded-full border border-white/12 text-white backdrop-blur-md transition-all disabled:opacity-50 data-[state=active]:border-white/22 data-[state=active]:bg-white/24 data-[state=active]:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_12px_28px_rgba(0,0,0,0.16)]'
+                className='size-12 cursor-pointer rounded-full border border-white/10 bg-white/12 text-white backdrop-blur-md transition-transform duration-300 group-hover:scale-[1.04] hover:bg-white/18 disabled:cursor-default disabled:opacity-45'
                 data-state={isActiveFm ? 'active' : 'idle'}
                 disabled={isLoading}
                 onClick={() => {
@@ -114,7 +113,6 @@ const FmFeatureCard = ({
               <Button
                 type='button'
                 size='icon'
-                variant='ghost'
                 className='size-10 rounded-full bg-transparent text-white/90 hover:bg-white/12 hover:text-white disabled:opacity-50'
                 disabled={isLoading}
                 onClick={() => {

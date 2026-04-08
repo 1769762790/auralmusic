@@ -1,5 +1,5 @@
-﻿import type { Ref } from 'react'
-import { PlayCircle } from 'lucide-react'
+import type { Ref } from 'react'
+import { Play } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   formatArtistPublishDate,
@@ -16,6 +16,8 @@ interface ArtistMediaTabsProps {
   mvHasMore?: boolean
   albumSentinelRef: Ref<HTMLDivElement>
   mvSentinelRef: Ref<HTMLDivElement>
+  onToAlbumDetail: (id: number) => void
+  onToMvDetail: (id: number) => void
 }
 
 function formatPlayCount(playCount?: number) {
@@ -32,6 +34,8 @@ const ArtistMediaTabs = ({
   mvHasMore = false,
   albumSentinelRef,
   mvSentinelRef,
+  onToAlbumDetail,
+  onToMvDetail,
 }: ArtistMediaTabsProps) => {
   return (
     <section className='space-y-5'>
@@ -68,6 +72,7 @@ const ArtistMediaTabs = ({
                   <article
                     key={album.id}
                     className='border-border/50 bg-card/72 overflow-hidden rounded-[24px] border p-4 shadow-[0_16px_36px_rgba(15,23,42,0.08)]'
+                    onClick={() => onToAlbumDetail(album.id)}
                   >
                     <div className='relative overflow-hidden rounded-[20px]'>
                       <img
@@ -114,7 +119,8 @@ const ArtistMediaTabs = ({
                 {mvs.map(mv => (
                   <article
                     key={mv.id}
-                    className='border-border/50 bg-card/72 flex gap-4 rounded-[24px] border p-4 shadow-[0_16px_36px_rgba(15,23,42,0.08)]'
+                    className='group border-border/50 bg-card/72 flex cursor-pointer gap-4 rounded-[24px] border p-4 shadow-[0_16px_36px_rgba(15,23,42,0.08)] transition-transform duration-300 hover:-translate-y-1'
+                    onClick={() => onToMvDetail(mv.id)}
                   >
                     <div className='relative min-w-0 flex-1 overflow-hidden rounded-[20px]'>
                       <img
@@ -125,8 +131,10 @@ const ArtistMediaTabs = ({
                         decoding='async'
                         draggable={false}
                       />
-                      <div className='absolute inset-0 flex items-center justify-center bg-black/12'>
-                        <PlayCircle className='size-12 text-white/90' />
+                      <div className='absolute inset-0 flex items-center justify-center bg-black/10 transition-colors duration-300 group-hover:bg-black/16'>
+                        <span className='inline-flex size-12 items-center justify-center rounded-full border border-white/75 bg-white/18 text-white shadow-[0_10px_24px_rgba(15,23,42,0.18)] backdrop-blur-sm transition-transform duration-300 group-hover:scale-[1.04]'>
+                          <Play className='ml-0.5 size-4 fill-current' />
+                        </span>
                       </div>
                     </div>
                     <div className='flex min-w-0 basis-[38%] flex-col justify-center gap-2'>
