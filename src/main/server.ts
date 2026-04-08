@@ -1,3 +1,8 @@
+import {
+  createMusicApiBaseUrl,
+  type MusicApiRuntimeInfo,
+} from './music-api-runtime'
+
 /**
  * Check if a port is available
  * @param port
@@ -18,32 +23,53 @@ function checkPortAvailable(port: number): Promise<boolean> {
   })
 }
 
-async function startMusicApi(): Promise<void> {
+async function waitForMusicApiListening(server?: {
+  listening?: boolean
+  once: (event: string, listener: (...args: unknown[]) => void) => void
+}): Promise<void> {
+  if (!server || server.listening) {
+    return
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    server.once('listening', () => resolve())
+    server.once('error', error => reject(error))
+  })
+}
+
+async function startMusicApi(): Promise<MusicApiRuntimeInfo> {
   console.log('MUSIC API STARTING...')
   let port = 7703
   const maxRetries = 10
-  // 检查端口是否可用，如果不可用则尝试下一个端口
+
   for (let i = 0; i < maxRetries; i++) {
     const isAvailable = await checkPortAvailable(port)
     if (isAvailable) {
       break
     }
-    console.log(`端口 ${port} 被占用，尝试切换到端口 ${port + 1}`)
+
+    console.log(`port ${port} is busy, switching to ${port + 1}`)
     port++
   }
 
-  // 如果端口发生变化，保存新端口到配置
-
   try {
-    const server = require('@neteasecloudmusicapienhanced/api/server')
-    await server.serveNcmApi({
+    const musicApiServer = require('@neteasecloudmusicapienhanced/api/server')
+    const app = await musicApiServer.serveNcmApi({
       port,
-      // 安全默认值：仅监听本机回环地址，避免对局域网暴露
       host: '127.0.0.1',
     })
+
+    await waitForMusicApiListening(app?.server)
+
+    const runtimeInfo = {
+      port,
+      baseURL: createMusicApiBaseUrl(port),
+    }
+
     console.log(`MUSIC API STARTED on port ${port}`)
+    return runtimeInfo
   } catch (error) {
-    console.error(`MUSIC API 启动失败:`, error)
+    console.error('MUSIC API start failed:', error)
     throw error
   }
 }

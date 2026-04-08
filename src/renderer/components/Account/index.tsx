@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/hooks/useTheme'
 
 const getAvatarFallback = (nickname: string | null) => {
   if (!nickname?.trim()) {
@@ -20,12 +21,12 @@ const getAvatarFallback = (nickname: string | null) => {
 }
 
 const AccountControl = ({
-  isDark,
+  currentTheme,
   onOpenDownloads,
   onToggleTheme,
   onOpenSettings,
 }: {
-  isDark: boolean
+  currentTheme: string
   onOpenDownloads: () => void
   onToggleTheme: () => void
   onOpenSettings: () => void
@@ -61,6 +62,9 @@ const AccountControl = ({
     }, 120)
   }
 
+  const isDark = useMemo(() => {
+    return currentTheme === 'dark'
+  }, [currentTheme])
   useEffect(() => () => clearCloseTimer(), [])
 
   return (
@@ -138,7 +142,7 @@ const AccountControl = ({
           >
             {isDark ? <Sun className='size-4' /> : <Moon className='size-4' />}
             <div className='flex flex-col'>
-              <span className='font-semibold'>
+              <span className='font-semibold' onClick={onToggleTheme}>
                 {isDark ? '切换到浅色模式' : '切换到深色模式'}
               </span>
             </div>

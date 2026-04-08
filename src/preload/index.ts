@@ -1,5 +1,5 @@
-import { contextBridge } from 'electron';
+import { exposeConfigApi } from './api/config-api'
+import { exposeRuntimeApi } from './api/runtime-api'
 
-contextBridge.exposeInMainWorld('electron', {
-  versions: process.versions,
-});
+exposeConfigApi()
+exposeRuntimeApi()

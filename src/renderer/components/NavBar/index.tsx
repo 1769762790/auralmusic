@@ -12,7 +12,7 @@ const NavBar = () => {
   const menuData = routeMenuConfig[0]?.children || []
 
   return (
-    <nav className='flex h-full w-full items-center justify-center px-4'>
+    <nav className='group flex h-full w-full items-center justify-center px-4'>
       <NavigationMenu>
         <NavigationMenuList>
           {menuData.map(

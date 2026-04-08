@@ -18,10 +18,16 @@ export function useIntersectionLoadMore<T>(
   const [hasMore, setHasMore] = useState(true)
   const [resetVersion, setResetVersion] = useState(0)
 
-  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [sentinelElement, setSentinelElement] = useState<HTMLDivElement | null>(
+    null
+  )
   const requestVersionRef = useRef(0)
   const loadingRef = useRef(false)
   const canBootstrapRef = useRef(false)
+
+  const sentinelRef = useCallback((node: HTMLDivElement | null) => {
+    setSentinelElement(node)
+  }, [])
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadingRef.current) return
@@ -70,17 +76,16 @@ export function useIntersectionLoadMore<T>(
       { threshold }
     )
 
-    const currentElement = sentinelRef.current
-    if (currentElement) {
-      observer.observe(currentElement)
+    if (sentinelElement) {
+      observer.observe(sentinelElement)
     }
 
     return () => {
-      if (currentElement) {
-        observer.unobserve(currentElement)
+      if (sentinelElement) {
+        observer.unobserve(sentinelElement)
       }
     }
-  }, [hasMore, loadMore, loading, threshold])
+  }, [hasMore, loadMore, loading, sentinelElement, threshold])
 
   useEffect(() => {
     if (!canBootstrapRef.current) {

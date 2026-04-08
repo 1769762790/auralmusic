@@ -1,4 +1,5 @@
-import { Clapperboard, Disc3, PlayCircle } from 'lucide-react'
+﻿import type { Ref } from 'react'
+import { PlayCircle } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   formatArtistPublishDate,
@@ -9,14 +10,29 @@ import {
 interface ArtistMediaTabsProps {
   albums: ArtistAlbumItem[]
   mvs: ArtistMvItem[]
+  albumLoading?: boolean
+  mvLoading?: boolean
+  albumHasMore?: boolean
+  mvHasMore?: boolean
+  albumSentinelRef: Ref<HTMLDivElement>
+  mvSentinelRef: Ref<HTMLDivElement>
 }
 
 function formatPlayCount(playCount?: number) {
-  if (!playCount) return '���޲���'
+  if (!playCount) return '暂无播放'
   return new Intl.NumberFormat('zh-CN').format(playCount)
 }
 
-const ArtistMediaTabs = ({ albums, mvs }: ArtistMediaTabsProps) => {
+const ArtistMediaTabs = ({
+  albums,
+  mvs,
+  albumLoading = false,
+  mvLoading = false,
+  albumHasMore = false,
+  mvHasMore = false,
+  albumSentinelRef,
+  mvSentinelRef,
+}: ArtistMediaTabsProps) => {
   return (
     <section className='space-y-5'>
       <Tabs defaultValue='albums' className='gap-5'>
@@ -40,77 +56,101 @@ const ArtistMediaTabs = ({ albums, mvs }: ArtistMediaTabsProps) => {
           </TabsList>
         </div>
 
-        <TabsContent value='albums'>
-          {albums.length === 0 ? (
+        <TabsContent value='albums' className='space-y-6'>
+          {albums.length === 0 && !albumLoading ? (
             <div className='border-border/60 bg-card/68 text-muted-foreground rounded-[30px] border px-6 py-10 text-sm'>
-              专辑
+              暂无专辑内容
             </div>
           ) : (
-            <div className='grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4'>
-              {albums.map(album => (
-                <article
-                  key={album.id}
-                  className='border-border/50 bg-card/72 overflow-hidden rounded-[24px] border p-4 shadow-[0_16px_36px_rgba(15,23,42,0.08)]'
-                >
-                  <div className='relative overflow-hidden rounded-[20px]'>
-                    <img
-                      src={album.picUrl}
-                      alt={album.name}
-                      className='aspect-square size-full object-cover'
-                      loading='lazy'
-                      decoding='async'
-                      draggable={false}
-                    />
-                  </div>
-                  <div className='mt-4 space-y-1.5'>
-                    <h3 className='truncate text-lg font-bold'>{album.name}</h3>
-                    <p className='text-muted-foreground text-sm'>
-                      {formatArtistPublishDate(album.publishTime)}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <>
+              <div className='grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-6'>
+                {albums.map(album => (
+                  <article
+                    key={album.id}
+                    className='border-border/50 bg-card/72 overflow-hidden rounded-[24px] border p-4 shadow-[0_16px_36px_rgba(15,23,42,0.08)]'
+                  >
+                    <div className='relative overflow-hidden rounded-[20px]'>
+                      <img
+                        src={album.picUrl}
+                        alt={album.name}
+                        className='aspect-square size-full object-cover'
+                        loading='lazy'
+                        decoding='async'
+                        draggable={false}
+                      />
+                    </div>
+                    <div className='mt-4 space-y-1.5'>
+                      <h3 className='truncate text-lg font-bold'>
+                        {album.name}
+                      </h3>
+                      <p className='text-muted-foreground text-sm'>
+                        {formatArtistPublishDate(album.publishTime)}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <div
+                ref={albumSentinelRef}
+                className='text-muted-foreground flex h-16 items-center justify-center text-sm'
+              >
+                {albumLoading ? '正在加载更多专辑...' : null}
+                {!albumLoading && !albumHasMore && albums.length > 0
+                  ? '没有更多专辑了'
+                  : null}
+              </div>
+            </>
           )}
         </TabsContent>
 
-        <TabsContent value='mvs'>
-          {mvs.length === 0 ? (
+        <TabsContent value='mvs' className='space-y-6'>
+          {mvs.length === 0 && !mvLoading ? (
             <div className='border-border/60 bg-card/68 text-muted-foreground rounded-[30px] border px-6 py-10 text-sm'>
-              MV
+              暂无 MV 内容
             </div>
           ) : (
-            <div className='grid grid-cols-2 gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4'>
-              {mvs.map(mv => (
-                <article
-                  key={mv.id}
-                  className='border-border/50 bg-card/72 flex gap-4 rounded-[24px] border p-4 shadow-[0_16px_36px_rgba(15,23,42,0.08)]'
-                >
-                  <div className='relative min-w-0 flex-1 overflow-hidden rounded-[20px]'>
-                    <img
-                      src={mv.coverUrl}
-                      alt={mv.name}
-                      className='aspect-[16/9] size-full object-cover'
-                      loading='lazy'
-                      decoding='async'
-                      draggable={false}
-                    />
-                    <div className='absolute inset-0 flex items-center justify-center bg-black/12'>
-                      <PlayCircle className='size-12 text-white/90' />
+            <>
+              <div className='grid grid-cols-2 gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4'>
+                {mvs.map(mv => (
+                  <article
+                    key={mv.id}
+                    className='border-border/50 bg-card/72 flex gap-4 rounded-[24px] border p-4 shadow-[0_16px_36px_rgba(15,23,42,0.08)]'
+                  >
+                    <div className='relative min-w-0 flex-1 overflow-hidden rounded-[20px]'>
+                      <img
+                        src={mv.coverUrl}
+                        alt={mv.name}
+                        className='aspect-[16/9] size-full object-cover'
+                        loading='lazy'
+                        decoding='async'
+                        draggable={false}
+                      />
+                      <div className='absolute inset-0 flex items-center justify-center bg-black/12'>
+                        <PlayCircle className='size-12 text-white/90' />
+                      </div>
                     </div>
-                  </div>
-                  <div className='flex min-w-0 basis-[38%] flex-col justify-center gap-2'>
-                    <h3 className='truncate text-xl font-bold'>{mv.name}</h3>
-                    <p className='text-muted-foreground text-sm'>
-                      {formatArtistPublishDate(mv.publishTime)}
-                    </p>
-                    <p className='text-muted-foreground text-sm'>
-                      播放次数 {formatPlayCount(mv.playCount)}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
+                    <div className='flex min-w-0 basis-[38%] flex-col justify-center gap-2'>
+                      <h3 className='truncate text-xl font-bold'>{mv.name}</h3>
+                      <p className='text-muted-foreground text-sm'>
+                        {formatArtistPublishDate(mv.publishTime)}
+                      </p>
+                      <p className='text-muted-foreground text-sm'>
+                        播放次数 {formatPlayCount(mv.playCount)}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <div
+                ref={mvSentinelRef}
+                className='text-muted-foreground flex h-16 items-center justify-center text-sm'
+              >
+                {mvLoading ? '正在加载更多 MV...' : null}
+                {!mvLoading && !mvHasMore && mvs.length > 0
+                  ? '没有更多 MV 了'
+                  : null}
+              </div>
+            </>
           )}
         </TabsContent>
       </Tabs>

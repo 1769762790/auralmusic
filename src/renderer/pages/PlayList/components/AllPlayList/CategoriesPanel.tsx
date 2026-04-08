@@ -35,7 +35,7 @@ const CategoriesPanel = ({ categoryData, className, currentCat, onSelect }) => {
 
   console.log('groupedCategories', groupedCategories)
   return (
-    <div className={cn('w-full space-y-8 bg-white p-4', className)}>
+    <div className={cn('bg-background w-full space-y-8 p-4', className)}>
       {/* 遍历每个分类 */}
       {Object.entries(groupedCategories).map(([categoryName, list]) => (
         <div key={categoryName} className='flex'>

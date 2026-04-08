@@ -36,7 +36,8 @@ const ArtistHero = ({ profile, summary }: ArtistHeroProps) => {
             {profile.name}
           </h1>
           <p className='text-muted-foreground mt-5 text-lg'>
-            {profile.identity} · {profile.musicSize}首歌2 · {profile.albumSize}
+            {profile.identity}
+            {profile.musicSize}首歌 · {profile.albumSize}
             张专辑 ·{profile.mvSize}个MV
           </p>
         </div>

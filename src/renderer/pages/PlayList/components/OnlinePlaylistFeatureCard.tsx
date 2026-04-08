@@ -45,7 +45,7 @@ export const OnlinePlaylistFeatureCard = ({
         <Button
           type='button'
           size='icon'
-          disabled={card.disabled}
+          disabled={card?.disabled}
           className='size-12 rounded-full border border-white/18 bg-white/12 text-white backdrop-blur-md hover:bg-white/20 disabled:cursor-default disabled:opacity-45'
           onClick={onPlay}
         >

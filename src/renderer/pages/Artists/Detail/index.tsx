@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   getArtistAlbums,
@@ -6,29 +6,26 @@ import {
   getArtistDetail,
   getArtistMvs,
   getArtistTopSongs,
-  // getSimilarArtists,
 } from '@/api/artist'
-import ArtistDescription from './components/ArtistDescription'
+import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
 import ArtistDetailSkeleton from './components/ArtistDetailSkeleton'
 import ArtistHero from './components/ArtistHero'
 import ArtistLatestRelease from './components/ArtistLatestRelease'
 import ArtistMediaTabs from './components/ArtistMediaTabs'
 import ArtistTopSongs from './components/ArtistTopSongs'
-// import SimilarArtists from './components/SimilarArtists'
 import {
   EMPTY_ARTIST_DESCRIPTION,
+  type ArtistAlbumItem,
   type ArtistDescPayload,
   type ArtistDetailPageState,
   type ArtistDetailProfile,
+  type ArtistMvItem,
   type ArtistTopSongItem,
 } from '../artist-detail.model'
 
 const INITIAL_STATE: ArtistDetailPageState = {
   profile: null,
   topSongs: [],
-  albums: [],
-  mvs: [],
-  similarArtists: [],
   description: EMPTY_ARTIST_DESCRIPTION,
 }
 
@@ -178,7 +175,7 @@ function normalizeAlbums(
     hotAlbums?: RawArtistAlbum[]
     albums?: RawArtistAlbum[]
   }>
-) {
+): ArtistAlbumItem[] {
   const payload = unwrapPayload(response)
   return (payload?.hotAlbums || payload?.albums || []).map(album => ({
     id: album.id,
@@ -189,7 +186,9 @@ function normalizeAlbums(
   }))
 }
 
-function normalizeMvs(response: RawArtistResponse<{ mvs?: RawArtistMv[] }>) {
+function normalizeMvs(
+  response: RawArtistResponse<{ mvs?: RawArtistMv[] }>
+): ArtistMvItem[] {
   const payload = unwrapPayload(response)
   return (payload?.mvs || []).map(mv => ({
     id: mv.id || mv.vid || 0,
@@ -197,19 +196,6 @@ function normalizeMvs(response: RawArtistResponse<{ mvs?: RawArtistMv[] }>) {
     coverUrl: mv.imgurl16v9 || mv.cover || '',
     publishTime: mv.publishTime,
     playCount: mv.playCount,
-  }))
-}
-
-function normalizeSimilarArtists(
-  response: RawArtistResponse<{ artists?: RawArtistProfile[] }>
-) {
-  const payload = unwrapPayload(response)
-  return (payload?.artists || []).map(artist => ({
-    id: artist.id || 0,
-    name: artist.name || '未知歌手',
-    picUrl: artist.picUrl || artist.img1v1Url || '',
-    musicSize: artist.musicSize,
-    albumSize: artist.albumSize,
   }))
 }
 
@@ -250,6 +236,69 @@ const ArtistDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const fetchAlbumsPage = useCallback(
+    async (offset: number, limit: number) => {
+      if (!artistId) {
+        return { list: [], hasMore: false }
+      }
+
+      const response = await getArtistAlbums({ id: artistId, limit, offset })
+      const albums = normalizeAlbums(response)
+
+      return {
+        list: albums,
+        hasMore: albums.length >= limit,
+      }
+    },
+    [artistId]
+  )
+
+  const fetchMvsPage = useCallback(
+    async (offset: number, limit: number) => {
+      if (!artistId) {
+        return { list: [], hasMore: false }
+      }
+
+      const response = await getArtistMvs({ id: artistId, limit, offset })
+      const mvs = normalizeMvs(response)
+
+      return {
+        list: mvs,
+        hasMore: mvs.length >= limit,
+      }
+    },
+    [artistId]
+  )
+
+  const {
+    data: albums,
+    loading: albumsLoading,
+    hasMore: albumHasMore,
+    sentinelRef: albumSentinelRef,
+    reset: resetAlbums,
+  } = useIntersectionLoadMore<ArtistAlbumItem>(fetchAlbumsPage, {
+    limit: PAGE_SIZE,
+  })
+
+  const {
+    data: mvs,
+    loading: mvsLoading,
+    hasMore: mvHasMore,
+    sentinelRef: mvSentinelRef,
+    reset: resetMvs,
+  } = useIntersectionLoadMore<ArtistMvItem>(fetchMvsPage, {
+    limit: PAGE_SIZE,
+  })
+
+  useEffect(() => {
+    if (!artistId) {
+      return
+    }
+
+    resetAlbums()
+    resetMvs()
+  }, [artistId, resetAlbums, resetMvs])
+
   useEffect(() => {
     if (!artistId) {
       setLoading(false)
@@ -265,34 +314,20 @@ const ArtistDetail = () => {
       setState(INITIAL_STATE)
 
       try {
-        const [
-          detailResponse,
-          topSongsResponse,
-          albumsResponse,
-          mvsResponse,
-          // similarResponse,
-          descResponse,
-        ] = await Promise.all([
-          getArtistDetail({ id: artistId }),
-          getArtistTopSongs({ id: artistId }),
-          getArtistAlbums({ id: artistId, limit: PAGE_SIZE, offset: 0 }),
-          getArtistMvs({ id: artistId, limit: PAGE_SIZE, offset: 0 }),
-          // getSimilarArtists({ id: artistId }),
-          getArtistDesc({ id: artistId }),
-        ])
+        const [detailResponse, topSongsResponse, descResponse] =
+          await Promise.all([
+            getArtistDetail({ id: artistId }),
+            getArtistTopSongs({ id: artistId }),
+            getArtistDesc({ id: artistId }),
+          ])
 
         if (!isActive) {
           return
         }
 
-        console.log('detailResponse', detailResponse)
-
         setState({
           profile: normalizeArtistProfile(detailResponse),
           topSongs: normalizeTopSongs(topSongsResponse),
-          albums: normalizeAlbums(albumsResponse),
-          mvs: normalizeMvs(mvsResponse),
-          // similarArtists: normalizeSimilarArtists(similarResponse),
           description: normalizeDescription(descResponse),
         })
       } catch (fetchError) {
@@ -318,10 +353,10 @@ const ArtistDetail = () => {
 
   const latestRelease = useMemo(
     () => ({
-      album: state.albums[0] || null,
-      mv: state.mvs[0] || null,
+      album: albums[0] || null,
+      mv: mvs[0] || null,
     }),
-    [state.albums, state.mvs]
+    [albums, mvs]
   )
 
   if (loading && !state.profile) {
@@ -354,10 +389,22 @@ const ArtistDetail = () => {
         profile={state.profile}
         summary={getHeroSummary(state.description)}
       />
-      <ArtistLatestRelease latestRelease={latestRelease} />
+      <ArtistLatestRelease
+        latestRelease={latestRelease}
+        albumsLoading={albumsLoading}
+        mvsLoading={mvsLoading}
+      />
       <ArtistTopSongs songs={state.topSongs} />
-      <ArtistMediaTabs albums={state.albums} mvs={state.mvs} />
-      {/* <SimilarArtists artists={state.similarArtists} /> */}
+      <ArtistMediaTabs
+        albums={albums}
+        mvs={mvs}
+        albumLoading={albumsLoading}
+        mvLoading={mvsLoading}
+        albumHasMore={albumHasMore}
+        mvHasMore={mvHasMore}
+        albumSentinelRef={albumSentinelRef}
+        mvSentinelRef={mvSentinelRef}
+      />
     </section>
   )
 }

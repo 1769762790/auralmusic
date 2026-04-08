@@ -7,7 +7,7 @@ import {
   getRecommendSongs,
   getTopArtists,
 } from '@/api/list'
-import { useDailySongs } from '@/store/useDailySongs'
+import { useDailySongs } from '@/stores/useDailySongs'
 import TopArtists from './components/TopArtists'
 import NewAlbumList from './components/NewAlbumList'
 import { getAlbumNewSet } from '@/api/album'

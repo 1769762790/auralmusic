@@ -13,6 +13,8 @@ body {
   scrollbar-width: none;
   /* IE 浏览器 */
   -ms-overflow-style: none;
+
+  transition: all 300ms ease-in-out;
 }
 
 /* Chrome / Edge / Safari 浏览器 */

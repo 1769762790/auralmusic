@@ -115,7 +115,7 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-:root.dark {
+/* :root.dark {
   --background: #09090b;
   --foreground: #f5f7fb;
   --card: rgba(17, 17, 22, 0.86);
@@ -161,7 +161,7 @@
   --player-scene-veil: rgba(8, 9, 16, 0.2);
   --player-scene-side: rgba(8, 9, 16, 0.08);
   --player-cover-opacity: 0.95;
-}
+} */
 
 @layer base {
   * {

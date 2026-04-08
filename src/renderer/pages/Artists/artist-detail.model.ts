@@ -1,4 +1,4 @@
-export interface ArtistDetailProfile {
+﻿export interface ArtistDetailProfile {
   id: number
   name: string
   coverUrl: string
@@ -39,14 +39,6 @@ export interface ArtistMvItem {
   playCount?: number
 }
 
-// export interface SimilarArtistItem {
-//   id: number
-//   name: string
-//   picUrl: string
-//   musicSize?: number
-//   albumSize?: number
-// }
-
 export interface ArtistDescSection {
   title: string
   content: string
@@ -65,9 +57,6 @@ export interface ArtistLatestReleaseData {
 export interface ArtistDetailPageState {
   profile: ArtistDetailProfile | null
   topSongs: ArtistTopSongItem[]
-  albums: ArtistAlbumItem[]
-  mvs: ArtistMvItem[]
-  // similarArtists: SimilarArtistItem[]
   description: ArtistDescPayload
 }
 
@@ -80,10 +69,10 @@ export function formatArtistDuration(duration: number) {
 }
 
 export function formatArtistPublishDate(timestamp?: number | string) {
-  if (!timestamp) return '��������'
+  if (!timestamp) return '暂无日期'
 
   const date = new Date(timestamp)
-  if (Number.isNaN(date.getTime())) return '��������'
+  if (Number.isNaN(date.getTime())) return '暂无日期'
 
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
     date.getDate()
