@@ -25,7 +25,6 @@ const LoginModeSwitcher = () => {
             onClick={() => setLoginMode(option.value)}
           >
             <Icon className='size-4' />
-            <span className='sm:hidden'>{option.shortLabel}</span>
           </button>
         )
       })}

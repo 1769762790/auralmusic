@@ -13,7 +13,7 @@ const LoginArtwork = () => {
           Welcome back
         </h2>
         <p className='mt-4 text-base leading-7 text-neutral-600'>
-          登录成功后会自动同步网易云数据。
+          登录成功后会自动同步账号信息。
         </p>
       </div>
     </div>

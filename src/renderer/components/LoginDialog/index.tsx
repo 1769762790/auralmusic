@@ -1,5 +1,6 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useAuthStore } from '@/stores/auth-store'
+
 import LoginArtwork from './components/LoginArtwork'
 import LoginForm from './components/LoginForm'
 import LoginModeSwitcher from './components/LoginModeSwitcher'
@@ -12,12 +13,10 @@ const LoginDialog = () => {
   const openLoginDialog = useAuthStore(state => state.openLoginDialog)
   const closeLoginDialog = useAuthStore(state => state.closeLoginDialog)
 
-  console.log('loginMode', loginMode)
-
-  const currentModeLabel = useMemo(() => {
-    return LOGIN_MODE_OPTIONS.filter(item => item.value == loginMode)[0].label
+  const currentLabel = useMemo(() => {
+    return LOGIN_MODE_OPTIONS.filter(item => item.value == loginMode)[0]
+      ?.shortLabel
   }, [loginMode])
-
   return (
     <Dialog
       open={open}
@@ -33,7 +32,7 @@ const LoginDialog = () => {
           <div className='border-border/60 bg-[#f9f7f2] p-6 sm:p-8 lg:border-r lg:p-10'>
             <div className='space-y-2'>
               <h1 className='text-center text-3xl font-black tracking-[-0.05em] text-neutral-950 sm:text-3xl'>
-                {currentModeLabel}登录
+                {currentLabel}登录
               </h1>
             </div>
 
