@@ -89,7 +89,7 @@ const Artists = () => {
 
   return (
     <section className='w-full pb-8'>
-      <div className='border-border/70 bg-background/88 relative overflow-hidden rounded-[34px] border p-6 shadow-[0_30px_90px_rgba(148,163,184,0.14)] backdrop-blur-xl'>
+      <div className='border-border/70 bg-background/88 relative overflow-hidden rounded-[34px] border p-6 shadow-[0_30px_90px_rgba(148,163,184,0.14)] backdrop-blur-xl duration-300'>
         <div className='absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(191,219,254,0.28),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(221,214,254,0.22),transparent_28%)]' />
         <div className='relative space-y-6'>
           <ArtistFilterGroup

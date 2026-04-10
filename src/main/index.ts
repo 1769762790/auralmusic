@@ -1,14 +1,20 @@
-import { app, BrowserWindow, globalShortcut } from 'electron'
+import { app, BrowserWindow, globalShortcut, nativeTheme } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { getConfig } from './config/store'
 import {
   bootstrapAuthSession,
   registerAuthRequestHeaderHook,
 } from './auth/store'
 import { registerAuthIpc } from './ipc/auth-ipc'
 import { registerConfigIpc } from './ipc/config-ipc'
+import { registerWindowIpc, bindWindowStateEvents } from './ipc/window-ipc'
 import { applyMusicApiRuntimeEnv } from './music-api-runtime'
 import { startMusicApi } from './server'
+import {
+  applyWindowTitleBarTheme,
+  syncNativeThemeSource,
+} from './window/titlebar-theme'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -28,17 +34,17 @@ function getPreloadPath() {
 }
 
 function createWindow() {
+  const isMac = process.platform === 'darwin'
+  const isWindows = process.platform === 'win32'
+
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 760,
     minWidth: 1280,
     minHeight: 760,
-    titleBarStyle: 'hiddenInset',
-    titleBarOverlay: {
-      color: '#09090b',
-      symbolColor: '#f5f7fb',
-      height: 52,
-    },
+    frame: !isWindows,
+    titleBarStyle: isMac ? 'hiddenInset' : isWindows ? undefined : 'hidden',
+    titleBarOverlay: isMac ? false : isWindows ? false : true,
     autoHideMenuBar: true,
     webPreferences: {
       preload: getPreloadPath(),
@@ -47,6 +53,7 @@ function createWindow() {
     },
   })
 
+  bindWindowStateEvents(mainWindow)
   mainWindow.setMenu(null)
 
   const rendererUrl = getRendererUrl()
@@ -61,18 +68,30 @@ function createWindow() {
       mainWindow?.webContents.toggleDevTools()
     })
   }
+
+  if (mainWindow) {
+    applyWindowTitleBarTheme(mainWindow)
+  }
 }
 
 app.whenReady().then(async () => {
   registerConfigIpc()
   registerAuthIpc()
+  registerWindowIpc()
 
   try {
     const runtimeInfo = await startMusicApi()
     applyMusicApiRuntimeEnv(runtimeInfo)
     registerAuthRequestHeaderHook()
     await bootstrapAuthSession()
+    syncNativeThemeSource(getConfig('theme'))
     createWindow()
+
+    nativeTheme.on('updated', () => {
+      if (mainWindow) {
+        applyWindowTitleBarTheme(mainWindow)
+      }
+    })
   } catch (error) {
     console.error('Failed to bootstrap Music API runtime:', error)
     app.quit()

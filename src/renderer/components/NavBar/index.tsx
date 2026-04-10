@@ -17,7 +17,7 @@ const NavBar = () => {
   const isAuthenticated = loginStatus === 'authenticated'
 
   return (
-    <nav className='group flex h-full w-full items-center justify-center px-4'>
+    <nav className='window-no-drag group flex h-full w-full items-center justify-center px-4'>
       <NavigationMenu>
         <NavigationMenuList>
           {menuData.map(
@@ -26,7 +26,7 @@ const NavBar = () => {
               (!item.meta.authOnly || isAuthenticated) && (
                 <NavigationMenuItem key={item.meta.title}>
                   <NavigationMenuLink asChild>
-                    <Link to={item.path} className='px-10 text-xl font-bold'>
+                    <Link to={item.path} className='px-8 text-[20px] font-bold'>
                       {item.meta.icon && (
                         <Icon name={item.meta.icon} className='mr-2 h-4 w-4' />
                       )}
