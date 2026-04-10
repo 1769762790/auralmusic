@@ -1,0 +1,184 @@
+import type { DailySongRowItem } from '../DailySongs/daily-songs.model'
+
+interface RawCloudArtist {
+  name?: string
+}
+
+interface RawCloudAlbum {
+  name?: string
+  picUrl?: string
+  coverUrl?: string
+}
+
+interface RawCloudSimpleSong {
+  id?: number
+  name?: string
+  dt?: number
+  ar?: RawCloudArtist[]
+  al?: RawCloudAlbum
+}
+
+interface RawCloudItem {
+  id?: number
+  songId?: number
+  name?: string
+  songName?: string
+  fileName?: string
+  artist?: string
+  artistName?: string
+  album?: string
+  albumName?: string
+  cover?: string
+  coverUrl?: string
+  duration?: number
+  dt?: number
+  simpleSong?: RawCloudSimpleSong
+}
+
+interface RawLibraryCloudBody {
+  data?: RawLibraryCloudBody | RawCloudItem[]
+  more?: boolean
+  hasMore?: boolean
+  count?: number
+}
+
+interface NormalizeLibraryCloudPageOptions {
+  limit: number
+  offset: number
+}
+
+export interface LibraryCloudPage {
+  list: DailySongRowItem[]
+  hasMore: boolean
+}
+
+function unwrapLibraryCloudBody(
+  response?: RawLibraryCloudBody | RawCloudItem[] | null
+): RawLibraryCloudBody | RawCloudItem[] {
+  if (!response) {
+    return {}
+  }
+
+  if (Array.isArray(response)) {
+    return response
+  }
+
+  if (
+    Array.isArray(response.data) ||
+    typeof response.more === 'boolean' ||
+    typeof response.hasMore === 'boolean' ||
+    typeof response.count === 'number'
+  ) {
+    return response
+  }
+
+  if (response.data && typeof response.data === 'object') {
+    return unwrapLibraryCloudBody(response.data)
+  }
+
+  return response
+}
+
+function formatArtistNames(artists?: RawCloudArtist[]) {
+  const joined =
+    artists
+      ?.map(artist => artist.name?.trim() || '')
+      .filter(Boolean)
+      .join(' / ') || ''
+
+  return joined
+}
+
+function resolveArtistNames(item: RawCloudItem) {
+  const simpleSongArtists = formatArtistNames(item.simpleSong?.ar)
+
+  return (
+    simpleSongArtists ||
+    item.artist?.trim() ||
+    item.artistName?.trim() ||
+    '未知歌手'
+  )
+}
+
+function normalizeLibraryCloudList(items?: RawCloudItem[]): DailySongRowItem[] {
+  if (!Array.isArray(items)) {
+    return []
+  }
+
+  return items.flatMap(item => {
+    const id = item.songId ?? item.simpleSong?.id ?? item.id
+
+    if (!id) {
+      return []
+    }
+
+    return [
+      {
+        id,
+        name:
+          item.simpleSong?.name ||
+          item.songName ||
+          item.name ||
+          item.fileName ||
+          '未知歌曲',
+        artistNames: resolveArtistNames(item),
+        albumName:
+          item.simpleSong?.al?.name ||
+          item.album?.trim() ||
+          item.albumName?.trim() ||
+          '未知专辑',
+        coverUrl:
+          item.simpleSong?.al?.picUrl ||
+          item.simpleSong?.al?.coverUrl ||
+          item.coverUrl ||
+          item.cover ||
+          '',
+        duration: item.simpleSong?.dt || item.duration || item.dt || 0,
+      },
+    ]
+  })
+}
+
+export function normalizeLibraryCloudPage(
+  response?: RawLibraryCloudBody | null,
+  { limit, offset }: NormalizeLibraryCloudPageOptions = { limit: 30, offset: 0 }
+): LibraryCloudPage {
+  const body = unwrapLibraryCloudBody(response)
+
+  if (Array.isArray(body)) {
+    return {
+      list: normalizeLibraryCloudList(body),
+      hasMore: body.length >= limit,
+    }
+  }
+
+  const list = normalizeLibraryCloudList(
+    Array.isArray(body.data) ? body.data : undefined
+  )
+
+  if (typeof body.more === 'boolean') {
+    return {
+      list,
+      hasMore: body.more,
+    }
+  }
+
+  if (typeof body.hasMore === 'boolean') {
+    return {
+      list,
+      hasMore: body.hasMore,
+    }
+  }
+
+  if (typeof body.count === 'number') {
+    return {
+      list,
+      hasMore: offset + list.length < body.count,
+    }
+  }
+
+  return {
+    list,
+    hasMore: list.length >= limit,
+  }
+}

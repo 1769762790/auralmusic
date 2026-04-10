@@ -1,7 +1,10 @@
 import { app, BrowserWindow, globalShortcut } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { bootstrapAuthSession } from './auth/store'
+import {
+  bootstrapAuthSession,
+  registerAuthRequestHeaderHook,
+} from './auth/store'
 import { registerAuthIpc } from './ipc/auth-ipc'
 import { registerConfigIpc } from './ipc/config-ipc'
 import { applyMusicApiRuntimeEnv } from './music-api-runtime'
@@ -67,6 +70,7 @@ app.whenReady().then(async () => {
   try {
     const runtimeInfo = await startMusicApi()
     applyMusicApiRuntimeEnv(runtimeInfo)
+    registerAuthRequestHeaderHook()
     await bootstrapAuthSession()
     createWindow()
   } catch (error) {

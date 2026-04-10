@@ -8,8 +8,19 @@ export interface ArtistListParams {
   limit?: number
 }
 
+export interface SubscribedArtistListParams {
+  limit?: number
+  offset?: number
+}
+
 export function getArtistList(params: ArtistListParams) {
   return request.get('/artist/list', {
+    params,
+  })
+}
+
+export function getSubscribedArtists(params: SubscribedArtistListParams) {
+  return request.get('/artist/sublist', {
     params,
   })
 }

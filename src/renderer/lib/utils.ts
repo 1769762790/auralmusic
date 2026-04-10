@@ -22,3 +22,12 @@ export function chunkArray<T>(arr: T[], count: number): T[][] {
   }
   return result
 }
+
+/**
+ * 判断值是否 非null、非undefined
+ * @param value 任意值
+ * @returns boolean
+ */
+export function isDef<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined
+}

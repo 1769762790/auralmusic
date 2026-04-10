@@ -100,6 +100,7 @@ const MvDetailPlayer = ({
           options={PLAYER_OPTIONS}
           playsInline
           preload='metadata'
+          style={{ height: '100%' }}
         />
       </div>
     </div>

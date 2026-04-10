@@ -71,6 +71,20 @@ export function getRecommendSongs() {
   return request.get('/recommend/songs')
 }
 
+export function getLikeList(uid: number | string) {
+  return request.get('/likelist', {
+    params: { uid },
+  })
+}
+
+export function getSongDetail(ids: Array<number | string> | number | string) {
+  const value = Array.isArray(ids) ? ids.join(',') : ids
+
+  return request.get('/song/detail', {
+    params: { ids: value },
+  })
+}
+
 export interface TopArtistsParams {
   limit?: number
   offset?: number
@@ -94,6 +108,23 @@ export function getPersonalizedNewSong(limit?: number) {
   return request.get('/personalized/newsong', {
     params: {
       limit,
+    },
+  })
+}
+
+/**
+ *
+ * @param id 歌单 id
+ * @param limit
+ * @param offset
+ * @returns
+ */
+export function getPlaylistTrackAll(id: number, limit: number, offset: number) {
+  return request.get('/playlist/track/all', {
+    params: {
+      id,
+      limit,
+      offset,
     },
   })
 }

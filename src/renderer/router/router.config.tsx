@@ -1,15 +1,18 @@
-﻿import type { RouteMenuConfig } from './router.type'
+import type { RouteMenuConfig } from './router.type'
+
 import AppLayout from '../layout/AppLayout'
-import Home from '@/pages/Home'
-import DailySongs from '@/pages/DailySongs'
+import AlbumDetail from '@/pages/Albums/Detail'
+import Albums from '@/pages/Albums'
+import ArtistDetail from '@/pages/Artists/Detail'
+import Artists from '@/pages/Artists'
 import Charts from '@/pages/Charts'
+import DailySongs from '@/pages/DailySongs'
+import Home from '@/pages/Home'
+import Library from '@/pages/Library'
+import LikedSongs from '@/pages/LikedSongs'
+import MvDetail from '@/pages/Mv/Detail'
 import PlayList from '@/pages/PlayList'
 import PlaylistDetail from '@/pages/PlayList/Detail'
-import MvDetail from '@/pages/Mv/Detail'
-import Artists from '@/pages/Artists'
-import ArtistDetail from '@/pages/Artists/Detail'
-import Albums from '@/pages/Albums'
-import AlbumDetail from '@/pages/Albums/Detail'
 
 export const routeMenuConfig: RouteMenuConfig[] = [
   {
@@ -26,6 +29,16 @@ export const routeMenuConfig: RouteMenuConfig[] = [
         path: '/daily-songs',
         element: <DailySongs />,
         meta: { title: '每日推荐', icon: '', hidden: true },
+      },
+      {
+        path: '/library',
+        element: <Library />,
+        meta: { title: '乐库', icon: '', authOnly: true },
+      },
+      {
+        path: '/library/liked-songs',
+        element: <LikedSongs />,
+        meta: { title: '我喜欢的音乐', icon: '', hidden: true, authOnly: true },
       },
       {
         path: '/charts',

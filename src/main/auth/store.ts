@@ -3,6 +3,7 @@ import Store from 'electron-store'
 import { AUTH_STORE_NAME } from './types'
 import { readMusicApiBaseUrlFromEnv } from '../music-api-runtime'
 import { parseCookiePairs, type AuthSession } from '../../shared/auth'
+import { resolveAuthRequestHeaders } from './request-header'
 
 interface AuthStoreSchema {
   session: AuthSession | null
@@ -30,6 +31,7 @@ class AuthStore {
 }
 
 const authStore = AuthStore.getInstance()
+let authRequestHookRegistered = false
 
 function resolveAuthOrigin() {
   const baseURL = readMusicApiBaseUrlFromEnv()
@@ -111,4 +113,23 @@ export async function bootstrapAuthSession() {
 
   await applyAuthCookies(currentSession)
   return currentSession
+}
+
+export function registerAuthRequestHeaderHook() {
+  if (authRequestHookRegistered) {
+    return
+  }
+
+  authRequestHookRegistered = true
+
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    callback({
+      requestHeaders: resolveAuthRequestHeaders({
+        authOrigin: resolveAuthOrigin(),
+        authSession: authStore.get('session'),
+        requestHeaders: details.requestHeaders,
+        requestUrl: details.url,
+      }),
+    })
+  })
 }

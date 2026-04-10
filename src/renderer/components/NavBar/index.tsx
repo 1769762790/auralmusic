@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom'
+
 import { routeMenuConfig } from '@/router/router.config'
+import { useAuthStore } from '@/stores/auth-store'
+
 import Icon from '../Icon'
 import {
   NavigationMenu,
@@ -10,6 +13,8 @@ import {
 
 const NavBar = () => {
   const menuData = routeMenuConfig[0]?.children || []
+  const loginStatus = useAuthStore(state => state.loginStatus)
+  const isAuthenticated = loginStatus === 'authenticated'
 
   return (
     <nav className='group flex h-full w-full items-center justify-center px-4'>
@@ -17,7 +22,8 @@ const NavBar = () => {
         <NavigationMenuList>
           {menuData.map(
             item =>
-              !item.meta.hidden && (
+              !item.meta.hidden &&
+              (!item.meta.authOnly || isAuthenticated) && (
                 <NavigationMenuItem key={item.meta.title}>
                   <NavigationMenuLink asChild>
                     <Link to={item.path} className='px-10 text-xl font-bold'>

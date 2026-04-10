@@ -3,13 +3,13 @@ import { useParams } from 'react-router-dom'
 import { getPlaylistDetail, getPlaylistTracks } from '@/api/list'
 import PlaylistDetailHero from './components/PlaylistDetailHero'
 import PlaylistDetailSkeleton from './components/PlaylistDetailSkeleton'
-import PlaylistTrackTable from './components/PlaylistTrackTable'
 import {
   EMPTY_PLAYLIST_DETAIL_STATE,
   normalizePlaylistDetailHero,
   normalizePlaylistTracks,
   type PlaylistDetailPageState,
 } from './playlist-detail.model'
+import TrackList from '@/components/TrackList'
 
 const PlaylistDetail = () => {
   const { id } = useParams()
@@ -96,7 +96,7 @@ const PlaylistDetail = () => {
   return (
     <section className='space-y-10 pb-8'>
       <PlaylistDetailHero hero={state.hero} />
-      <PlaylistTrackTable tracks={state.tracks} />
+      <TrackList data={state.tracks} />
     </section>
   )
 }

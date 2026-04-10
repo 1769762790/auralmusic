@@ -4,6 +4,7 @@ import {
   formatPlaylistUpdateDate,
   type PlaylistDetailHeroData,
 } from '../playlist-detail.model'
+import AvatarCover from '@/components/AvatarCover'
 
 interface PlaylistDetailHeroProps {
   hero: PlaylistDetailHeroData
@@ -12,22 +13,14 @@ interface PlaylistDetailHeroProps {
 const PlaylistDetailHero = ({ hero }: PlaylistDetailHeroProps) => {
   return (
     <section className='grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start'>
-      <div className='border-border/60 bg-card/80 relative aspect-square overflow-hidden rounded-[28px] border shadow-[0_28px_80px_rgba(15,23,42,0.14)]'>
+      <div className='relative'>
         {hero.coverUrl ? (
-          <img
-            src={hero.coverUrl}
-            alt={hero.name}
-            className='size-full object-cover'
-            loading='eager'
-            decoding='async'
-            draggable={false}
-          />
+          <AvatarCover shadowClassName='top-4 left-3' url={hero.coverUrl} />
         ) : (
           <div className='from-muted to-muted/70 text-muted-foreground flex size-full items-center justify-center bg-gradient-to-br text-5xl font-black tracking-[-0.08em]'>
             PL
           </div>
         )}
-        <div className='pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(15,23,42,0.08))]' />
       </div>
 
       <div className='flex h-full flex-col justify-between gap-6'>

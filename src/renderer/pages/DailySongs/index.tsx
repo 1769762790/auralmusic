@@ -8,6 +8,7 @@ import {
   normalizeDailySongs,
   type DailySongsPageState,
 } from './daily-songs.model'
+import TrackList from '@/components/TrackList'
 
 const DailySongs = () => {
   const [state, setState] = useState<DailySongsPageState>(
@@ -56,7 +57,7 @@ const DailySongs = () => {
   }, [])
 
   return (
-    <section className='relative isolate min-h-full overflow-hidden pb-8'>
+    <section className='relative isolate min-h-full overflow-hidden'>
       <DailySongsHero totalSongs={state.songs.length} />
 
       {loading && state.songs.length === 0 ? (
@@ -66,7 +67,8 @@ const DailySongs = () => {
           <div className='px-6 py-12 text-center text-sm'>{error}</div>
         </div>
       ) : (
-        <DailySongsList songs={state.songs} />
+        // <DailySongsList songs={state.songs} />
+        <TrackList data={state.songs} />
       )}
     </section>
   )

@@ -15,7 +15,7 @@ const DailySongsList = ({ songs }: DailySongsListProps) => {
   }
 
   return (
-    <section className='mx-auto px-4 pb-10 md:px-6'>
+    <section className='mx-auto px-4 md:px-6'>
       <div className='backdrop-blur'>
         {songs.map(song => (
           <DailySongRow key={song.id} song={song} />

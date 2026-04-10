@@ -10,6 +10,7 @@ import {
   normalizeAlbumTracks,
   type AlbumDetailPageState,
 } from './album-detail.model'
+import TrackList from '@/components/TrackList'
 
 const AlbumDetail = () => {
   const { id } = useParams()
@@ -93,7 +94,7 @@ const AlbumDetail = () => {
   return (
     <section className='space-y-10 pb-8'>
       <AlbumDetailHero hero={state.hero} />
-      <AlbumTrackTable tracks={state.tracks} coverUrl={state.hero.coverUrl} />
+      <TrackList data={state.tracks} coverUrl={state.hero.coverUrl} />
     </section>
   )
 }
