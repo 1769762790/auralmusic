@@ -45,7 +45,7 @@ const PlaylistDetailHero = ({
               {hero.trackCount} 首歌
             </p>
           </div>
-          <p className='text-muted-foreground line-clamp-3 max-w-[70ch] text-[15px] leading-8'>
+          <p className='text-muted-foreground line-clamp-3 text-[15px] leading-8'>
             {hero.description || '暂无歌单简介'}
           </p>
         </div>

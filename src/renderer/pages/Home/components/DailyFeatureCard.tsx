@@ -23,7 +23,7 @@ const DailyFeatureCard = ({
 
   return (
     <section
-      className='group border-border/70 bg-animate relative h-[200px] overflow-hidden rounded-[26px] border bg-[#090909] p-6 shadow-[0_24px_64px_rgba(0,0,0,0.18)]'
+      className='group border-border/70 bg-animate relative h-[200px] overflow-hidden rounded-[26px] border p-6 shadow-2xl'
       style={
         coverUrl
           ? {

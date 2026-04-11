@@ -62,10 +62,10 @@ const CreatePlaylistDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className='w-[min(420px,calc(100vw-1.5rem))] max-w-[420px] rounded-[26px] border border-white/70 bg-white/95 p-0 text-neutral-950 shadow-[0_30px_80px_rgba(15,23,42,0.16)] backdrop-blur-sm'
+        className='bg-background/90 text-primary w-[min(420px,calc(100vw-1.5rem))] max-w-[420px] rounded-[26px] border p-0 shadow-[0_30px_80px_rgba(15,23,42,0.16)] backdrop-blur-sm'
       >
         <div className='px-7 pt-6 pb-7'>
-          <DialogHeader className='flex-row items-center justify-between gap-4 border-b border-neutral-100 pb-5'>
+          <DialogHeader className='flex-row items-center justify-between gap-4 border-b pb-5'>
             <DialogTitle className='text-[15px] font-bold'>
               新建歌单
             </DialogTitle>
@@ -73,7 +73,7 @@ const CreatePlaylistDialog = ({
             <DialogClose asChild>
               <button
                 type='button'
-                className='text-primary/50 hover:text-primary inline-flex size-8 items-center justify-center rounded-full transition-colors hover:bg-neutral-100'
+                className='text-primary/50 hover:text-primary hover:bg-background/5 inline-flex size-8 items-center justify-center rounded-full transition-colors'
                 aria-label='关闭新建歌单弹窗'
               >
                 <X className='size-4' />
@@ -97,17 +97,17 @@ const CreatePlaylistDialog = ({
               className='text-primary focus-visible:border-primary/20 focus-visible:ring-primary/10 h-12 rounded-[14px] border-neutral-100 bg-neutral-100 px-4 text-[15px] placeholder:text-neutral-400'
             />
 
-            <label className='text-primary/60 flex cursor-pointer items-center gap-2.5 text-sm font-medium'>
+            <label className='text-primary flex cursor-pointer items-center gap-2.5 text-sm font-medium'>
               <input
                 type='checkbox'
                 checked={isPrivate}
                 onChange={event => setIsPrivate(event.target.checked)}
-                className='accent-primary size-4 rounded-[4px] border border-neutral-300'
+                className='accent-primary border-primary size-4 rounded-[4px] border'
               />
               设为隐私歌单
             </label>
 
-            <Separator className='bg-neutral-100' />
+            <Separator className='border-primary' />
 
             <Button
               type='button'

@@ -12,7 +12,7 @@ const AppLayout = () => {
         isWindows ? 'pt-20' : 'pt-16.25'
       }`}
     >
-      <Header className='window-drag fixed top-0 right-0 left-0 z-50 pt-2.5 pb-1.25' />
+      <Header className='window-drag fixed top-0 right-0 left-0 z-50 pt-5 pb-1.25' />
       <div className='flex w-full items-center justify-center py-2'>
         <KeepAliveRouteOutlet
           include={['/', '/albums', '/artists', '/playlist']}

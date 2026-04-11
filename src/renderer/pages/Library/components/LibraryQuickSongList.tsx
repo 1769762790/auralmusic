@@ -26,10 +26,10 @@ const LibraryQuickSongList = ({ songs }: LibraryQuickSongListProps) => {
           </div>
 
           <div className='min-w-0'>
-            <p className='truncate text-sm font-semibold text-neutral-950'>
+            <p className='text-primary truncate text-sm font-semibold'>
               {song.name}
             </p>
-            <p className='truncate text-xs text-neutral-500'>
+            <p className='text-primary/80 truncate text-xs'>
               {song.artistNames}
             </p>
           </div>

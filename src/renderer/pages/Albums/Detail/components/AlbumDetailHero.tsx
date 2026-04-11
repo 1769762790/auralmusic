@@ -51,7 +51,7 @@ const AlbumDetailHero = ({
             </p>
           </div>
 
-          <p className='text-muted-foreground line-clamp-3 max-w-[70ch] text-[15px] leading-8'>
+          <p className='text-muted-foreground line-clamp-3 text-[15px] leading-8'>
             {hero.description || '暂无专辑简介'}
           </p>
         </div>

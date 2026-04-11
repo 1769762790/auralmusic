@@ -107,7 +107,7 @@ const TrackListItem = ({
 
         <div className='flex-1 truncate'>
           <div className='truncate text-[15px] font-semibold'>{item.name}</div>
-          <div className='truncate text-xs text-neutral-500 md:text-sm'>
+          <div className='text-primary/50 truncate text-xs md:text-sm'>
             {type === 'default'
               ? item.artistNames
               : formatArtistNames(item.artists)}
@@ -115,12 +115,12 @@ const TrackListItem = ({
         </div>
       </div>
       {type === 'default' && (
-        <div className='hidden truncate text-[15px] text-neutral-700 md:block'>
+        <div className='text-primary/50 hidden truncate text-[15px] md:block'>
           {item.albumName}
         </div>
       )}
 
-      <div className='flex items-center justify-end gap-5 text-[15px] text-neutral-700'>
+      <div className='text-primary/50 flex items-center justify-end gap-5 text-[15px]'>
         <button
           type='button'
           disabled={!item.id || isLikePending}

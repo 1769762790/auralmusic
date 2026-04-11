@@ -61,9 +61,9 @@ const LibraryTabsSection = ({
           <div className='relative flex w-full items-center justify-between gap-4'>
             <TabsList variant='line' className='bg-transparent p-0'>
               <div
-                className={`relative inline-flex w-[150px] items-center rounded-[14px] px-4 py-2.5 text-base font-semibold transition-colors ${
+                className={`relative flex inline-flex w-[150px] items-center justify-between rounded-[14px] px-4 py-2.5 text-base font-semibold transition-colors ${
                   activeTab === 'playlists'
-                    ? 'text-neutral-950'
+                    ? 'text-primary/90'
                     : 'text-foreground/60 hover:text-foreground'
                 }`}
               >
@@ -80,7 +80,7 @@ const LibraryTabsSection = ({
                     <button
                       type='button'
                       aria-label='切换歌单来源'
-                      className='ml-2 inline-flex size-5 items-center justify-center rounded-full text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-800'
+                      className='hover:bg-primary/20 text-primary/50 ml-2 inline-flex size-5 items-center justify-center rounded-full transition-colors hover:text-neutral-800'
                     >
                       <ChevronDown className='size-3.5' />
                     </button>

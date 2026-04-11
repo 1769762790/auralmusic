@@ -19,7 +19,7 @@ const ArtistFilterGroup = <T,>({
 }: ArtistFilterGroupProps<T>) => {
   return (
     <div className='flex flex-col gap-4 lg:flex-row lg:items-start'>
-      <div className='text-muted-foreground min-w-16 pt-1 text-sm font-medium tracking-[0.24em] uppercase'>
+      <div className='text-muted-foreground min-w-16 pt-1 text-[16px] font-medium tracking-[0.24em] uppercase'>
         {label}
       </div>
       <div className={cn('flex flex-wrap gap-2.5', compact && 'max-w-4xl')}>
