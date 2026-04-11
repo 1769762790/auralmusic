@@ -1,5 +1,118 @@
 import { create } from 'zustand'
-import { AppConfig, defaultConfig } from '../../main/config/types'
+import {
+  AppConfig,
+  AUDIO_QUALITY_LEVELS,
+  MUSIC_SOURCE_PROVIDERS,
+  defaultConfig,
+  type AudioQualityLevel,
+  type MusicSourceProvider,
+} from '../../main/config/types'
+import {
+  normalizeImportedLxMusicSource,
+  normalizeImportedLxMusicSources,
+  resolveActiveLxMusicSourceScriptId,
+} from '../../shared/lx-music-source'
+import { normalizeShortcutBindings } from '../../shared/shortcut-keys'
+
+function normalizeQuality(value: unknown): AudioQualityLevel {
+  if (value === 'high') {
+    return 'higher'
+  }
+
+  if (
+    typeof value === 'string' &&
+    AUDIO_QUALITY_LEVELS.includes(value as AudioQualityLevel)
+  ) {
+    return value as AudioQualityLevel
+  }
+
+  return defaultConfig.quality
+}
+
+function normalizeMusicSourceProviders(value: unknown): MusicSourceProvider[] {
+  if (!Array.isArray(value)) {
+    return defaultConfig.musicSourceProviders
+  }
+
+  const providers = value.filter((item): item is MusicSourceProvider => {
+    return (
+      typeof item === 'string' &&
+      MUSIC_SOURCE_PROVIDERS.includes(item as MusicSourceProvider)
+    )
+  })
+
+  return providers.length ? providers : defaultConfig.musicSourceProviders
+}
+
+function normalizeProvidersForLxState(
+  providers: MusicSourceProvider[],
+  activeLxScriptId: string | null
+) {
+  if (activeLxScriptId) {
+    return providers
+  }
+
+  const normalizedProviders = providers.filter(
+    provider => provider !== 'lxMusic'
+  )
+
+  return normalizedProviders.length
+    ? normalizedProviders
+    : defaultConfig.musicSourceProviders
+}
+
+function normalizeConfig(config: AppConfig): AppConfig {
+  const luoxueMusicSourceScript = normalizeImportedLxMusicSource(
+    config.luoxueMusicSourceScript
+  )
+  const luoxueMusicSourceScripts = normalizeImportedLxMusicSources(
+    config.luoxueMusicSourceScripts,
+    luoxueMusicSourceScript
+  )
+  const activeLuoxueMusicSourceScriptId = resolveActiveLxMusicSourceScriptId(
+    config.activeLuoxueMusicSourceScriptId,
+    luoxueMusicSourceScripts
+  )
+  const musicSourceProviders = normalizeProvidersForLxState(
+    normalizeMusicSourceProviders(config.musicSourceProviders),
+    activeLuoxueMusicSourceScriptId
+  )
+
+  return {
+    ...defaultConfig,
+    ...config,
+    quality: normalizeQuality(config.quality),
+    musicSourceEnabled:
+      typeof config.musicSourceEnabled === 'boolean'
+        ? config.musicSourceEnabled
+        : defaultConfig.musicSourceEnabled,
+    musicSourceProviders,
+    luoxueSourceEnabled:
+      typeof config.luoxueSourceEnabled === 'boolean'
+        ? config.luoxueSourceEnabled
+        : defaultConfig.luoxueSourceEnabled,
+    luoxueSourceUrl:
+      typeof config.luoxueSourceUrl === 'string'
+        ? config.luoxueSourceUrl
+        : defaultConfig.luoxueSourceUrl,
+    luoxueMusicSourceScript,
+    luoxueMusicSourceScripts,
+    activeLuoxueMusicSourceScriptId,
+    customMusicApiEnabled:
+      typeof config.customMusicApiEnabled === 'boolean'
+        ? config.customMusicApiEnabled
+        : defaultConfig.customMusicApiEnabled,
+    customMusicApiUrl:
+      typeof config.customMusicApiUrl === 'string'
+        ? config.customMusicApiUrl
+        : defaultConfig.customMusicApiUrl,
+    globalShortcutEnabled:
+      typeof config.globalShortcutEnabled === 'boolean'
+        ? config.globalShortcutEnabled
+        : defaultConfig.globalShortcutEnabled,
+    shortcutBindings: normalizeShortcutBindings(config.shortcutBindings),
+  }
+}
 
 // 定义 Store 状态类型
 interface ConfigStoreState {
@@ -29,14 +142,17 @@ export const useConfigStore = create<ConfigStoreState>((set, get) => ({
       set({ isLoading: true })
       // 批量读取所有配置项
       const configKeys = Object.keys(defaultConfig) as (keyof AppConfig)[]
-      const loadedConfig = {} as AppConfig
-
-      for (const key of configKeys) {
-        loadedConfig[key] = await window.electronConfig.getConfig(key)
-      }
+      const loadedConfigEntries = await Promise.all(
+        configKeys.map(async key => [
+          key,
+          await window.electronConfig.getConfig(key),
+        ])
+      )
+      const loadedConfig = Object.fromEntries(loadedConfigEntries) as AppConfig
+      const normalizedConfig = normalizeConfig(loadedConfig)
 
       // 更新 Zustand 全局状态
-      set({ config: loadedConfig })
+      set({ config: normalizedConfig })
     } catch (err) {
       console.error('❌ 配置初始化失败:', err)
       // 出错时保持默认值，避免应用崩溃

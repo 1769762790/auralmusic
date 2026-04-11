@@ -9,28 +9,36 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
 export interface songProps {
-  artists: Artist[] | null | undefined
+  artists?: Artist[] | null
   id: number
-  coverUrl: string
+  coverUrl?: string
   name: string
-  artistNames: string
+  artistNames?: string
   duration: number
-  albumName: string
+  albumName?: string
 }
 interface TrackListItemProps {
   item: songProps
   type?: 'default' | 'hot'
+  coverUrl?: string
+  isActive?: boolean
+  isPlaying?: boolean
+  onPlay?: () => void
   onLikeChangeSuccess?: (songId: number, nextLiked: boolean) => void
 }
 
 interface Artist {
-  id: number
+  id?: number
   name: string
 }
 
 const TrackListItem = ({
   item,
   type = 'default',
+  coverUrl,
+  isActive = false,
+  isPlaying = false,
+  onPlay,
   onLikeChangeSuccess,
 }: TrackListItemProps) => {
   const userId = useAuthStore(state => state.user?.userId)
@@ -95,18 +103,30 @@ const TrackListItem = ({
 
   return (
     <div
+      onDoubleClick={onPlay}
       className={cn(
-        'hover:bg-primary/5 grid cursor-pointer grid-cols-3 items-center rounded-[15px] px-4 py-4',
+        'hover:bg-primary/5 grid cursor-pointer grid-cols-3 items-center rounded-[15px] px-4 py-4 transition-colors',
+        isActive && 'bg-primary/8',
         type === 'hot' && 'grid-cols-2'
       )}
     >
       <div className='flex items-center gap-4'>
-        {item.coverUrl && (
-          <AvatarCover className='w-12.5 shrink-0' url={item.coverUrl} />
+        {(item.coverUrl || coverUrl) && (
+          <AvatarCover
+            className='w-12.5 shrink-0'
+            url={item.coverUrl || coverUrl || ''}
+          />
         )}
 
         <div className='flex-1 truncate'>
-          <div className='truncate text-[15px] font-semibold'>{item.name}</div>
+          <div
+            className={cn(
+              'truncate text-[15px] font-semibold',
+              isPlaying && 'text-primary'
+            )}
+          >
+            {item.name}
+          </div>
           <div className='text-primary/50 truncate text-xs md:text-sm'>
             {type === 'default'
               ? item.artistNames

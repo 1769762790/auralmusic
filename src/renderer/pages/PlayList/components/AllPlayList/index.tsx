@@ -123,7 +123,7 @@ const AllPlaylist = ({
       {loading ? (
         <AllPlayListSkeleton />
       ) : (
-        <div className='grid grid-cols-4 gap-6 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6'>
+        <div className='grid grid-cols-4 gap-6 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5'>
           {playLists.map(item => (
             <CoverCard
               key={item.id}

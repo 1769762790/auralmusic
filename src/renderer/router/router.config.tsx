@@ -13,6 +13,7 @@ import LikedSongs from '@/pages/LikedSongs'
 import MvDetail from '@/pages/Mv/Detail'
 import PlayList from '@/pages/PlayList'
 import PlaylistDetail from '@/pages/PlayList/Detail'
+import Settings from '@/pages/Settings'
 
 export const routeMenuConfig: RouteMenuConfig[] = [
   {
@@ -39,6 +40,11 @@ export const routeMenuConfig: RouteMenuConfig[] = [
         path: '/library/liked-songs',
         element: <LikedSongs />,
         meta: { title: '我喜欢的音乐', icon: '', hidden: true, authOnly: true },
+      },
+      {
+        path: '/settings',
+        element: <Settings />,
+        meta: { title: '设置', icon: '', hidden: true },
       },
       {
         path: '/charts',

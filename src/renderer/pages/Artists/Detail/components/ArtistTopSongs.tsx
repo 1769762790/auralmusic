@@ -1,7 +1,8 @@
-import { Heart } from 'lucide-react'
 import { type ArtistTopSongItem } from '@/pages/Artists/artist-detail.model'
 import { useMemo, useState } from 'react'
 import TrackListItem from '@/components/TrackList/TrackListItem'
+import { usePlaybackStore } from '@/stores/playback-store'
+import type { PlaybackTrack } from '../../../../../shared/playback.ts'
 
 interface ArtistTopSongsProps {
   songs: ArtistTopSongItem[]
@@ -9,6 +10,9 @@ interface ArtistTopSongsProps {
 
 const ArtistTopSongs = ({ songs }: ArtistTopSongsProps) => {
   const [isMore, setIsMore] = useState(false)
+  const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
+  const currentTrackId = usePlaybackStore(state => state.currentTrack?.id)
+  const playbackStatus = usePlaybackStore(state => state.status)
   const onToggleMore = () => {
     setIsMore(!isMore)
   }
@@ -18,6 +22,17 @@ const ArtistTopSongs = ({ songs }: ArtistTopSongsProps) => {
     }
     return songs.slice(0, 12)
   }, [songs, isMore])
+  const playbackQueue = useMemo<PlaybackTrack[]>(() => {
+    return list.map(song => ({
+      id: song.id,
+      name: song.name,
+      artistNames: (song.artists || []).map(artist => artist.name).join(' / '),
+      albumName: song.albumName,
+      coverUrl: song.coverUrl,
+      duration: song.duration,
+    }))
+  }, [list])
+
   return (
     <section className='space-y-5'>
       <h2 className='text-foreground text-3xl font-bold tracking-tight'>
@@ -31,7 +46,7 @@ const ArtistTopSongs = ({ songs }: ArtistTopSongsProps) => {
         ) : (
           <div>
             <div className='grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4'>
-              {list.map(song => (
+              {list.map((song, index) => (
                 // <div
                 //   key={song.id}
                 //   className='hover:bg-primary/5 flex items-center justify-between gap-4 rounded-[15px] px-5 py-4 transition-colors odd:bg-white/[0.02]'
@@ -60,7 +75,16 @@ const ArtistTopSongs = ({ songs }: ArtistTopSongsProps) => {
                 //     <Heart className='text-foreground/70 size-5' />
                 //   </div>
                 // </div>
-                <TrackListItem item={song} type='hot' />
+                <TrackListItem
+                  key={song.id}
+                  item={song}
+                  type='hot'
+                  isActive={song.id === currentTrackId}
+                  isPlaying={
+                    song.id === currentTrackId && playbackStatus === 'playing'
+                  }
+                  onPlay={() => playQueueFromIndex(playbackQueue, index)}
+                />
               ))}
             </div>
             {songs.length > 12 && (

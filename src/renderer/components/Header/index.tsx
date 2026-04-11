@@ -6,6 +6,7 @@ import NavBar from '../NavBar'
 import Back from './Back'
 import WindowControls from './WindowControls'
 import { useAuthStore } from '@/stores/auth-store'
+import { SearchIcon } from 'lucide-react'
 
 interface HeaderProps {
   className?: string
@@ -53,6 +54,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         <Back />
         <NavBar />
         <div className='window-no-drag flex items-center gap-2'>
+          <SearchIcon className='mr-5 size-5 cursor-pointer' />
           <Account onToggleTheme={onToggleTheme} currentTheme={currentTheme} />
           {isWindows ? <WindowControls /> : null}
         </div>

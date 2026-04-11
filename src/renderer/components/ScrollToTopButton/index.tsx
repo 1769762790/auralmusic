@@ -37,9 +37,9 @@ const ScrollToTopButton = ({
       className={cn(
         'bg-primary shadow-primary/20 hover:bg-primary/90 focus:ring-primary/50 fixed z-50 inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-lg hover:-translate-y-0.5 focus:ring-2 focus:outline-none',
         // ✅ 核心动画：位移 + 透明度 双过渡
-        'right-[15px] transition-all duration-500 ease-out',
+        'right-3.75 transition-all duration-500 ease-out',
         // ✅ 显示状态：正常位置 + 完全可见
-        visible ? 'bottom-4 opacity-100' : 'bottom-[-20px] opacity-0',
+        visible ? 'bottom-20 opacity-100' : '-bottom-7.5 opacity-0',
         className
       )}
     >

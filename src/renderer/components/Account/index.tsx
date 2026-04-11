@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { LogOut, Moon, Sun } from 'lucide-react'
+import { LogOut, Moon, Settings, Sun } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -28,6 +29,7 @@ const AccountControl = ({
   currentTheme,
   onToggleTheme,
 }: AccountControlProps) => {
+  const navigate = useNavigate()
   const user = useAuthStore(state => state.user)
   const hasHydrated = useAuthStore(state => state.hasHydrated)
   const isLoading = useAuthStore(state => state.isLoading)
@@ -71,6 +73,11 @@ const AccountControl = ({
   const handleLogout = async () => {
     setMenuOpen(false)
     await logout()
+  }
+
+  const handleOpenSettings = () => {
+    setMenuOpen(false)
+    navigate('/settings')
   }
 
   useEffect(() => () => clearCloseTimer(), [])
@@ -155,6 +162,19 @@ const AccountControl = ({
               <span className='font-semibold'>
                 {isDark ? '切换到浅色模式' : '切换到深色模式'}
               </span>
+            </div>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            className='rounded-[18px] px-3 py-3'
+            onSelect={event => {
+              event.preventDefault()
+              handleOpenSettings()
+            }}
+          >
+            <Settings className='size-4' />
+            <div className='flex flex-col'>
+              <span className='font-semibold'>设置</span>
             </div>
           </DropdownMenuItem>
 

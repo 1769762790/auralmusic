@@ -1,4 +1,5 @@
 import request from '@/lib/request'
+import type { AudioQualityLevel } from '../../main/config/types'
 
 // 获取排行榜列表
 export function getTopList() {
@@ -102,6 +103,18 @@ export interface ToggleSongLikeParams {
 
 export function toggleSongLike(params: ToggleSongLikeParams) {
   return request.get('/song/like', {
+    params,
+  })
+}
+
+export interface SongUrlV1Params {
+  id: number | string
+  level: AudioQualityLevel
+  unblock: boolean
+}
+
+export function getSongUrlV1(params: SongUrlV1Params) {
+  return request.get('/song/url/v1', {
     params,
   })
 }

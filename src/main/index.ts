@@ -1,4 +1,10 @@
-import { app, BrowserWindow, globalShortcut, nativeTheme } from 'electron'
+import {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  nativeTheme,
+  session,
+} from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getConfig } from './config/store'
@@ -8,6 +14,7 @@ import {
 } from './auth/store'
 import { registerAuthIpc } from './ipc/auth-ipc'
 import { registerConfigIpc } from './ipc/config-ipc'
+import { registerMusicSourceIpc } from './ipc/music-source-ipc'
 import { registerWindowIpc, bindWindowStateEvents } from './ipc/window-ipc'
 import { applyMusicApiRuntimeEnv } from './music-api-runtime'
 import { startMusicApi } from './server'
@@ -20,6 +27,68 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 let mainWindow: BrowserWindow | null = null
+
+type AudioPermissionDetails = {
+  mediaType?: string
+  mediaTypes?: string[]
+}
+
+function registerPermissionHandlers() {
+  const isMainWindowRequest = (webContents: Electron.WebContents) => {
+    return webContents === mainWindow?.webContents
+  }
+
+  const isAllowedAudioPermission = (
+    permission: string,
+    details?: AudioPermissionDetails
+  ) => {
+    if (permission === 'speaker-selection') {
+      return true
+    }
+
+    if (permission !== 'media') {
+      return false
+    }
+
+    const mediaTypes = details?.mediaTypes || []
+    const mediaType = details?.mediaType
+    if (!mediaTypes.length && mediaType) {
+      return mediaType === 'audio'
+    }
+
+    return mediaTypes.includes('audio') && !mediaTypes.includes('video')
+  }
+
+  session.defaultSession.setPermissionCheckHandler(
+    (webContents, permission, _requestingOrigin, details) => {
+      const permissionName = String(permission)
+
+      return (
+        isMainWindowRequest(webContents) &&
+        (permissionName === 'local-fonts' ||
+          isAllowedAudioPermission(
+            permissionName,
+            details as AudioPermissionDetails
+          ))
+      )
+    }
+  )
+
+  session.defaultSession.setPermissionRequestHandler(
+    (webContents, permission, callback, details) => {
+      const permissionName = String(permission)
+
+      callback(
+        isMainWindowRequest(webContents) &&
+          (permissionName === 'local-fonts' ||
+            isAllowedAudioPermission(
+              permissionName,
+              details as AudioPermissionDetails
+            ))
+      )
+    }
+  )
+}
 
 function getRendererUrl() {
   if (app.isPackaged) {
@@ -49,6 +118,7 @@ function createWindow() {
     webPreferences: {
       preload: getPreloadPath(),
       contextIsolation: true,
+      enableBlinkFeatures: 'LocalFontAccess',
       nodeIntegration: false,
     },
   })
@@ -77,7 +147,9 @@ function createWindow() {
 app.whenReady().then(async () => {
   registerConfigIpc()
   registerAuthIpc()
+  registerMusicSourceIpc()
   registerWindowIpc()
+  registerPermissionHandlers()
 
   try {
     const runtimeInfo = await startMusicApi()

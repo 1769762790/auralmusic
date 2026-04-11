@@ -1,24 +1,81 @@
-/**
- * 全局应用配置类型（所有持久化配置都在这里定义）
- */
+import type { ImportedLxMusicSource } from '../../shared/lx-music-source'
+import {
+  DEFAULT_SHORTCUT_BINDINGS,
+  type ShortcutBindings,
+} from '../../shared/shortcut-keys'
+
+export const AUDIO_QUALITY_LEVELS = [
+  'standard',
+  'higher',
+  'exhigh',
+  'lossless',
+  'hires',
+  'jyeffect',
+  'sky',
+  'dolby',
+  'jymaster',
+] as const
+
+export type AudioQualityLevel = (typeof AUDIO_QUALITY_LEVELS)[number]
+
+export const MUSIC_SOURCE_PROVIDERS = [
+  'migu',
+  'kugou',
+  'pyncmd',
+  'bilibili',
+  'lxMusic',
+] as const
+
+export type MusicSourceProvider = (typeof MUSIC_SOURCE_PROVIDERS)[number]
+
 export interface AppConfig {
-  // 主题设置
   theme: 'light' | 'dark' | 'system'
-  // 音质设置（可无限扩展）
-  quality: 'standard' | 'high' | 'lossless'
+  fontFamily: string
+  audioOutputDeviceId: string
+  musicSourceEnabled: boolean
+  musicSourceProviders: MusicSourceProvider[]
+  luoxueSourceEnabled: boolean
+  luoxueSourceUrl: string
+  luoxueMusicSourceScript: ImportedLxMusicSource | null
+  luoxueMusicSourceScripts: ImportedLxMusicSource[]
+  activeLuoxueMusicSourceScriptId: string | null
+  customMusicApiEnabled: boolean
+  customMusicApiUrl: string
+  quality: AudioQualityLevel
+  globalShortcutEnabled: boolean
+  shortcutBindings: ShortcutBindings
 }
 
-// 默认配置（初始化兜底，所有配置的默认值）
 export const defaultConfig: AppConfig = {
   theme: 'system',
-  quality: 'high',
+  fontFamily: 'Inter Variable',
+  audioOutputDeviceId: 'default',
+  musicSourceEnabled: false,
+  musicSourceProviders: ['migu', 'kugou', 'pyncmd', 'bilibili'],
+  luoxueSourceEnabled: false,
+  luoxueSourceUrl: '',
+  luoxueMusicSourceScript: null,
+  luoxueMusicSourceScripts: [],
+  activeLuoxueMusicSourceScriptId: null,
+  customMusicApiEnabled: false,
+  customMusicApiUrl: '',
+  quality: 'higher',
+  globalShortcutEnabled: false,
+  shortcutBindings: DEFAULT_SHORTCUT_BINDINGS,
 }
 
-// IPC 通道名（统一管理，避免魔法字符串）
 export const IPC_CHANNELS = {
   CONFIG: {
     GET: 'config:get',
     SET: 'config:set',
     RESET: 'config:reset',
+  },
+  MUSIC_SOURCE: {
+    SELECT_LX_SCRIPT: 'music-source:select-lx-script',
+    SAVE_LX_SCRIPT: 'music-source:save-lx-script',
+    READ_LX_SCRIPT: 'music-source:read-lx-script',
+    REMOVE_LX_SCRIPT: 'music-source:remove-lx-script',
+    DOWNLOAD_LX_SCRIPT: 'music-source:download-lx-script',
+    LX_HTTP_REQUEST: 'music-source:lx-http-request',
   },
 } as const

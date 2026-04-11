@@ -227,7 +227,7 @@ const Library = () => {
   }
 
   return (
-    <section className='relative isolate w-full pb-8'>
+    <section className='relative isolate w-full'>
       {errorMessage ? (
         <div className='border-destructive/20 bg-destructive/5 text-destructive mb-6 rounded-[18px] border px-4 py-3 text-sm'>
           {errorMessage}

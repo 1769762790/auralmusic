@@ -126,7 +126,7 @@ const ArtistMediaTabs = ({
             </div>
           ) : (
             <>
-              <div className='grid grid-cols-2 gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4'>
+              <div className='grid grid-cols-2 gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3'>
                 {mvs.map(mv => (
                   <article
                     key={mv.id}

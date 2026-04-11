@@ -1,0 +1,266 @@
+import {
+  Heart,
+  ListMusic,
+  Pause,
+  Play,
+  Repeat2,
+  Shuffle,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+} from 'lucide-react'
+import type { ReactNode } from 'react'
+import { toast } from 'sonner'
+
+import { toggleSongLike } from '@/api/list'
+import AvatarCover from '@/components/AvatarCover'
+import { Slider } from '@/components/ui/slider'
+import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth-store'
+import { usePlaybackStore } from '@/stores/playback-store'
+import { useUserStore } from '@/stores/user'
+
+type PlaybackControlTrack = {
+  name: string
+  artistName: string
+  coverUrl: string
+}
+
+const DEFAULT_TRACK: PlaybackControlTrack = {
+  name: '暂无播放歌曲',
+  artistName: 'AuralMusic',
+  coverUrl:
+    'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="%2393c5fd"/><stop offset="1" stop-color="%23f9a8d4"/></linearGradient></defs><rect width="128" height="128" rx="24" fill="url(%23g)"/><path d="M78 31v47.5a16 16 0 1 1-8-13.85V42.2l-30 6.24V84.5a16 16 0 1 1-8-13.85V42z" fill="white" fill-opacity=".88"/></svg>',
+}
+
+function clampPercent(value: number) {
+  if (!Number.isFinite(value)) {
+    return 0
+  }
+
+  return Math.min(100, Math.max(0, value))
+}
+
+type ControlButtonProps = {
+  label: string
+  children: ReactNode
+  className?: string
+  disabled?: boolean
+  onClick?: () => void
+}
+
+const ControlButton = ({
+  label,
+  children,
+  className,
+  disabled,
+  onClick,
+}: ControlButtonProps) => {
+  return (
+    <button
+      type='button'
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        'text-foreground/75 hover:text-foreground flex size-9 items-center justify-center rounded-full transition-colors',
+        'hover:bg-foreground/8',
+        disabled && 'cursor-not-allowed opacity-45 hover:bg-transparent',
+        className
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+const PlaybackControl = () => {
+  const track = usePlaybackStore(state => state.currentTrack)
+  const status = usePlaybackStore(state => state.status)
+  const progress = usePlaybackStore(state => state.progress)
+  const duration = usePlaybackStore(state => state.duration)
+  const volume = usePlaybackStore(state => state.volume)
+  const togglePlay = usePlaybackStore(state => state.togglePlay)
+  const playPrevious = usePlaybackStore(state => state.playPrevious)
+  const playNext = usePlaybackStore(state => state.playNext)
+  const setVolume = usePlaybackStore(state => state.setVolume)
+  const toggleMute = usePlaybackStore(state => state.toggleMute)
+  const userId = useAuthStore(state => state.user?.userId)
+  const hasHydrated = useAuthStore(state => state.hasHydrated)
+  const openLoginDialog = useAuthStore(state => state.openLoginDialog)
+  const likedSongIds = useUserStore(state => state.likedSongIds)
+  const likedSongPendingIds = useUserStore(state => state.likedSongPendingIds)
+  const toggleLikedSong = useUserStore(state => state.toggleLikedSong)
+  const setSongLikePending = useUserStore(state => state.setSongLikePending)
+  const fetchLikedSongs = useUserStore(state => state.fetchLikedSongs)
+
+  const hasTrack = Boolean(track)
+  const currentTrack = track
+    ? {
+        name: track.name,
+        artistName: track.artistNames,
+        coverUrl: track.coverUrl,
+      }
+    : DEFAULT_TRACK
+  const isPlaying = status === 'playing' || status === 'loading'
+  const isLiked = track ? likedSongIds.has(track.id) : false
+  const isLikePending = track ? likedSongPendingIds.has(track.id) : false
+  const progressPercent = clampPercent(
+    duration ? (progress / duration) * 100 : 0
+  )
+  const volumePercent = clampPercent(volume)
+  const isMuted = volumePercent === 0
+
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0] ?? 0)
+  }
+
+  const handleToggleLike = async () => {
+    if (!track) {
+      return
+    }
+
+    if (!hasHydrated || !userId) {
+      openLoginDialog('email')
+      return
+    }
+
+    if (isLikePending) {
+      return
+    }
+
+    const nextLiked = !isLiked
+
+    toggleLikedSong(track.id, nextLiked)
+    setSongLikePending(track.id, true)
+
+    try {
+      await toggleSongLike({
+        id: track.id,
+        uid: userId,
+        like: nextLiked,
+      })
+
+      void fetchLikedSongs()
+    } catch (error) {
+      console.error('toggle current song like failed', error)
+      toggleLikedSong(track.id, !nextLiked)
+      toast.error(
+        nextLiked ? '喜欢歌曲失败，请稍后重试' : '取消喜欢失败，请稍后重试'
+      )
+    } finally {
+      setSongLikePending(track.id, false)
+    }
+  }
+
+  return (
+    <footer className='window-no-drag bg-background/50 border-border/60 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-2xl'>
+      <div
+        className='bg-primary absolute top-0 left-0 h-0.5 transition-[width] duration-300 ease-out'
+        style={{ width: `${progressPercent}%` }}
+      />
+
+      <div className='grid h-18 grid-cols-[minmax(220px,1fr)_minmax(260px,420px)_minmax(220px,1fr)] items-center gap-6 px-12 xl:px-25 2xl:px-50'>
+        <div className='flex min-w-0 items-center gap-3'>
+          <AvatarCover
+            url={currentTrack.coverUrl}
+            className='size-11 shrink-0'
+            rounded='12px'
+            isAutoHovered
+          />
+          <div className='min-w-0'>
+            <div className='truncate text-sm font-semibold'>
+              {currentTrack.name}
+            </div>
+            <div className='text-muted-foreground truncate text-xs'>
+              {currentTrack.artistName}
+            </div>
+          </div>
+          <ControlButton
+            label={isLiked ? '取消喜欢' : '喜欢歌曲'}
+            disabled={!hasTrack || isLikePending}
+            onClick={handleToggleLike}
+          >
+            <Heart
+              className={cn(
+                'size-5 transition-colors',
+                isLiked ? 'fill-current text-red-500' : 'text-foreground/60'
+              )}
+            />
+          </ControlButton>
+        </div>
+
+        <div className='flex items-center justify-center gap-4'>
+          <ControlButton
+            label='上一首'
+            disabled={!hasTrack}
+            onClick={() => {
+              playPrevious()
+            }}
+          >
+            <SkipBack className='size-5 fill-current' />
+          </ControlButton>
+          <ControlButton
+            label={isPlaying ? '暂停' : '播放'}
+            disabled={!hasTrack}
+            onClick={togglePlay}
+            className='bg-foreground text-background hover:bg-foreground/90 hover:text-background size-11'
+          >
+            {isPlaying ? (
+              <Pause className='size-5 fill-current' />
+            ) : (
+              <Play className='ml-0.5 size-5 fill-current' />
+            )}
+          </ControlButton>
+          <ControlButton
+            label='下一首'
+            disabled={!hasTrack}
+            onClick={() => {
+              playNext()
+            }}
+          >
+            <SkipForward className='size-5 fill-current' />
+          </ControlButton>
+        </div>
+
+        <div className='text-foreground/70 flex items-center justify-end gap-3'>
+          <ControlButton label='播放列表'>
+            <ListMusic className='size-5' />
+          </ControlButton>
+          <ControlButton label='循环播放'>
+            <Repeat2 className='size-5' />
+          </ControlButton>
+          <ControlButton label='随机播放'>
+            <Shuffle className='size-5' />
+          </ControlButton>
+          <ControlButton
+            label={isMuted ? '取消静音' : '静音'}
+            onClick={toggleMute}
+            className='size-7'
+          >
+            {isMuted ? (
+              <VolumeX className='size-4 shrink-0' />
+            ) : (
+              <Volume2 className='size-4 shrink-0' />
+            )}
+          </ControlButton>
+          <Slider
+            aria-label='音量'
+            min={0}
+            max={100}
+            step={1}
+            value={[volumePercent]}
+            onValueChange={handleVolumeChange}
+            className='**:[[role=slider]]:bg-primary **:data-[slot=slider-track]:bg-primary/30 w-24'
+          />
+          <span className='text-muted-foreground w-9 text-right text-xs tabular-nums'>
+            {Math.round(volumePercent)}%
+          </span>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+export default PlaybackControl

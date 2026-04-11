@@ -1,14 +1,18 @@
 import Header from '@/components/Header'
+import PlaybackControl from '@/components/PlaybackControl'
+import PlaybackEngine from '@/components/PlaybackControl/PlaybackEngine'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import KeepAliveRouteOutlet from 'keepalive-for-react-router'
 import { Toaster } from '@/components/ui/sonner'
+import { useSystemFont } from '@/hooks/useSystemFont'
 
 const AppLayout = () => {
   const isWindows = window.appRuntime.getPlatform() === 'win32'
+  useSystemFont()
 
   return (
     <main
-      className={`w-full px-12 pb-10 xl:px-25 2xl:px-50 ${
+      className={`w-full px-12 pb-[100px] xl:px-25 2xl:px-50 ${
         isWindows ? 'pt-20' : 'pt-16.25'
       }`}
     >
@@ -17,9 +21,11 @@ const AppLayout = () => {
         <KeepAliveRouteOutlet
           include={['/', '/albums', '/artists', '/playlist']}
         />
-        <ScrollToTopButton />
       </div>
+      <PlaybackEngine />
+      <PlaybackControl />
       <Toaster />
+      <ScrollToTopButton />
     </main>
   )
 }
