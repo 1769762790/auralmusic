@@ -7,6 +7,7 @@ import AvatarCover from '../AvatarCover'
 import { Heart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import MusicContextMenu from '../MusicContextMenu'
 
 export interface songProps {
   artists?: Artist[] | null
@@ -59,9 +60,11 @@ const TrackListItem = ({
     return artistNames.map(artist => artist.name).join(' / ')
   }
 
-  const handleToggleSongLike = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
+  const handleToggleSongLike = async (
+    event?: MouseEvent<HTMLButtonElement>
+  ) => {
+    event?.preventDefault()
+    event?.stopPropagation()
 
     if (!item.id) {
       return
@@ -102,65 +105,74 @@ const TrackListItem = ({
   }
 
   return (
-    <div
-      onDoubleClick={onPlay}
-      className={cn(
-        'hover:bg-primary/5 grid cursor-pointer grid-cols-3 items-center rounded-[15px] px-4 py-4 transition-colors',
-        isActive && 'bg-primary/8',
-        type === 'hot' && 'grid-cols-2'
-      )}
+    <MusicContextMenu
+      coverUrl={item.coverUrl || coverUrl}
+      artistName={item?.artistNames}
+      onPlayClick={() => onPlay?.()}
+      onToggleClick={handleToggleSongLike}
+      name={item.name}
+      likeStatus={isLiked}
     >
-      <div className='flex items-center gap-4'>
-        {(item.coverUrl || coverUrl) && (
-          <AvatarCover
-            className='w-12.5 shrink-0'
-            url={item.coverUrl || coverUrl || ''}
-          />
+      <div
+        onDoubleClick={() => onPlay?.()}
+        className={cn(
+          'hover:bg-primary/5 grid cursor-pointer grid-cols-3 items-center rounded-[15px] px-4 py-4 transition-colors',
+          isActive && 'bg-primary/8',
+          type === 'hot' && 'grid-cols-2'
+        )}
+      >
+        <div className='flex items-center gap-4'>
+          {(item.coverUrl || coverUrl) && (
+            <AvatarCover
+              className='w-12.5 shrink-0'
+              url={item.coverUrl || coverUrl || ''}
+            />
+          )}
+
+          <div className='flex-1 truncate'>
+            <div
+              className={cn(
+                'truncate text-[15px] font-semibold',
+                isPlaying && 'text-primary'
+              )}
+            >
+              {item.name}
+            </div>
+            <div className='text-primary/50 truncate text-xs md:text-sm'>
+              {type === 'default'
+                ? item.artistNames
+                : formatArtistNames(item.artists)}
+            </div>
+          </div>
+        </div>
+        {type === 'default' && (
+          <div className='text-primary/50 hidden truncate text-[15px] md:block'>
+            {item.albumName}
+          </div>
         )}
 
-        <div className='flex-1 truncate'>
-          <div
+        <div className='text-primary/50 flex items-center justify-end gap-5 text-[15px]'>
+          <button
+            type='button'
+            disabled={!item.id || isLikePending}
+            onClick={handleToggleSongLike}
+            aria-label={isLiked ? '取消喜欢' : '喜欢歌曲'}
             className={cn(
-              'truncate text-[15px] font-semibold',
-              isPlaying && 'text-primary'
+              'transition-opacity',
+              (!item.id || isLikePending) && 'cursor-not-allowed opacity-60'
             )}
           >
-            {item.name}
-          </div>
-          <div className='text-primary/50 truncate text-xs md:text-sm'>
-            {type === 'default'
-              ? item.artistNames
-              : formatArtistNames(item.artists)}
-          </div>
+            <Heart
+              className={cn(
+                'size-6 transition-colors',
+                isLiked ? 'fill-current text-red-500' : 'text-neutral-700'
+              )}
+            />
+          </button>
+          {type === 'default' && formatDailySongDuration(item.duration)}
         </div>
       </div>
-      {type === 'default' && (
-        <div className='text-primary/50 hidden truncate text-[15px] md:block'>
-          {item.albumName}
-        </div>
-      )}
-
-      <div className='text-primary/50 flex items-center justify-end gap-5 text-[15px]'>
-        <button
-          type='button'
-          disabled={!item.id || isLikePending}
-          onClick={handleToggleSongLike}
-          aria-label={isLiked ? '取消喜欢' : '喜欢歌曲'}
-          className={cn(
-            'transition-opacity',
-            (!item.id || isLikePending) && 'cursor-not-allowed opacity-60'
-          )}
-        >
-          <Heart
-            className={cn(
-              'size-6 transition-colors',
-              isLiked ? 'fill-current text-red-500' : 'text-neutral-700'
-            )}
-          />
-        </button>
-        {type === 'default' && formatDailySongDuration(item.duration)}
-      </div>
-    </div>
+    </MusicContextMenu>
   )
 }
 

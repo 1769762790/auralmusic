@@ -6,6 +6,7 @@ type AvatarCoverProps = {
   rounded?: 'full' | string
   className?: string
   shadowClassName?: string
+  wrapperClass?: string
   isAutoHovered?: boolean
   onClickCover?: () => void
 }
@@ -17,6 +18,7 @@ const AvatarCover = ({
   onClickCover,
   shadowClassName,
   isAutoHovered,
+  wrapperClass,
 }: AvatarCoverProps) => {
   const [isHovered, setIsHovered] = useState(Boolean(isAutoHovered))
   const roundedStyle =
@@ -24,7 +26,7 @@ const AvatarCover = ({
 
   return (
     <div
-      className='relative cursor-pointer'
+      className={cn('relative cursor-pointer', wrapperClass)}
       onMouseEnter={() => !isAutoHovered && setIsHovered(true)}
       onMouseLeave={() => !isAutoHovered && setIsHovered(false)}
       onClick={onClickCover}

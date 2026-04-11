@@ -36,16 +36,41 @@ export function registerWindowIpc() {
     const window = getEventWindow(event)
     return window?.isMaximized() ?? false
   })
+
+  ipcMain.handle(WINDOW_IPC_CHANNELS.TOGGLE_FULLSCREEN, event => {
+    const window = getEventWindow(event)
+    if (!window) {
+      return false
+    }
+
+    const nextFullscreen = !window.isFullScreen()
+    window.setFullScreen(nextFullscreen)
+    return nextFullscreen
+  })
+
+  ipcMain.handle(WINDOW_IPC_CHANNELS.IS_FULLSCREEN, event => {
+    const window = getEventWindow(event)
+    return window?.isFullScreen() ?? false
+  })
 }
 
 export function bindWindowStateEvents(window: BrowserWindow) {
-  const emitState = () => {
+  const emitMaximizeState = () => {
     window.webContents.send(
       WINDOW_IPC_CHANNELS.MAXIMIZE_CHANGED,
       window.isMaximized()
     )
   }
 
-  window.on('maximize', emitState)
-  window.on('unmaximize', emitState)
+  const emitFullscreenState = () => {
+    window.webContents.send(
+      WINDOW_IPC_CHANNELS.FULLSCREEN_CHANGED,
+      window.isFullScreen()
+    )
+  }
+
+  window.on('maximize', emitMaximizeState)
+  window.on('unmaximize', emitMaximizeState)
+  window.on('enter-full-screen', emitFullscreenState)
+  window.on('leave-full-screen', emitFullscreenState)
 }

@@ -1,3 +1,5 @@
+import type { HomeFmSong } from './home.model'
+
 export interface ArtistSummary {
   id: number
   name: string
@@ -11,15 +13,7 @@ export interface DailySong {
   }
 }
 
-export interface HomeFmData {
-  album?: {
-    picUrl?: string
-    name?: string
-    artist?: {
-      name?: string
-    }
-  }
-}
+export type HomeFmData = HomeFmSong
 
 export interface NewSongArtist {
   name?: string

@@ -80,3 +80,56 @@ test('toggleMute restores the last audible volume', () => {
 
   assert.equal(usePlaybackStore.getState().volume, 35)
 })
+
+test('player scene open state can be toggled without resetting playback', () => {
+  usePlaybackStore.getState().resetPlayback()
+  usePlaybackStore.getState().playQueueFromIndex(tracks, 0)
+
+  usePlaybackStore.getState().openPlayerScene()
+
+  assert.equal(usePlaybackStore.getState().isPlayerSceneOpen, true)
+  assert.equal(usePlaybackStore.getState().currentTrack?.id, 1)
+
+  usePlaybackStore.getState().closePlayerScene()
+
+  assert.equal(usePlaybackStore.getState().isPlayerSceneOpen, false)
+  assert.equal(usePlaybackStore.getState().currentTrack?.id, 1)
+})
+
+test('setPlayerSceneOpen syncs controlled drawer open state', () => {
+  usePlaybackStore.getState().resetPlayback()
+
+  usePlaybackStore.getState().setPlayerSceneOpen(true)
+
+  assert.equal(usePlaybackStore.getState().isPlayerSceneOpen, true)
+
+  usePlaybackStore.getState().setPlayerSceneOpen(false)
+
+  assert.equal(usePlaybackStore.getState().isPlayerSceneOpen, false)
+})
+
+test('setPlayerSceneFullscreen syncs fullscreen button state', () => {
+  usePlaybackStore.getState().resetPlayback()
+
+  usePlaybackStore.getState().setPlayerSceneFullscreen(true)
+
+  assert.equal(usePlaybackStore.getState().isPlayerSceneFullscreen, true)
+
+  usePlaybackStore.getState().setPlayerSceneFullscreen(false)
+
+  assert.equal(usePlaybackStore.getState().isPlayerSceneFullscreen, false)
+})
+
+test('seekTo stores a clamped seek request in milliseconds', () => {
+  usePlaybackStore.getState().resetPlayback()
+
+  usePlaybackStore.getState().seekTo(60000)
+
+  assert.equal(usePlaybackStore.getState().seekPosition, 60000)
+  assert.equal(usePlaybackStore.getState().seekRequestId, 1)
+
+  usePlaybackStore.getState().seekTo(-1)
+
+  assert.equal(usePlaybackStore.getState().seekPosition, 0)
+  assert.equal(usePlaybackStore.getState().seekRequestId, 2)
+})

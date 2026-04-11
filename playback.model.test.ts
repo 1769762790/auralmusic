@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 
 import {
   createPlaybackQueueSnapshot,
+  createSongUrlRequestAttempts,
   getNextQueueIndex,
   getPreviousQueueIndex,
   normalizeSongUrlV1Response,
@@ -57,6 +58,11 @@ test('normalizeSongUrlV1Response returns null when url is missing', () => {
     null
   )
   assert.equal(normalizeSongUrlV1Response({ data: [] }), null)
+})
+
+test('createSongUrlRequestAttempts requests official url first', () => {
+  assert.deepEqual(createSongUrlRequestAttempts(false), [false])
+  assert.deepEqual(createSongUrlRequestAttempts(true), [false, true])
 })
 
 test('createPlaybackQueueSnapshot keeps a valid queue and selected index', () => {

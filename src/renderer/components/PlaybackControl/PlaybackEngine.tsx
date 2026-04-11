@@ -5,7 +5,10 @@ import { getSongUrlV1 } from '@/api/list'
 import { applyAudioOutputDevice } from '@/lib/audio-output'
 import { useConfigStore } from '@/stores/config-store'
 import { usePlaybackStore } from '@/stores/playback-store'
-import { normalizeSongUrlV1Response } from '../../../shared/playback.ts'
+import {
+  createSongUrlRequestAttempts,
+  normalizeSongUrlV1Response,
+} from '../../../shared/playback.ts'
 
 const PLAYBACK_UNAVAILABLE_MESSAGE = '暂时无法播放'
 
@@ -22,6 +25,8 @@ const PlaybackEngine = () => {
   const requestId = usePlaybackStore(state => state.requestId)
   const status = usePlaybackStore(state => state.status)
   const volume = usePlaybackStore(state => state.volume)
+  const seekRequestId = usePlaybackStore(state => state.seekRequestId)
+  const seekPosition = usePlaybackStore(state => state.seekPosition)
   const quality = useConfigStore(state => state.config.quality)
   const musicSourceEnabled = useConfigStore(
     state => state.config.musicSourceEnabled
@@ -124,13 +129,28 @@ const PlaybackEngine = () => {
       usePlaybackStore.getState().markPlaybackLoading()
 
       try {
-        const response = await getSongUrlV1({
-          id: currentTrack.id,
-          level: qualityRef.current,
-          unblock: unblockRef.current,
-        })
+        let result = null
 
-        const result = normalizeSongUrlV1Response(response.data)
+        for (const unblock of createSongUrlRequestAttempts(
+          unblockRef.current
+        )) {
+          const response = await getSongUrlV1({
+            id: currentTrack.id,
+            level: qualityRef.current,
+            unblock,
+          })
+
+          result = normalizeSongUrlV1Response(response.data)
+
+          if (cancelled) {
+            return
+          }
+
+          if (result?.url) {
+            break
+          }
+        }
+
         const latestState = usePlaybackStore.getState()
 
         if (
@@ -210,6 +230,25 @@ const PlaybackEngine = () => {
       })
     }
   }, [status])
+
+  useEffect(() => {
+    const audio = audioRef.current
+
+    if (!audio || seekRequestId <= 0) {
+      return
+    }
+
+    const nextTime = Math.max(0, seekPosition) / 1000
+
+    if (Number.isFinite(nextTime)) {
+      try {
+        audio.currentTime = nextTime
+        usePlaybackStore.getState().setProgress(seekPosition)
+      } catch (error) {
+        console.error('seek playback failed', error)
+      }
+    }
+  }, [seekRequestId, seekPosition])
 
   return null
 }

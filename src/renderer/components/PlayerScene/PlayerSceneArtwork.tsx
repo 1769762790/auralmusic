@@ -1,0 +1,55 @@
+import { Music2 } from 'lucide-react'
+
+import { cn } from '@/lib/utils'
+
+type PlayerSceneArtworkProps = {
+  coverUrl: string
+  title: string
+  artistNames: string
+  isPlaying: boolean
+}
+
+const PlayerSceneArtwork = ({
+  coverUrl,
+  title,
+  artistNames,
+  isPlaying,
+}: PlayerSceneArtworkProps) => {
+  return (
+    <section className='flex min-w-0 flex-col items-center gap-7 text-center'>
+      <div
+        className={cn(
+          'player-scene-artwork-shell x aspect-square w-full max-w-[360px] rounded-[20px] 2xl:max-w-[500px]',
+          isPlaying && 'is-breathing'
+        )}
+      >
+        <div className='player-scene-artwork-pulse' />
+        <div className='player-scene-artwork-surface relative size-full overflow-hidden rounded-[20px] border border-white/18 bg-white/10 shadow-[0_42px_120px_rgba(0,0,0,0.35)] backdrop-blur-xl'>
+          {coverUrl ? (
+            <img
+              src={coverUrl}
+              alt={title}
+              className='size-full object-cover'
+              draggable={false}
+            />
+          ) : (
+            <div className='flex size-full items-center justify-center bg-gradient-to-br from-white/18 to-white/6 text-white/70'>
+              <Music2 className='size-20' />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className='max-w-[420px] space-y-2 2xl:max-w-[500px]'>
+        <h2 className='truncate text-3xl font-black tracking-tight text-[var(--player-foreground)] 2xl:py-10'>
+          {title}
+        </h2>
+        <p className='truncate text-base text-[var(--player-muted)] 2xl:pb-5'>
+          {artistNames}
+        </p>
+      </div>
+    </section>
+  )
+}
+
+export default PlayerSceneArtwork

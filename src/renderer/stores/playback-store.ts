@@ -18,6 +18,10 @@ interface PlaybackStoreState {
   lastAudibleVolume: number
   error: string
   requestId: number
+  seekRequestId: number
+  seekPosition: number
+  isPlayerSceneOpen: boolean
+  isPlayerSceneFullscreen: boolean
   playQueueFromIndex: (tracks: PlaybackTrack[], startIndex: number) => void
   togglePlay: () => void
   playNext: () => boolean
@@ -26,6 +30,11 @@ interface PlaybackStoreState {
   setDuration: (duration: number) => void
   setVolume: (volume: number) => void
   toggleMute: () => void
+  seekTo: (positionMs: number) => void
+  setPlayerSceneOpen: (open: boolean) => void
+  setPlayerSceneFullscreen: (fullscreen: boolean) => void
+  openPlayerScene: () => void
+  closePlayerScene: () => void
   markPlaybackLoading: () => void
   markPlaybackPlaying: () => void
   markPlaybackPaused: () => void
@@ -44,6 +53,10 @@ const INITIAL_PLAYBACK_STATE = {
   lastAudibleVolume: 70,
   error: '',
   requestId: 0,
+  seekRequestId: 0,
+  seekPosition: 0,
+  isPlayerSceneOpen: false,
+  isPlayerSceneFullscreen: false,
 }
 
 function clampPercent(value: number) {
@@ -163,6 +176,23 @@ export const usePlaybackStore = create<PlaybackStoreState>((set, get) => ({
       }
     })
   },
+  seekTo: positionMs => {
+    const nextPosition = Math.max(
+      0,
+      Number.isFinite(positionMs) ? positionMs : 0
+    )
+
+    set(state => ({
+      progress: nextPosition,
+      seekPosition: nextPosition,
+      seekRequestId: state.seekRequestId + 1,
+    }))
+  },
+  setPlayerSceneOpen: open => set({ isPlayerSceneOpen: open }),
+  setPlayerSceneFullscreen: fullscreen =>
+    set({ isPlayerSceneFullscreen: fullscreen }),
+  openPlayerScene: () => set({ isPlayerSceneOpen: true }),
+  closePlayerScene: () => set({ isPlayerSceneOpen: false }),
   markPlaybackLoading: () => set({ status: 'loading', error: '' }),
   markPlaybackPlaying: () => set({ status: 'playing', error: '' }),
   markPlaybackPaused: () => set({ status: 'paused' }),

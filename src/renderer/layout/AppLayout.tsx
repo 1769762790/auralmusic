@@ -1,6 +1,7 @@
 import Header from '@/components/Header'
 import PlaybackControl from '@/components/PlaybackControl'
 import PlaybackEngine from '@/components/PlaybackControl/PlaybackEngine'
+import PlayerScene from '@/components/PlayerScene'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import KeepAliveRouteOutlet from 'keepalive-for-react-router'
 import { Toaster } from '@/components/ui/sonner'
@@ -24,6 +25,7 @@ const AppLayout = () => {
       </div>
       <PlaybackEngine />
       <PlaybackControl />
+      <PlayerScene />
       <Toaster />
       <ScrollToTopButton />
     </main>

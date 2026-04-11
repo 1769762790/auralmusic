@@ -75,9 +75,25 @@ export function gePlayListCatList() {
   return request.get('/playlist/catlist')
 }
 
+export interface PersonalFmParams {
+  timestamp?: number
+}
+
 // 私人FM
-export function getPersonalFm() {
-  return request.get('/personal_fm')
+export function getPersonalFm(params?: PersonalFmParams) {
+  return request.get('/personal_fm', {
+    params,
+  })
+}
+
+export interface FmTrashParams {
+  id: number | string
+}
+
+export function fmTrash(params: FmTrashParams) {
+  return request.get('/fm_trash', {
+    params,
+  })
 }
 //每日推荐
 export function getRecommendSongs() {
@@ -115,6 +131,16 @@ export interface SongUrlV1Params {
 
 export function getSongUrlV1(params: SongUrlV1Params) {
   return request.get('/song/url/v1', {
+    params,
+  })
+}
+
+export interface LyricParams {
+  id: number | string
+}
+
+export function getLyric(params: LyricParams) {
+  return request.get('/lyric', {
     params,
   })
 }

@@ -6,6 +6,11 @@ interface FmFeatureCardProps {
   title?: string
   artist?: string
   isLoading?: boolean
+  isActiveFm?: boolean
+  isPlayingFm?: boolean
+  actionLoading?: boolean
+  disabled?: boolean
+  onTogglePlay?: () => void
   moveToNext?: () => void
   trashCurrent?: () => void
 }
@@ -15,11 +20,16 @@ const FmFeatureCard = ({
   title,
   artist,
   isLoading,
+  isActiveFm = false,
+  isPlayingFm = false,
+  actionLoading = false,
+  disabled = false,
+  onTogglePlay,
   moveToNext,
   trashCurrent,
 }: FmFeatureCardProps) => {
-  const isPlayingFm = false
-  const isActiveFm = false
+  const isActionDisabled = Boolean(isLoading || actionLoading || disabled)
+
   return (
     <section
       className='group border-border/70 relative h-[200px] overflow-hidden rounded-[26px] border p-4 shadow-[0_24px_64px_rgba(0,0,0,0.14)]'
@@ -82,7 +92,7 @@ const FmFeatureCard = ({
                 type='button'
                 size='icon'
                 className='size-10 rounded-full bg-transparent text-white/90 hover:bg-white/12 hover:text-white disabled:opacity-50'
-                disabled={isLoading}
+                disabled={isActionDisabled}
                 onClick={() => {
                   trashCurrent?.()
                 }}
@@ -94,14 +104,9 @@ const FmFeatureCard = ({
                 size='icon'
                 className='size-12 cursor-pointer rounded-full border border-white/10 bg-white/12 text-white backdrop-blur-md transition-transform duration-300 group-hover:scale-[1.04] hover:bg-white/18 disabled:cursor-default disabled:opacity-45'
                 data-state={isActiveFm ? 'active' : 'idle'}
-                disabled={isLoading}
+                disabled={isActionDisabled}
                 onClick={() => {
-                  if (isActiveFm) {
-                    // togglePlay()
-                    return
-                  }
-
-                  // playFromCursor()
+                  onTogglePlay?.()
                 }}
               >
                 {isPlayingFm ? (
@@ -114,7 +119,7 @@ const FmFeatureCard = ({
                 type='button'
                 size='icon'
                 className='size-10 rounded-full bg-transparent text-white/90 hover:bg-white/12 hover:text-white disabled:opacity-50'
-                disabled={isLoading}
+                disabled={isActionDisabled}
                 onClick={() => {
                   moveToNext?.()
                 }}

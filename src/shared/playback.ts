@@ -62,6 +62,10 @@ export function normalizeSongUrlV1Response(
   }
 }
 
+export function createSongUrlRequestAttempts(unblockEnabled: boolean) {
+  return unblockEnabled ? [false, true] : [false]
+}
+
 export function normalizePlaybackTrack(track: unknown): PlaybackTrack | null {
   if (!isRecord(track)) {
     return null

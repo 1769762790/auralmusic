@@ -10,7 +10,7 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
 import { toggleSongLike } from '@/api/list'
@@ -86,6 +86,8 @@ const PlaybackControl = () => {
   const playNext = usePlaybackStore(state => state.playNext)
   const setVolume = usePlaybackStore(state => state.setVolume)
   const toggleMute = usePlaybackStore(state => state.toggleMute)
+  const seekTo = usePlaybackStore(state => state.seekTo)
+  const openPlayerScene = usePlaybackStore(state => state.openPlayerScene)
   const userId = useAuthStore(state => state.user?.userId)
   const hasHydrated = useAuthStore(state => state.hasHydrated)
   const openLoginDialog = useAuthStore(state => state.openLoginDialog)
@@ -106,11 +108,30 @@ const PlaybackControl = () => {
   const isPlaying = status === 'playing' || status === 'loading'
   const isLiked = track ? likedSongIds.has(track.id) : false
   const isLikePending = track ? likedSongPendingIds.has(track.id) : false
-  const progressPercent = clampPercent(
-    duration ? (progress / duration) * 100 : 0
-  )
+  const [dragProgress, setDragProgress] = useState<number | null>(null)
+  const maxProgress = Math.max(duration, 1)
+  const currentProgress = Math.min(dragProgress ?? progress, maxProgress)
   const volumePercent = clampPercent(volume)
   const isMuted = volumePercent === 0
+
+  useEffect(() => {
+    if (hasTrack && duration > 0) {
+      return
+    }
+
+    setDragProgress(null)
+  }, [duration, hasTrack])
+
+  const handleProgressChange = (value: number[]) => {
+    setDragProgress(value[0] ?? 0)
+  }
+
+  const handleProgressCommit = (value: number[]) => {
+    const nextProgress = value[0] ?? 0
+
+    setDragProgress(null)
+    seekTo(nextProgress)
+  }
 
   const handleVolumeChange = (value: number[]) => {
     setVolume(value[0] ?? 0)
@@ -156,27 +177,41 @@ const PlaybackControl = () => {
 
   return (
     <footer className='window-no-drag bg-background/50 border-border/60 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-2xl'>
-      <div
-        className='bg-primary absolute top-0 left-0 h-0.5 transition-[width] duration-300 ease-out'
-        style={{ width: `${progressPercent}%` }}
+      <Slider
+        aria-label='播放进度'
+        min={0}
+        max={maxProgress}
+        step={1000}
+        value={[currentProgress]}
+        disabled={!hasTrack || duration <= 0}
+        onValueChange={handleProgressChange}
+        onValueCommit={handleProgressCommit}
+        className='**:data-[slot=slider-range]:bg-primary **:data-[slot=slider-thumb]:border-primary/30 **:data-[slot=slider-thumb]:bg-primary absolute -top-0.75 right-0 left-0 z-10 h-2 cursor-pointer **:data-[slot=slider-thumb]:size-2.5 **:data-[slot=slider-track]:h-0.5 **:data-[slot=slider-track]:rounded-none **:data-[slot=slider-track]:bg-transparent'
       />
 
       <div className='grid h-18 grid-cols-[minmax(220px,1fr)_minmax(260px,420px)_minmax(220px,1fr)] items-center gap-6 px-12 xl:px-25 2xl:px-50'>
         <div className='flex min-w-0 items-center gap-3'>
-          <AvatarCover
-            url={currentTrack.coverUrl}
-            className='size-11 shrink-0'
-            rounded='12px'
-            isAutoHovered
-          />
-          <div className='min-w-0'>
-            <div className='truncate text-sm font-semibold'>
-              {currentTrack.name}
+          <button
+            type='button'
+            onClick={openPlayerScene}
+            className='group flex min-w-0 items-center gap-3 rounded-2xl pr-2 text-left transition-colors outline-none'
+          >
+            <AvatarCover
+              url={currentTrack.coverUrl}
+              className='size-11 shrink-0'
+              wrapperClass='shrink-0'
+              rounded='12px'
+              isAutoHovered
+            />
+            <div className='min-w-0'>
+              <div className='truncate text-sm font-semibold'>
+                {currentTrack.name}
+              </div>
+              <div className='text-muted-foreground truncate text-xs'>
+                {currentTrack.artistName}
+              </div>
             </div>
-            <div className='text-muted-foreground truncate text-xs'>
-              {currentTrack.artistName}
-            </div>
-          </div>
+          </button>
           <ControlButton
             label={isLiked ? '取消喜欢' : '喜欢歌曲'}
             disabled={!hasTrack || isLikePending}
@@ -252,7 +287,7 @@ const PlaybackControl = () => {
             step={1}
             value={[volumePercent]}
             onValueChange={handleVolumeChange}
-            className='**:[[role=slider]]:bg-primary **:data-[slot=slider-track]:bg-primary/30 w-24'
+            className='[&_[data-slot=slider-range]]:bg-foreground [&_[data-slot=slider-track]]:bg-foreground/18 w-24'
           />
           <span className='text-muted-foreground w-9 text-right text-xs tabular-nums'>
             {Math.round(volumePercent)}%
