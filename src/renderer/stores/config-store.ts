@@ -13,7 +13,10 @@ import {
   resolveActiveLxMusicSourceScriptId,
 } from '../../shared/lx-music-source'
 import { normalizeShortcutBindings } from '../../shared/shortcut-keys'
-import { normalizePlaybackVolume } from '../../shared/playback'
+import {
+  normalizePlaybackMode,
+  normalizePlaybackVolume,
+} from '../../shared/playback'
 
 function normalizeQuality(value: unknown): AudioQualityLevel {
   if (value === 'high') {
@@ -84,6 +87,7 @@ function normalizeConfig(config: AppConfig): AppConfig {
     ...config,
     quality: normalizeQuality(config.quality),
     playbackVolume: normalizePlaybackVolume(config.playbackVolume),
+    playbackMode: normalizePlaybackMode(config.playbackMode),
     musicSourceEnabled:
       typeof config.musicSourceEnabled === 'boolean'
         ? config.musicSourceEnabled

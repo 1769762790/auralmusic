@@ -21,6 +21,14 @@ const tracks: PlaybackTrack[] = [
     coverUrl: 'cover-2',
     duration: 200000,
   },
+  {
+    id: 3,
+    name: 'Track 3',
+    artistNames: 'Artist 3',
+    albumName: 'Album 3',
+    coverUrl: 'cover-3',
+    duration: 210000,
+  },
 ]
 
 test('playQueueFromIndex sets queue and starts loading selected track', () => {
@@ -29,7 +37,7 @@ test('playQueueFromIndex sets queue and starts loading selected track', () => {
   usePlaybackStore.getState().playQueueFromIndex(tracks, 1)
 
   const state = usePlaybackStore.getState()
-  assert.equal(state.queue.length, 2)
+  assert.equal(state.queue.length, 3)
   assert.equal(state.currentIndex, 1)
   assert.equal(state.currentTrack?.id, 2)
   assert.equal(state.status, 'loading')
@@ -37,22 +45,24 @@ test('playQueueFromIndex sets queue and starts loading selected track', () => {
   assert.equal(state.requestId, 1)
 })
 
-test('playNext and playPrevious respect queue boundaries', () => {
+test('playNext and playPrevious loop queue boundaries in repeat-all mode', () => {
   usePlaybackStore.getState().resetPlayback()
   usePlaybackStore.getState().playQueueFromIndex(tracks, 0)
 
   assert.equal(usePlaybackStore.getState().playNext(), true)
   assert.equal(usePlaybackStore.getState().currentTrack?.id, 2)
 
-  assert.equal(usePlaybackStore.getState().playNext(), false)
-  assert.equal(usePlaybackStore.getState().status, 'paused')
-  assert.equal(usePlaybackStore.getState().currentTrack?.id, 2)
+  assert.equal(usePlaybackStore.getState().playNext(), true)
+  assert.equal(usePlaybackStore.getState().currentTrack?.id, 3)
+
+  assert.equal(usePlaybackStore.getState().playNext(), true)
+  assert.equal(usePlaybackStore.getState().currentTrack?.id, 1)
 
   assert.equal(usePlaybackStore.getState().playPrevious(), true)
-  assert.equal(usePlaybackStore.getState().currentTrack?.id, 1)
+  assert.equal(usePlaybackStore.getState().currentTrack?.id, 3)
 
-  assert.equal(usePlaybackStore.getState().playPrevious(), false)
-  assert.equal(usePlaybackStore.getState().currentTrack?.id, 1)
+  assert.equal(usePlaybackStore.getState().playPrevious(), true)
+  assert.equal(usePlaybackStore.getState().currentTrack?.id, 2)
 })
 
 test('markPlaybackError keeps queue and current track', () => {
@@ -64,7 +74,7 @@ test('markPlaybackError keeps queue and current track', () => {
   const state = usePlaybackStore.getState()
   assert.equal(state.status, 'error')
   assert.equal(state.error, 'temporarily unavailable')
-  assert.equal(state.queue.length, 2)
+  assert.equal(state.queue.length, 3)
   assert.equal(state.currentTrack?.id, 1)
 })
 
@@ -132,4 +142,69 @@ test('seekTo stores a clamped seek request in milliseconds', () => {
 
   assert.equal(usePlaybackStore.getState().seekPosition, 0)
   assert.equal(usePlaybackStore.getState().seekRequestId, 2)
+})
+
+test('setPlaybackMode builds shuffle state without changing the visible queue', () => {
+  usePlaybackStore.getState().resetPlayback()
+  usePlaybackStore.getState().playQueueFromIndex(tracks, 1)
+
+  const queueBeforeShuffle = usePlaybackStore.getState().queue
+
+  usePlaybackStore.getState().setPlaybackMode('shuffle')
+
+  const state = usePlaybackStore.getState()
+  assert.equal(state.playbackMode, 'shuffle')
+  assert.equal(state.queue, queueBeforeShuffle)
+  assert.equal(state.shuffleOrder[0], 1)
+  assert.deepEqual(
+    [...state.shuffleOrder].sort((a, b) => a - b),
+    [0, 1, 2]
+  )
+  assert.equal(state.shuffleCursor, 0)
+})
+
+test('shuffle mode advances through the internal shuffle order', () => {
+  usePlaybackStore.getState().resetPlayback()
+  usePlaybackStore.getState().playQueueFromIndex(tracks, 0)
+  usePlaybackStore.setState({
+    playbackMode: 'shuffle',
+    shuffleOrder: [0, 2, 1],
+    shuffleCursor: 0,
+  })
+
+  assert.equal(usePlaybackStore.getState().playNext(), true)
+
+  const state = usePlaybackStore.getState()
+  assert.equal(state.currentTrack?.id, 3)
+  assert.equal(state.shuffleCursor, 1)
+  assert.deepEqual(state.shuffleOrder, [0, 2, 1])
+})
+
+test('repeat-one repeats on automatic advance and skips on manual advance', () => {
+  usePlaybackStore.getState().resetPlayback()
+  usePlaybackStore.getState().playQueueFromIndex(tracks, 0)
+  usePlaybackStore.getState().setPlaybackMode('repeat-one')
+
+  assert.equal(usePlaybackStore.getState().playNext('auto'), true)
+  assert.equal(usePlaybackStore.getState().currentTrack?.id, 1)
+
+  assert.equal(usePlaybackStore.getState().playNext('manual'), true)
+  assert.equal(usePlaybackStore.getState().currentTrack?.id, 2)
+})
+
+test('resetPlayback restores default playback mode and shuffle state', () => {
+  usePlaybackStore.getState().resetPlayback()
+  usePlaybackStore.getState().playQueueFromIndex(tracks, 0)
+  usePlaybackStore.setState({
+    playbackMode: 'shuffle',
+    shuffleOrder: [0, 2, 1],
+    shuffleCursor: 2,
+  })
+
+  usePlaybackStore.getState().resetPlayback()
+
+  const state = usePlaybackStore.getState()
+  assert.equal(state.playbackMode, 'repeat-all')
+  assert.deepEqual(state.shuffleOrder, [])
+  assert.equal(state.shuffleCursor, 0)
 })

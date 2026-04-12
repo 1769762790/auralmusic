@@ -3,6 +3,7 @@ import {
   ListMusic,
   Pause,
   Play,
+  Repeat1,
   Repeat2,
   Shuffle,
   SkipBack,
@@ -22,7 +23,12 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useConfigStore } from '@/stores/config-store'
 import { usePlaybackStore } from '@/stores/playback-store'
 import { useUserStore } from '@/stores/user'
-import { normalizePlaybackVolume } from '../../../shared/playback.ts'
+import {
+  getNextPlaybackMode,
+  normalizePlaybackMode,
+  normalizePlaybackVolume,
+  type PlaybackMode,
+} from '../../../shared/playback.ts'
 
 type PlaybackControlTrack = {
   name: string
@@ -35,6 +41,12 @@ const DEFAULT_TRACK: PlaybackControlTrack = {
   artistName: 'AuralMusic',
   coverUrl:
     'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="%2393c5fd"/><stop offset="1" stop-color="%23f9a8d4"/></linearGradient></defs><rect width="128" height="128" rx="24" fill="url(%23g)"/><path d="M78 31v47.5a16 16 0 1 1-8-13.85V42.2l-30 6.24V84.5a16 16 0 1 1-8-13.85V42z" fill="white" fill-opacity=".88"/></svg>',
+}
+
+const PLAYBACK_MODE_LABELS: Record<PlaybackMode, string> = {
+  'repeat-all': '循环播放',
+  shuffle: '随机播放',
+  'repeat-one': '单曲循环',
 }
 
 function clampPercent(value: number) {
@@ -84,15 +96,20 @@ const PlaybackControl = () => {
   const progress = usePlaybackStore(state => state.progress)
   const duration = usePlaybackStore(state => state.duration)
   const volume = usePlaybackStore(state => state.volume)
+  const playbackMode = usePlaybackStore(state => state.playbackMode)
   const togglePlay = usePlaybackStore(state => state.togglePlay)
   const playPrevious = usePlaybackStore(state => state.playPrevious)
   const playNext = usePlaybackStore(state => state.playNext)
+  const setPlaybackMode = usePlaybackStore(state => state.setPlaybackMode)
   const setVolume = usePlaybackStore(state => state.setVolume)
   const toggleMute = usePlaybackStore(state => state.toggleMute)
   const seekTo = usePlaybackStore(state => state.seekTo)
   const openPlayerScene = usePlaybackStore(state => state.openPlayerScene)
   const isConfigLoading = useConfigStore(state => state.isLoading)
   const persistedVolume = useConfigStore(state => state.config.playbackVolume)
+  const persistedPlaybackMode = useConfigStore(
+    state => state.config.playbackMode
+  )
   const setConfig = useConfigStore(state => state.setConfig)
   const userId = useAuthStore(state => state.user?.userId)
   const hasHydrated = useAuthStore(state => state.hasHydrated)
@@ -120,6 +137,7 @@ const PlaybackControl = () => {
   const currentProgress = Math.min(dragProgress ?? progress, maxProgress)
   const volumePercent = clampPercent(volume)
   const isMuted = volumePercent === 0
+  const playbackModeLabel = PLAYBACK_MODE_LABELS[playbackMode]
 
   useEffect(() => {
     if (hasTrack && duration > 0) {
@@ -135,7 +153,14 @@ const PlaybackControl = () => {
     }
 
     setVolume(normalizePlaybackVolume(persistedVolume))
-  }, [isConfigLoading, persistedVolume, setVolume])
+    setPlaybackMode(normalizePlaybackMode(persistedPlaybackMode))
+  }, [
+    isConfigLoading,
+    persistedPlaybackMode,
+    persistedVolume,
+    setPlaybackMode,
+    setVolume,
+  ])
 
   const handleProgressChange = (value: number[]) => {
     setDragProgress(value[0] ?? 0)
@@ -162,6 +187,13 @@ const PlaybackControl = () => {
       'playbackVolume',
       normalizePlaybackVolume(usePlaybackStore.getState().volume)
     )
+  }
+
+  const handleTogglePlaybackMode = () => {
+    const nextMode = getNextPlaybackMode(playbackMode)
+
+    setPlaybackMode(nextMode)
+    void setConfig('playbackMode', nextMode)
   }
 
   const handleToggleLike = async () => {
@@ -296,11 +328,18 @@ const PlaybackControl = () => {
             >
               <ListMusic className='size-5' />
             </ControlButton>
-            <ControlButton label='循环播放'>
-              <Repeat2 className='size-5' />
-            </ControlButton>
-            <ControlButton label='随机播放'>
-              <Shuffle className='size-5' />
+            <ControlButton
+              label={playbackModeLabel}
+              onClick={handleTogglePlaybackMode}
+              className='text-primary hover:text-primary'
+            >
+              {playbackMode === 'repeat-all' ? (
+                <Repeat2 className='size-5' />
+              ) : playbackMode === 'shuffle' ? (
+                <Shuffle className='size-5' />
+              ) : (
+                <Repeat1 className='size-5' />
+              )}
             </ControlButton>
             <ControlButton
               label={isMuted ? '取消静音' : '静音'}
@@ -323,9 +362,6 @@ const PlaybackControl = () => {
               onValueCommit={handleVolumeCommit}
               className='[&_[data-slot=slider-range]]:bg-foreground [&_[data-slot=slider-track]]:bg-foreground/18 w-24'
             />
-            {/* <span className='text-muted-foreground w-9 text-right text-xs tabular-nums'>
-              {Math.round(volumePercent)}%
-            </span> */}
           </div>
         </div>
       </footer>

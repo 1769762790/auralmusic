@@ -1,4 +1,5 @@
 import type { ImportedLxMusicSource } from '../../shared/lx-music-source'
+import type { PlaybackMode } from '../../shared/playback'
 import {
   DEFAULT_SHORTCUT_BINDINGS,
   type ShortcutBindings,
@@ -33,6 +34,7 @@ export interface AppConfig {
   fontFamily: string
   audioOutputDeviceId: string
   playbackVolume: number
+  playbackMode: PlaybackMode
   musicSourceEnabled: boolean
   musicSourceProviders: MusicSourceProvider[]
   luoxueSourceEnabled: boolean
@@ -52,6 +54,7 @@ export const defaultConfig: AppConfig = {
   fontFamily: 'Inter Variable',
   audioOutputDeviceId: 'default',
   playbackVolume: 70,
+  playbackMode: 'repeat-all',
   musicSourceEnabled: false,
   musicSourceProviders: ['migu', 'kugou', 'pyncmd', 'bilibili'],
   luoxueSourceEnabled: false,

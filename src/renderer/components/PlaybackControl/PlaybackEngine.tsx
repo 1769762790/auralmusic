@@ -81,7 +81,7 @@ const PlaybackEngine = () => {
     }
 
     const handleEnded = () => {
-      const hasNext = usePlaybackStore.getState().playNext()
+      const hasNext = usePlaybackStore.getState().playNext('auto')
 
       if (!hasNext) {
         usePlaybackStore.getState().markPlaybackPaused()

@@ -1,8 +1,11 @@
 import { create } from 'zustand'
 import {
+  createShuffleOrder,
   createPlaybackQueueSnapshot,
-  getNextQueueIndex,
-  getPreviousQueueIndex,
+  normalizePlaybackMode,
+  resolvePlaybackQueueStep,
+  type PlaybackAdvanceReason,
+  type PlaybackMode,
   type PlaybackStatus,
   type PlaybackTrack,
 } from '../../shared/playback.ts'
@@ -11,6 +14,9 @@ interface PlaybackStoreState {
   queue: PlaybackTrack[]
   currentIndex: number
   currentTrack: PlaybackTrack | null
+  playbackMode: PlaybackMode
+  shuffleOrder: number[]
+  shuffleCursor: number
   status: PlaybackStatus
   progress: number
   duration: number
@@ -24,7 +30,8 @@ interface PlaybackStoreState {
   isPlayerSceneFullscreen: boolean
   playQueueFromIndex: (tracks: PlaybackTrack[], startIndex: number) => void
   togglePlay: () => void
-  playNext: () => boolean
+  setPlaybackMode: (mode: PlaybackMode) => void
+  playNext: (reason?: PlaybackAdvanceReason) => boolean
   playPrevious: () => boolean
   setProgress: (progress: number) => void
   setDuration: (duration: number) => void
@@ -46,6 +53,9 @@ const INITIAL_PLAYBACK_STATE = {
   queue: [],
   currentIndex: -1,
   currentTrack: null,
+  playbackMode: 'repeat-all' as PlaybackMode,
+  shuffleOrder: [],
+  shuffleCursor: 0,
   status: 'idle' as PlaybackStatus,
   progress: 0,
   duration: 0,
@@ -94,6 +104,11 @@ export const usePlaybackStore = create<PlaybackStoreState>((set, get) => ({
     const snapshot = createPlaybackQueueSnapshot(tracks, startIndex)
     set(state => ({
       ...snapshot,
+      shuffleOrder:
+        state.playbackMode === 'shuffle' && snapshot.currentTrack
+          ? createShuffleOrder(snapshot.queue.length, snapshot.currentIndex)
+          : [],
+      shuffleCursor: 0,
       status: snapshot.currentTrack ? 'loading' : 'idle',
       progress: 0,
       duration: snapshot.currentTrack?.duration || 0,
@@ -126,28 +141,67 @@ export const usePlaybackStore = create<PlaybackStoreState>((set, get) => ({
     set({ status: 'playing', error: '' })
   },
 
-  playNext: () => {
+  setPlaybackMode: mode => {
     const state = get()
-    const nextIndex = getNextQueueIndex(state.queue, state.currentIndex)
+    const playbackMode = normalizePlaybackMode(mode)
+    const shuffleOrder =
+      playbackMode === 'shuffle' && state.currentTrack
+        ? createShuffleOrder(state.queue.length, state.currentIndex)
+        : []
 
-    if (nextIndex === null) {
+    set({
+      playbackMode,
+      shuffleOrder,
+      shuffleCursor: 0,
+    })
+  },
+
+  playNext: (reason = 'manual') => {
+    const state = get()
+    const step = resolvePlaybackQueueStep({
+      queueLength: state.queue.length,
+      currentIndex: state.currentIndex,
+      playbackMode: state.playbackMode,
+      direction: 'next',
+      reason,
+      shuffleOrder: state.shuffleOrder,
+      shuffleCursor: state.shuffleCursor,
+    })
+
+    if (step.index === null) {
       set({ status: state.currentTrack ? 'paused' : 'idle' })
       return false
     }
 
-    set(createTrackPatch(state.queue, nextIndex, state.requestId))
+    set({
+      ...createTrackPatch(state.queue, step.index, state.requestId),
+      shuffleOrder: step.shuffleOrder,
+      shuffleCursor: step.shuffleCursor,
+    })
     return true
   },
 
   playPrevious: () => {
     const state = get()
-    const previousIndex = getPreviousQueueIndex(state.queue, state.currentIndex)
+    const step = resolvePlaybackQueueStep({
+      queueLength: state.queue.length,
+      currentIndex: state.currentIndex,
+      playbackMode: state.playbackMode,
+      direction: 'previous',
+      reason: 'manual',
+      shuffleOrder: state.shuffleOrder,
+      shuffleCursor: state.shuffleCursor,
+    })
 
-    if (previousIndex === null) {
+    if (step.index === null) {
       return false
     }
 
-    set(createTrackPatch(state.queue, previousIndex, state.requestId))
+    set({
+      ...createTrackPatch(state.queue, step.index, state.requestId),
+      shuffleOrder: step.shuffleOrder,
+      shuffleCursor: step.shuffleCursor,
+    })
     return true
   },
 
