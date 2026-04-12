@@ -1,4 +1,4 @@
-import type { HomeFmSong } from './home.model'
+import type { HomeDailySong, HomeFmSong, HomeNewSong } from './home.model'
 
 export interface ArtistSummary {
   id: number
@@ -6,28 +6,11 @@ export interface ArtistSummary {
   picUrl: string
 }
 
-export interface DailySong {
-  id?: number
-  al?: {
-    picUrl?: string
-  }
-}
+export type DailySong = HomeDailySong
 
 export type HomeFmData = HomeFmSong
 
-export interface NewSongArtist {
-  name?: string
-}
-
-export interface NewSong {
-  id: number
-  name?: string
-  picUrl?: string
-  artist?: NewSongArtist
-  song?: {
-    artists?: NewSongArtist[]
-  }
-}
+export type NewSong = HomeNewSong
 
 export interface AlbumSummary {
   id: number

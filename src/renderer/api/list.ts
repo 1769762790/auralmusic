@@ -70,6 +70,17 @@ export function getPlaylistTracks(params: PlaylistTracksParams) {
     params,
   })
 }
+
+export interface PlaylistSubscribeParams {
+  id: number | string
+  t: 1 | 2
+}
+
+export function togglePlaylistSubscription(params: PlaylistSubscribeParams) {
+  return request.get('/playlist/subscribe', {
+    params,
+  })
+}
 // 获取热门歌单
 export function gePlayListCatList() {
   return request.get('/playlist/catlist')

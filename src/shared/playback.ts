@@ -66,6 +66,14 @@ export function createSongUrlRequestAttempts(unblockEnabled: boolean) {
   return unblockEnabled ? [false, true] : [false]
 }
 
+export function normalizePlaybackVolume(value: unknown) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return 70
+  }
+
+  return Math.min(100, Math.max(0, Math.round(value)))
+}
+
 export function normalizePlaybackTrack(track: unknown): PlaybackTrack | null {
   if (!isRecord(track)) {
     return null
@@ -138,4 +146,17 @@ export function getPreviousQueueIndex(
   const previousIndex = currentIndex - 1
 
   return queue.length > 0 && previousIndex >= 0 ? previousIndex : null
+}
+
+export function getPlaybackQueueItemState(
+  itemIndex: number,
+  currentIndex: number,
+  status: PlaybackStatus
+) {
+  const isActive = itemIndex === currentIndex
+
+  return {
+    isActive,
+    isPlaying: isActive && (status === 'playing' || status === 'loading'),
+  }
 }

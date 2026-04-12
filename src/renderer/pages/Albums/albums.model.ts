@@ -12,7 +12,7 @@ export interface AlbumArtist {
 export interface AlbumListItem {
   id: number
   name: string
-  picUrl?: string
+  picUrl: string
   blurPicUrl?: string
   artists?: AlbumArtist[]
   artist?: AlbumArtist

@@ -13,6 +13,7 @@ import {
   resolveActiveLxMusicSourceScriptId,
 } from '../../shared/lx-music-source'
 import { normalizeShortcutBindings } from '../../shared/shortcut-keys'
+import { normalizePlaybackVolume } from '../../shared/playback'
 
 function normalizeQuality(value: unknown): AudioQualityLevel {
   if (value === 'high') {
@@ -90,6 +91,7 @@ class ConfigStore {
           theme: { type: 'string', enum: ['light', 'dark', 'system'] },
           fontFamily: { type: 'string' },
           audioOutputDeviceId: { type: 'string' },
+          playbackVolume: { type: 'number', minimum: 0, maximum: 100 },
           musicSourceEnabled: { type: 'boolean' },
           musicSourceProviders: {
             type: 'array',
@@ -154,6 +156,12 @@ class ConfigStore {
       const normalizedQuality = normalizeQuality(quality)
       if (quality !== normalizedQuality) {
         ConfigStore.instance.set('quality', normalizedQuality)
+      }
+
+      const playbackVolume = ConfigStore.instance.get('playbackVolume')
+      const normalizedPlaybackVolume = normalizePlaybackVolume(playbackVolume)
+      if (playbackVolume !== normalizedPlaybackVolume) {
+        ConfigStore.instance.set('playbackVolume', normalizedPlaybackVolume)
       }
 
       const globalShortcutEnabled = ConfigStore.instance.get(

@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
-import AlbumCard from '@/pages/Albums/components/AlbumCard'
 import type { AlbumListItem } from '@/pages/Albums/albums.model'
 import { useAuthStore } from '@/stores/auth-store'
 import { useUserStore } from '@/stores/user'
+import ArtistCover from '@/components/ArtistCover'
+import { isDef } from '@/lib/utils'
 
 interface LibraryAlbumPanelProps {
   active: boolean
@@ -43,6 +44,11 @@ const LibraryAlbumPanel = ({ active }: LibraryAlbumPanelProps) => {
   } = useIntersectionLoadMore<AlbumListItem>(fetchSubscribedAlbums, {
     limit: PAGE_SIZE,
   })
+
+  const navigateToAlbumDetail = (id: number) => {
+    if (!isDef(id)) return
+    navigate(`/albums/${id}`)
+  }
 
   useEffect(() => {
     if (!active) {
@@ -95,10 +101,13 @@ const LibraryAlbumPanel = ({ active }: LibraryAlbumPanelProps) => {
     <div className='space-y-6'>
       <div className='grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6'>
         {albums.map(album => (
-          <AlbumCard
+          <ArtistCover
+            artistCoverUrl={album.picUrl}
+            subTitle={album.artist?.name}
+            artistName={album.name}
             key={album.id}
-            album={album}
-            onToAlbumDetail={albumId => navigate(`/albums/${albumId}`)}
+            // onPlay={() => handlePlay(item)}
+            onClickCover={() => navigateToAlbumDetail(album.id)}
           />
         ))}
       </div>

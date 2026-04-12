@@ -10,31 +10,57 @@ type RawAlbum = {
   artist?: RawArtist
 }
 
-export type HomeFmSong = {
+type RawSongLike = {
   id?: number
   name?: string
   duration?: number
   dt?: number
   artists?: RawArtist[]
   ar?: RawArtist[]
+  artist?: RawArtist
   album?: RawAlbum
   al?: RawAlbum
+  picUrl?: string
 }
 
-function resolveArtistNames(song: HomeFmSong) {
-  const artists = song.artists || song.ar || []
-  const names = artists
+export type HomeFmSong = RawSongLike
+
+export type HomeDailySong = RawSongLike
+
+export type HomeNewSong = {
+  id?: number
+  name?: string
+  picUrl?: string
+  artist?: RawArtist
+  song?: RawSongLike
+}
+
+function joinArtistNames(artists?: RawArtist[]) {
+  return (artists || [])
     .map(artist => artist.name?.trim())
     .filter((name): name is string => Boolean(name))
-
-  if (names.length) {
-    return names.join(' / ')
-  }
-
-  return song.album?.artist?.name || song.al?.artist?.name || '未知歌手'
+    .join(' / ')
 }
 
-export function normalizeHomeFmTrack(song: HomeFmSong): PlaybackTrack | null {
+function resolveArtistNames(song: RawSongLike) {
+  const names = joinArtistNames(song.artists || song.ar)
+
+  if (names) {
+    return names
+  }
+
+  return (
+    song.artist?.name ||
+    song.album?.artist?.name ||
+    song.al?.artist?.name ||
+    '未知歌手'
+  )
+}
+
+function normalizeSongLikeTrack(
+  song: RawSongLike,
+  fallbackAlbumName = '未知专辑'
+): PlaybackTrack | null {
   const id = song.id || 0
   const name = song.name?.trim() || ''
 
@@ -48,8 +74,60 @@ export function normalizeHomeFmTrack(song: HomeFmSong): PlaybackTrack | null {
     id,
     name,
     artistNames: resolveArtistNames(song),
-    albumName: album?.name || '私人 FM',
-    coverUrl: album?.picUrl || '',
+    albumName: album?.name || fallbackAlbumName,
+    coverUrl: song.picUrl || album?.picUrl || '',
     duration: song.duration || song.dt || 0,
   }
+}
+
+function resolveNewSongArtistNames(item: HomeNewSong) {
+  const song = item.song || {}
+  const names = joinArtistNames(song.artists || song.ar)
+
+  if (names) {
+    return names
+  }
+
+  return item.artist?.name || resolveArtistNames(song)
+}
+
+export function normalizeHomeFmTrack(song: HomeFmSong): PlaybackTrack | null {
+  return normalizeSongLikeTrack(song, '私人 FM')
+}
+
+export function normalizeHomeDailyTracks(
+  songs: HomeDailySong[]
+): PlaybackTrack[] {
+  return songs
+    .map(song => normalizeSongLikeTrack(song, '每日推荐'))
+    .filter((track): track is PlaybackTrack => Boolean(track))
+}
+
+export function normalizeHomeNewSongTracks(
+  songs: HomeNewSong[]
+): PlaybackTrack[] {
+  return songs
+    .map(item => {
+      const song = item.song || {}
+      const track = normalizeSongLikeTrack(
+        {
+          ...song,
+          id: item.id || song.id,
+          name: item.name || song.name,
+          artist: item.artist || song.artist,
+          picUrl: item.picUrl || song.picUrl,
+        },
+        '新歌速递'
+      )
+
+      if (!track) {
+        return null
+      }
+
+      return {
+        ...track,
+        artistNames: resolveNewSongArtistNames(item),
+      }
+    })
+    .filter((track): track is PlaybackTrack => Boolean(track))
 }

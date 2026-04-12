@@ -7,6 +7,7 @@ export interface PlaylistDetailHeroData {
   description: string
   updateTime?: number
   trackCount: number
+  isSubscribed: boolean
 }
 
 export interface PlaylistTrackItem {
@@ -35,6 +36,7 @@ interface RawPlaylistDetail {
   description?: string
   updateTime?: number
   trackCount?: number
+  subscribed?: boolean
   creator?: RawPlaylistCreator
 }
 
@@ -86,6 +88,7 @@ export function normalizePlaylistDetailHero(
     description: playlist.description || '',
     updateTime: playlist.updateTime,
     trackCount: playlist.trackCount || 0,
+    isSubscribed: playlist.subscribed === true,
   }
 }
 

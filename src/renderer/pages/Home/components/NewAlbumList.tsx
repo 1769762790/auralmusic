@@ -1,19 +1,25 @@
 import { Link, useNavigate } from 'react-router-dom'
 import type { AlbumSummary } from '../home.type'
 import { NewAlbumSkeleton } from './HomeSkeletons'
-import AlbumCard from './AlbumCard'
+import ArtistCover from '@/components/ArtistCover'
 
 interface NewAlbumListProps {
   list?: AlbumSummary[]
   isLoading?: boolean
+  onPlayAlbum?: (album: AlbumSummary) => void
 }
 
-const NewAlbumList = ({ list = [], isLoading = false }: NewAlbumListProps) => {
+const NewAlbumList = ({
+  list = [],
+  isLoading = false,
+  onPlayAlbum,
+}: NewAlbumListProps) => {
   const navigate = useNavigate()
   const navigateToAlbumDetail = (albumId: number) => {
     if (!albumId) return
     navigate(`/albums/${albumId}`)
   }
+
   return (
     <div className='mt-10'>
       <div className='group mb-10 flex items-center justify-between'>
@@ -28,13 +34,13 @@ const NewAlbumList = ({ list = [], isLoading = false }: NewAlbumListProps) => {
       ) : (
         <div className='grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-8 2xl:grid-cols-6 2xl:gap-8'>
           {list.map(item => (
-            <AlbumCard
-              coverUrl={item.picUrl}
-              title={item.name}
-              artist={item.artist.name}
+            <ArtistCover
+              artistCoverUrl={item.picUrl}
+              subTitle={item.artist.name}
+              artistName={item.name}
               key={item.id}
-              id={item.id}
-              onToAlbumDetail={navigateToAlbumDetail}
+              onPlay={() => onPlayAlbum?.(item)}
+              onClickCover={() => navigateToAlbumDetail(item.id)}
             />
           ))}
         </div>

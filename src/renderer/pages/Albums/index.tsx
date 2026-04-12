@@ -1,7 +1,6 @@
 import { startTransition, useCallback, useEffect, useState } from 'react'
 import { getNewAlbums } from '@/api/album'
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
-import AlbumCard from './components/AlbumCard'
 import AlbumFilters from './components/AlbumFilters'
 import { AlbumsGridSkeleton } from './components/AlbumsSkeletons'
 import {
@@ -11,6 +10,8 @@ import {
   type NewAlbumsResponse,
 } from './albums.model'
 import { useNavigate } from 'react-router-dom'
+import ArtistCover from '@/components/ArtistCover'
+import { isDef } from '@/lib/utils'
 
 const PAGE_SIZE = 30
 
@@ -66,7 +67,7 @@ const Albums = () => {
   }
 
   const navigateToAlbumDetail = (albumId: number) => {
-    if (!albumId) return
+    if (!isDef(albumId)) return
     navigate(`/albums/${albumId}`)
   }
 
@@ -91,11 +92,14 @@ const Albums = () => {
           </div>
         ) : (
           <div className='grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
-            {albums.map(album => (
-              <AlbumCard
-                key={album.id}
-                album={album}
-                onToAlbumDetail={navigateToAlbumDetail}
+            {albums.map(item => (
+              <ArtistCover
+                artistCoverUrl={item.picUrl}
+                subTitle={item.artist?.name}
+                artistName={item.name}
+                key={item.id}
+                // onPlay={() => handlePlay(item)}
+                onClickCover={() => navigateToAlbumDetail(item.id)}
               />
             ))}
           </div>

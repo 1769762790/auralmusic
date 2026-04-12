@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { getAlbumDetail, toggleAlbumSubscription } from '@/api/album'
 import TrackList from '@/components/TrackList'
 import { useAuthStore } from '@/stores/auth-store'
+import { usePlaybackStore } from '@/stores/playback-store'
 import { useUserStore } from '@/stores/user'
 
 import AlbumDetailHero from './components/AlbumDetailHero'
@@ -33,6 +34,7 @@ const AlbumDetail = () => {
   const likedAlbumsLoaded = useUserStore(state => state.likedAlbumsLoaded)
   const fetchLikedAlbums = useUserStore(state => state.fetchLikedAlbums)
   const toggleLikedAlbum = useUserStore(state => state.toggleLikedAlbum)
+  const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
   const isLiked = useUserStore(state =>
     albumId ? state.likedAlbumIds.has(albumId) : false
   )
@@ -123,6 +125,15 @@ const AlbumDetail = () => {
     }
   }
 
+  const handlePlayAlbum = () => {
+    if (!state.tracks.length) {
+      toast.error('暂无可播放的专辑歌曲')
+      return
+    }
+
+    playQueueFromIndex(state.tracks, 0)
+  }
+
   if (loading && !state.hero) {
     return <AlbumDetailSkeleton />
   }
@@ -154,6 +165,7 @@ const AlbumDetail = () => {
         isLiked={isLiked}
         likeLoading={likeLoading}
         onToggleLiked={handleToggleLikedAlbum}
+        onPlay={handlePlayAlbum}
       />
       <TrackList data={state.tracks} coverUrl={state.hero.coverUrl} />
     </section>

@@ -79,7 +79,7 @@ export const routeMenuConfig: RouteMenuConfig[] = [
       {
         path: '/albums',
         element: <Albums />,
-        meta: { title: '专辑', icon: '' },
+        meta: { title: '专辑', icon: '', hidden: true },
       },
       {
         path: '/albums/:id',

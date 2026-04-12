@@ -1,5 +1,5 @@
+import ArtistCover from '@/components/ArtistCover'
 import type { LibraryPlaylistItem } from '../library.model'
-import LibraryPlaylistCard from './LibraryPlaylistCard'
 
 interface LibraryPlaylistPanelProps {
   playlists: LibraryPlaylistItem[]
@@ -20,13 +20,18 @@ const LibraryPlaylistPanel = ({
     )
   }
 
+  console.log('playlists', playlists)
+
   return (
     <div className='grid grid-cols-2 gap-6 md:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-6'>
-      {playlists.map(playlist => (
-        <LibraryPlaylistCard
-          key={playlist.id}
-          playlist={playlist}
-          onOpen={onOpen}
+      {playlists.map(item => (
+        <ArtistCover
+          artistCoverUrl={item.coverUrl}
+          subTitle={item.subtitle}
+          artistName={item.name}
+          key={item.id}
+          // onPlay={() => handlePlay(item)}
+          onClickCover={() => onOpen(item.id)}
         />
       ))}
     </div>

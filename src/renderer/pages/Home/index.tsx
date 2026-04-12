@@ -13,7 +13,7 @@ import { usePlaybackStore } from '@/stores/playback-store'
 import { useDailySongs } from '@/stores/useDailySongs'
 import TopArtists from './components/TopArtists'
 import NewAlbumList from './components/NewAlbumList'
-import { getAlbumNewSet } from '@/api/album'
+import { getAlbumDetail, getAlbumNewSet } from '@/api/album'
 import NewSongsList from './components/NewSongsList'
 import { HomeFeatureSkeleton } from './components/HomeSkeletons'
 import type {
@@ -23,8 +23,13 @@ import type {
   NewSong,
 } from './home.type'
 import { useNavigate } from 'react-router-dom'
-import { normalizeHomeFmTrack } from './home.model'
+import {
+  normalizeHomeDailyTracks,
+  normalizeHomeFmTrack,
+  normalizeHomeNewSongTracks,
+} from './home.model'
 import type { PlaybackTrack } from '../../../shared/playback.ts'
+import { normalizeAlbumTracks } from '../Albums/Detail/album-detail.model'
 
 const Home = () => {
   const [featureLoading, setFeatureLoading] = useState(true)
@@ -98,6 +103,14 @@ const Home = () => {
 
   const topOneSong = dailyList[0] || {}
   const fmTrack = useMemo(() => normalizeHomeFmTrack(fmData), [fmData])
+  const dailyPlaybackQueue = useMemo(
+    () => normalizeHomeDailyTracks(dailyList),
+    [dailyList]
+  )
+  const newSongPlaybackQueue = useMemo(
+    () => normalizeHomeNewSongTracks(newSongs),
+    [newSongs]
+  )
   const isActiveFm = Boolean(fmTrack && currentTrack?.id === fmTrack.id)
   const isPlayingFm =
     isActiveFm && (playbackStatus === 'playing' || playbackStatus === 'loading')
@@ -108,6 +121,49 @@ const Home = () => {
 
   const playFmTrack = (track: PlaybackTrack) => {
     playQueueFromIndex([track], 0)
+  }
+
+  const handlePlayDailySongs = () => {
+    if (!dailyPlaybackQueue.length) {
+      toast.error('暂无可播放的每日推荐')
+      return
+    }
+
+    playQueueFromIndex(dailyPlaybackQueue, 0)
+  }
+
+  const handlePlayNewSong = (song: NewSong) => {
+    const startIndex = newSongPlaybackQueue.findIndex(
+      track => track.id === song.id
+    )
+
+    if (startIndex < 0) {
+      toast.error('暂无可播放的新歌')
+      return
+    }
+
+    playQueueFromIndex(newSongPlaybackQueue, startIndex)
+  }
+
+  const handlePlayAlbum = async (album: AlbumSummary) => {
+    if (!album.id) {
+      return
+    }
+
+    try {
+      const response = await getAlbumDetail(album.id)
+      const tracks = normalizeAlbumTracks(response.data)
+
+      if (!tracks.length) {
+        toast.error('暂无可播放的专辑歌曲')
+        return
+      }
+
+      playQueueFromIndex(tracks, 0)
+    } catch (error) {
+      console.error('play album failed', error)
+      toast.error('专辑歌曲加载失败')
+    }
   }
 
   const fetchNextFmTrack = async (autoPlay: boolean) => {
@@ -186,6 +242,7 @@ const Home = () => {
             isLoading={featureLoading}
             coverUrl={topOneSong?.al?.picUrl}
             id={topOneSong?.id || 0}
+            onPlay={handlePlayDailySongs}
             onOpenDailySongs={handleOpenDailySongs}
           />
           <FmFeatureCard
@@ -204,8 +261,16 @@ const Home = () => {
         </div>
       )}
       <TopArtists isLoading={artistsLoading} list={topArtists} />
-      <NewSongsList isLoading={newSongsLoading} list={newSongs} />
-      <NewAlbumList isLoading={albumsLoading} list={albumNewSet} />
+      <NewSongsList
+        isLoading={newSongsLoading}
+        list={newSongs}
+        onPlaySong={handlePlayNewSong}
+      />
+      <NewAlbumList
+        isLoading={albumsLoading}
+        list={albumNewSet}
+        onPlayAlbum={handlePlayAlbum}
+      />
     </div>
   )
 }

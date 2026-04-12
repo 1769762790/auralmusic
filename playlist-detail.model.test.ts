@@ -12,6 +12,7 @@ test('normalizePlaylistDetailHero maps creator user id from playlist detail payl
       description: 'desc',
       updateTime: 1710000000000,
       trackCount: 32,
+      subscribed: true,
       creator: {
         nickname: 'Creator A',
         userId: 9527,
@@ -28,6 +29,7 @@ test('normalizePlaylistDetailHero maps creator user id from playlist detail payl
     description: 'desc',
     updateTime: 1710000000000,
     trackCount: 32,
+    isSubscribed: true,
   })
 })
 
@@ -40,4 +42,5 @@ test('normalizePlaylistDetailHero falls back to null creator user id when creato
   })
 
   assert.equal(hero?.creatorUserId, null)
+  assert.equal(hero?.isSubscribed, false)
 })

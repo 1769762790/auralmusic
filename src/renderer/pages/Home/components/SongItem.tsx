@@ -4,9 +4,10 @@ import type { NewSong } from '../home.type'
 
 interface SongItemProps {
   song: NewSong
+  onPlay?: () => void
 }
 
-const SongItem = ({ song }: SongItemProps) => {
+const SongItem = ({ song, onPlay }: SongItemProps) => {
   return (
     <div className='group hover:bg-primary/5 mb-5 flex cursor-pointer items-center rounded-md px-2 py-2 transition-all duration-500'>
       <div
@@ -23,7 +24,7 @@ const SongItem = ({ song }: SongItemProps) => {
         className='bg-primary size-10 flex-shrink-0 scale-95 cursor-pointer rounded-full border border-white/10 text-white opacity-0 backdrop-blur-md transition-all duration-300 group-hover:scale-100 group-hover:opacity-100'
         onClick={event => {
           event.stopPropagation()
-          // onPlay?.()
+          onPlay?.()
         }}
       >
         <Play className='ml-0.5 size-3 fill-current' />

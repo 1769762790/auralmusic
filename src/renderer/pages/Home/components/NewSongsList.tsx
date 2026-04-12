@@ -7,9 +7,14 @@ import SongItem from './SongItem'
 interface NewSongsListProps {
   list?: NewSong[]
   isLoading?: boolean
+  onPlaySong?: (song: NewSong) => void
 }
 
-const NewSongsList = ({ list = [], isLoading = false }: NewSongsListProps) => {
+const NewSongsList = ({
+  list = [],
+  isLoading = false,
+  onPlaySong,
+}: NewSongsListProps) => {
   const groupedSongs = chunkArray(list, 5)
 
   const formatSong = (song: NewSong): NewSong => {
@@ -31,7 +36,11 @@ const NewSongsList = ({ list = [], isLoading = false }: NewSongsListProps) => {
           {groupedSongs.map((group, index) => (
             <div key={index} className='flex flex-col'>
               {group.map(song => (
-                <SongItem key={song.id} song={formatSong(song)} />
+                <SongItem
+                  key={song.id}
+                  song={formatSong(song)}
+                  onPlay={() => onPlaySong?.(song)}
+                />
               ))}
             </div>
           ))}

@@ -5,11 +5,9 @@ import {
 
 interface AlbumTrackTableProps {
   tracks: AlbumTrackItem[]
-  coverUrl: string
 }
 
-const AlbumTrackTable = ({ tracks, coverUrl }: AlbumTrackTableProps) => {
-  console.log(tracks)
+const AlbumTrackTable = ({ tracks }: AlbumTrackTableProps) => {
   if (tracks.length === 0) {
     return (
       <div className='border-border/60 bg-card/70 text-muted-foreground rounded-[28px] border px-6 py-10 text-center text-sm'>

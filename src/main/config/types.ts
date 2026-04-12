@@ -32,6 +32,7 @@ export interface AppConfig {
   theme: 'light' | 'dark' | 'system'
   fontFamily: string
   audioOutputDeviceId: string
+  playbackVolume: number
   musicSourceEnabled: boolean
   musicSourceProviders: MusicSourceProvider[]
   luoxueSourceEnabled: boolean
@@ -50,6 +51,7 @@ export const defaultConfig: AppConfig = {
   theme: 'system',
   fontFamily: 'Inter Variable',
   audioOutputDeviceId: 'default',
+  playbackVolume: 70,
   musicSourceEnabled: false,
   musicSourceProviders: ['migu', 'kugou', 'pyncmd', 'bilibili'],
   luoxueSourceEnabled: false,

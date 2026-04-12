@@ -28,6 +28,7 @@ export interface LibraryPlaylistItem {
 }
 
 export interface LibraryMvItem {
+  vid: Key | null | undefined
   id: number
   name: string
   coverUrl: string

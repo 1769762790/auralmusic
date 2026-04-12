@@ -26,6 +26,7 @@ import {
   type LibraryPageData,
   type PlaylistSourceValue,
 } from './library.model'
+import { isDef } from '@/lib/utils'
 
 const Library = () => {
   const navigate = useNavigate()
@@ -181,12 +182,12 @@ const Library = () => {
   }
 
   const handleOpenPlaylist = (playlistId: number) => {
-    if (!playlistId) return
+    if (!isDef(playlistId)) return
     navigate(`/playlist/${playlistId}`)
   }
 
   const handleOpenMv = (mvId: number) => {
-    if (!mvId) return
+    if (!isDef(mvId)) return
     navigate(`/mv/${mvId}`)
   }
 

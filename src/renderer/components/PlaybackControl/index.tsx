@@ -15,11 +15,14 @@ import { toast } from 'sonner'
 
 import { toggleSongLike } from '@/api/list'
 import AvatarCover from '@/components/AvatarCover'
+import PlaybackQueueDrawer from '@/components/PlaybackQueueDrawer'
 import { Slider } from '@/components/ui/slider'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
+import { useConfigStore } from '@/stores/config-store'
 import { usePlaybackStore } from '@/stores/playback-store'
 import { useUserStore } from '@/stores/user'
+import { normalizePlaybackVolume } from '../../../shared/playback.ts'
 
 type PlaybackControlTrack = {
   name: string
@@ -88,6 +91,9 @@ const PlaybackControl = () => {
   const toggleMute = usePlaybackStore(state => state.toggleMute)
   const seekTo = usePlaybackStore(state => state.seekTo)
   const openPlayerScene = usePlaybackStore(state => state.openPlayerScene)
+  const isConfigLoading = useConfigStore(state => state.isLoading)
+  const persistedVolume = useConfigStore(state => state.config.playbackVolume)
+  const setConfig = useConfigStore(state => state.setConfig)
   const userId = useAuthStore(state => state.user?.userId)
   const hasHydrated = useAuthStore(state => state.hasHydrated)
   const openLoginDialog = useAuthStore(state => state.openLoginDialog)
@@ -109,6 +115,7 @@ const PlaybackControl = () => {
   const isLiked = track ? likedSongIds.has(track.id) : false
   const isLikePending = track ? likedSongPendingIds.has(track.id) : false
   const [dragProgress, setDragProgress] = useState<number | null>(null)
+  const [isQueueDrawerOpen, setIsQueueDrawerOpen] = useState(false)
   const maxProgress = Math.max(duration, 1)
   const currentProgress = Math.min(dragProgress ?? progress, maxProgress)
   const volumePercent = clampPercent(volume)
@@ -122,6 +129,14 @@ const PlaybackControl = () => {
     setDragProgress(null)
   }, [duration, hasTrack])
 
+  useEffect(() => {
+    if (isConfigLoading) {
+      return
+    }
+
+    setVolume(normalizePlaybackVolume(persistedVolume))
+  }, [isConfigLoading, persistedVolume, setVolume])
+
   const handleProgressChange = (value: number[]) => {
     setDragProgress(value[0] ?? 0)
   }
@@ -134,7 +149,19 @@ const PlaybackControl = () => {
   }
 
   const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0] ?? 0)
+    setVolume(normalizePlaybackVolume(value[0]))
+  }
+
+  const handleVolumeCommit = (value: number[]) => {
+    void setConfig('playbackVolume', normalizePlaybackVolume(value[0]))
+  }
+
+  const handleToggleMute = () => {
+    toggleMute()
+    void setConfig(
+      'playbackVolume',
+      normalizePlaybackVolume(usePlaybackStore.getState().volume)
+    )
   }
 
   const handleToggleLike = async () => {
@@ -176,125 +203,138 @@ const PlaybackControl = () => {
   }
 
   return (
-    <footer className='window-no-drag bg-background/50 border-border/60 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-2xl'>
-      <Slider
-        aria-label='播放进度'
-        min={0}
-        max={maxProgress}
-        step={1000}
-        value={[currentProgress]}
-        disabled={!hasTrack || duration <= 0}
-        onValueChange={handleProgressChange}
-        onValueCommit={handleProgressCommit}
-        className='**:data-[slot=slider-range]:bg-primary **:data-[slot=slider-thumb]:border-primary/30 **:data-[slot=slider-thumb]:bg-primary absolute -top-0.75 right-0 left-0 z-10 h-2 cursor-pointer **:data-[slot=slider-thumb]:size-2.5 **:data-[slot=slider-track]:h-0.5 **:data-[slot=slider-track]:rounded-none **:data-[slot=slider-track]:bg-transparent'
-      />
+    <>
+      <footer className='window-no-drag bg-background/50 border-border/60 fixed right-0 bottom-0 left-0 z-50 border-t backdrop-blur-2xl'>
+        <Slider
+          aria-label='播放进度'
+          min={0}
+          max={maxProgress}
+          step={1000}
+          value={[currentProgress]}
+          disabled={!hasTrack || duration <= 0}
+          onValueChange={handleProgressChange}
+          onValueCommit={handleProgressCommit}
+          className='**:data-[slot=slider-range]:bg-primary **:data-[slot=slider-thumb]:border-primary/30 **:data-[slot=slider-thumb]:bg-primary absolute -top-0.75 right-0 left-0 z-10 h-2 cursor-pointer **:data-[slot=slider-thumb]:size-2.5 **:data-[slot=slider-track]:h-0.5 **:data-[slot=slider-track]:rounded-none **:data-[slot=slider-track]:bg-transparent'
+        />
 
-      <div className='grid h-18 grid-cols-[minmax(220px,1fr)_minmax(260px,420px)_minmax(220px,1fr)] items-center gap-6 px-12 xl:px-25 2xl:px-50'>
-        <div className='flex min-w-0 items-center gap-3'>
-          <button
-            type='button'
-            onClick={openPlayerScene}
-            className='group flex min-w-0 items-center gap-3 rounded-2xl pr-2 text-left transition-colors outline-none'
-          >
-            <AvatarCover
-              url={currentTrack.coverUrl}
-              className='size-11 shrink-0'
-              wrapperClass='shrink-0'
-              rounded='12px'
-              isAutoHovered
-            />
-            <div className='min-w-0'>
-              <div className='truncate text-sm font-semibold'>
-                {currentTrack.name}
+        <div className='grid h-18 grid-cols-[minmax(220px,1fr)_minmax(260px,420px)_minmax(220px,1fr)] items-center gap-6 px-12 xl:px-25 2xl:px-50'>
+          <div className='flex min-w-0 items-center gap-3'>
+            <button
+              type='button'
+              onClick={openPlayerScene}
+              className='group flex min-w-0 items-center gap-3 rounded-2xl pr-2 text-left transition-colors outline-none'
+            >
+              <AvatarCover
+                url={currentTrack.coverUrl}
+                className='size-11 shrink-0'
+                wrapperClass='shrink-0'
+                rounded='12px'
+                isAutoHovered
+              />
+              <div className='min-w-0'>
+                <div className='truncate text-sm font-semibold'>
+                  {currentTrack.name}
+                </div>
+                <div className='text-muted-foreground truncate text-xs'>
+                  {currentTrack.artistName}
+                </div>
               </div>
-              <div className='text-muted-foreground truncate text-xs'>
-                {currentTrack.artistName}
-              </div>
-            </div>
-          </button>
-          <ControlButton
-            label={isLiked ? '取消喜欢' : '喜欢歌曲'}
-            disabled={!hasTrack || isLikePending}
-            onClick={handleToggleLike}
-          >
-            <Heart
-              className={cn(
-                'size-5 transition-colors',
-                isLiked ? 'fill-current text-red-500' : 'text-foreground/60'
+            </button>
+            <ControlButton
+              label={isLiked ? '取消喜欢' : '喜欢歌曲'}
+              disabled={!hasTrack || isLikePending}
+              onClick={handleToggleLike}
+            >
+              <Heart
+                className={cn(
+                  'size-5 transition-colors',
+                  isLiked ? 'fill-current text-red-500' : 'text-foreground/60'
+                )}
+              />
+            </ControlButton>
+          </div>
+
+          <div className='flex items-center justify-center gap-4'>
+            <ControlButton
+              label='上一首'
+              disabled={!hasTrack}
+              onClick={() => {
+                playPrevious()
+              }}
+            >
+              <SkipBack className='size-5 fill-current' />
+            </ControlButton>
+            <ControlButton
+              label={isPlaying ? '暂停' : '播放'}
+              disabled={!hasTrack}
+              onClick={togglePlay}
+              className='bg-foreground text-background hover:bg-foreground/90 hover:text-background size-11'
+            >
+              {isPlaying ? (
+                <Pause className='size-5 fill-current' />
+              ) : (
+                <Play className='ml-0.5 size-5 fill-current' />
               )}
+            </ControlButton>
+            <ControlButton
+              label='下一首'
+              disabled={!hasTrack}
+              onClick={() => {
+                playNext()
+              }}
+            >
+              <SkipForward className='size-5 fill-current' />
+            </ControlButton>
+          </div>
+
+          <div className='text-foreground/70 flex items-center justify-end gap-3'>
+            <ControlButton
+              label='播放列表'
+              onClick={() => {
+                setIsQueueDrawerOpen(true)
+              }}
+            >
+              <ListMusic className='size-5' />
+            </ControlButton>
+            <ControlButton label='循环播放'>
+              <Repeat2 className='size-5' />
+            </ControlButton>
+            <ControlButton label='随机播放'>
+              <Shuffle className='size-5' />
+            </ControlButton>
+            <ControlButton
+              label={isMuted ? '取消静音' : '静音'}
+              onClick={handleToggleMute}
+              className='size-7'
+            >
+              {isMuted ? (
+                <VolumeX className='size-4 shrink-0' />
+              ) : (
+                <Volume2 className='size-4 shrink-0' />
+              )}
+            </ControlButton>
+            <Slider
+              aria-label='音量'
+              min={0}
+              max={100}
+              step={1}
+              value={[volumePercent]}
+              onValueChange={handleVolumeChange}
+              onValueCommit={handleVolumeCommit}
+              className='[&_[data-slot=slider-range]]:bg-foreground [&_[data-slot=slider-track]]:bg-foreground/18 w-24'
             />
-          </ControlButton>
+            {/* <span className='text-muted-foreground w-9 text-right text-xs tabular-nums'>
+              {Math.round(volumePercent)}%
+            </span> */}
+          </div>
         </div>
+      </footer>
 
-        <div className='flex items-center justify-center gap-4'>
-          <ControlButton
-            label='上一首'
-            disabled={!hasTrack}
-            onClick={() => {
-              playPrevious()
-            }}
-          >
-            <SkipBack className='size-5 fill-current' />
-          </ControlButton>
-          <ControlButton
-            label={isPlaying ? '暂停' : '播放'}
-            disabled={!hasTrack}
-            onClick={togglePlay}
-            className='bg-foreground text-background hover:bg-foreground/90 hover:text-background size-11'
-          >
-            {isPlaying ? (
-              <Pause className='size-5 fill-current' />
-            ) : (
-              <Play className='ml-0.5 size-5 fill-current' />
-            )}
-          </ControlButton>
-          <ControlButton
-            label='下一首'
-            disabled={!hasTrack}
-            onClick={() => {
-              playNext()
-            }}
-          >
-            <SkipForward className='size-5 fill-current' />
-          </ControlButton>
-        </div>
-
-        <div className='text-foreground/70 flex items-center justify-end gap-3'>
-          <ControlButton label='播放列表'>
-            <ListMusic className='size-5' />
-          </ControlButton>
-          <ControlButton label='循环播放'>
-            <Repeat2 className='size-5' />
-          </ControlButton>
-          <ControlButton label='随机播放'>
-            <Shuffle className='size-5' />
-          </ControlButton>
-          <ControlButton
-            label={isMuted ? '取消静音' : '静音'}
-            onClick={toggleMute}
-            className='size-7'
-          >
-            {isMuted ? (
-              <VolumeX className='size-4 shrink-0' />
-            ) : (
-              <Volume2 className='size-4 shrink-0' />
-            )}
-          </ControlButton>
-          <Slider
-            aria-label='音量'
-            min={0}
-            max={100}
-            step={1}
-            value={[volumePercent]}
-            onValueChange={handleVolumeChange}
-            className='[&_[data-slot=slider-range]]:bg-foreground [&_[data-slot=slider-track]]:bg-foreground/18 w-24'
-          />
-          <span className='text-muted-foreground w-9 text-right text-xs tabular-nums'>
-            {Math.round(volumePercent)}%
-          </span>
-        </div>
-      </div>
-    </footer>
+      <PlaybackQueueDrawer
+        open={isQueueDrawerOpen}
+        onOpenChange={setIsQueueDrawerOpen}
+      />
+    </>
   )
 }
 

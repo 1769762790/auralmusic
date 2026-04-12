@@ -4,6 +4,7 @@ import AvatarCover from '../AvatarCover'
 interface ArtistCoverProps {
   artistCoverUrl: string
   artistName: string
+  subTitle?: string
   rounded?: 'full' | string
   onPlay?: () => void
   onClickCover?: () => void
@@ -14,6 +15,7 @@ const ArtistCover = ({
   onPlay,
   rounded,
   onClickCover,
+  subTitle,
 }: ArtistCoverProps) => {
   return (
     <div>
@@ -36,7 +38,12 @@ const ArtistCover = ({
           </div>
         ) : null}
       </div>
-      <div className='mt-2 text-center text-[16px]'>{artistName}</div>
+      <div className='mt-2 truncate text-center text-[16px]'>{artistName}</div>
+      {subTitle && (
+        <div className='text-primary/50 mt-1 truncate text-center text-[14px]'>
+          {subTitle}
+        </div>
+      )}
     </div>
   )
 }
