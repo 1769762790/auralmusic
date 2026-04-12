@@ -4,6 +4,7 @@ import {
   AUDIO_QUALITY_LEVELS,
   MUSIC_SOURCE_PROVIDERS,
   defaultConfig,
+  normalizeDynamicCoverEnabled,
   type AudioQualityLevel,
   type MusicSourceProvider,
 } from '../../main/config/types'
@@ -88,6 +89,9 @@ function normalizeConfig(config: AppConfig): AppConfig {
     quality: normalizeQuality(config.quality),
     playbackVolume: normalizePlaybackVolume(config.playbackVolume),
     playbackMode: normalizePlaybackMode(config.playbackMode),
+    dynamicCoverEnabled: normalizeDynamicCoverEnabled(
+      config.dynamicCoverEnabled
+    ),
     musicSourceEnabled:
       typeof config.musicSourceEnabled === 'boolean'
         ? config.musicSourceEnabled

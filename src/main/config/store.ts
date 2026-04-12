@@ -4,6 +4,7 @@ import {
   AUDIO_QUALITY_LEVELS,
   MUSIC_SOURCE_PROVIDERS,
   defaultConfig,
+  normalizeDynamicCoverEnabled,
   type AudioQualityLevel,
   type MusicSourceProvider,
 } from './types'
@@ -97,6 +98,7 @@ class ConfigStore {
           audioOutputDeviceId: { type: 'string' },
           playbackVolume: { type: 'number', minimum: 0, maximum: 100 },
           playbackMode: { type: 'string', enum: PLAYBACK_MODE_SEQUENCE },
+          dynamicCoverEnabled: { type: 'boolean' },
           musicSourceEnabled: { type: 'boolean' },
           musicSourceProviders: {
             type: 'array',
@@ -173,6 +175,18 @@ class ConfigStore {
       const normalizedPlaybackMode = normalizePlaybackMode(playbackMode)
       if (playbackMode !== normalizedPlaybackMode) {
         ConfigStore.instance.set('playbackMode', normalizedPlaybackMode)
+      }
+
+      const dynamicCoverEnabled = ConfigStore.instance.get(
+        'dynamicCoverEnabled'
+      )
+      const normalizedDynamicCoverEnabled =
+        normalizeDynamicCoverEnabled(dynamicCoverEnabled)
+      if (dynamicCoverEnabled !== normalizedDynamicCoverEnabled) {
+        ConfigStore.instance.set(
+          'dynamicCoverEnabled',
+          normalizedDynamicCoverEnabled
+        )
       }
 
       const globalShortcutEnabled = ConfigStore.instance.get(

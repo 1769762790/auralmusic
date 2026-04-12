@@ -1,9 +1,9 @@
-import type { ImportedLxMusicSource } from '../../shared/lx-music-source'
-import type { PlaybackMode } from '../../shared/playback'
+import type { ImportedLxMusicSource } from '../../shared/lx-music-source.ts'
+import type { PlaybackMode } from '../../shared/playback.ts'
 import {
   DEFAULT_SHORTCUT_BINDINGS,
   type ShortcutBindings,
-} from '../../shared/shortcut-keys'
+} from '../../shared/shortcut-keys.ts'
 
 export const AUDIO_QUALITY_LEVELS = [
   'standard',
@@ -35,6 +35,7 @@ export interface AppConfig {
   audioOutputDeviceId: string
   playbackVolume: number
   playbackMode: PlaybackMode
+  dynamicCoverEnabled: boolean
   musicSourceEnabled: boolean
   musicSourceProviders: MusicSourceProvider[]
   luoxueSourceEnabled: boolean
@@ -55,6 +56,7 @@ export const defaultConfig: AppConfig = {
   audioOutputDeviceId: 'default',
   playbackVolume: 70,
   playbackMode: 'repeat-all',
+  dynamicCoverEnabled: true,
   musicSourceEnabled: false,
   musicSourceProviders: ['migu', 'kugou', 'pyncmd', 'bilibili'],
   luoxueSourceEnabled: false,
@@ -67,6 +69,10 @@ export const defaultConfig: AppConfig = {
   quality: 'higher',
   globalShortcutEnabled: false,
   shortcutBindings: DEFAULT_SHORTCUT_BINDINGS,
+}
+
+export function normalizeDynamicCoverEnabled(value: unknown) {
+  return typeof value === 'boolean' ? value : defaultConfig.dynamicCoverEnabled
 }
 
 export const IPC_CHANNELS = {

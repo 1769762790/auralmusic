@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { useTexture, Plane, useCursor } from '@react-three/drei'
 import * as THREE from 'three'
 
@@ -15,7 +15,6 @@ export default function WaterRipple3DCover({
   playBeat = false,
 }: WaterRipple3DCoverProps) {
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
 
   return (
     // 父容器：相对定位 + 宽高100%
@@ -27,13 +26,6 @@ export default function WaterRipple3DCover({
       {loading && (
         <div className='absolute inset-0 z-10 animate-pulse bg-black/20' />
       )}
-      {/* 错误状态 */}
-      {error && (
-        <div className='absolute inset-0 z-10 flex items-center justify-center bg-black/40'>
-          <span className='text-xs text-zinc-400'>加载失败</span>
-        </div>
-      )}
-
       {/* ✅ 核心修复：Canvas 强制绝对定位铺满全屏 */}
       <Canvas
         camera={{ position: [0, 0, 2.2], fov: 35 }}
@@ -52,7 +44,6 @@ export default function WaterRipple3DCover({
           url={src}
           playBeat={playBeat}
           onLoad={() => setLoading(false)}
-          onError={() => setError(true)}
         />
       </Canvas>
     </div>
@@ -60,7 +51,7 @@ export default function WaterRipple3DCover({
 }
 
 // 水面核心组件
-function WaterSurface({ url, playBeat, onLoad, onError }) {
+function WaterSurface({ url, playBeat, onLoad }) {
   const meshRef = useRef(null)
   const texture = useTexture(url)
   useCursor(true)
@@ -114,7 +105,6 @@ function WaterSurface({ url, playBeat, onLoad, onError }) {
       ref={meshRef}
       args={[2, 2, 42, 42]}
       onPointerDown={handlePointerDown}
-      onError={onError}
     >
       <meshStandardMaterial
         map={texture}

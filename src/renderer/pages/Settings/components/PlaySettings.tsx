@@ -55,6 +55,9 @@ const PlaySettings = () => {
   const musicSourceEnabled = useConfigStore(
     state => state.config.musicSourceEnabled
   )
+  const dynamicCoverEnabled = useConfigStore(
+    state => state.config.dynamicCoverEnabled
+  )
   const isConfigLoading = useConfigStore(state => state.isLoading)
   const initConfig = useConfigStore(state => state.initConfig)
   const setConfig = useConfigStore(state => state.setConfig)
@@ -109,6 +112,10 @@ const PlaySettings = () => {
 
   const handleToggleMusicSource = () => {
     void setConfig('musicSourceEnabled', !musicSourceEnabled)
+  }
+
+  const handleToggleDynamicCover = () => {
+    void setConfig('dynamicCoverEnabled', !dynamicCoverEnabled)
   }
 
   const handleTestAudioOutput = async () => {
@@ -204,6 +211,56 @@ const PlaySettings = () => {
             ))}
           </SelectContent>
         </Select>
+      </div>
+      <Separator />
+
+      <div className='grid grid-cols-[minmax(0,1fr)_minmax(220px,280px)] items-center gap-6 py-3'>
+        <div className='space-y-1'>
+          <div className='text-muted-foreground text-sm font-medium'>
+            动态封面效果
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            开启后播放器大界面使用水波动态封面，关闭后使用静态封面
+          </p>
+        </div>
+        <button
+          type='button'
+          disabled={isConfigLoading}
+          aria-pressed={dynamicCoverEnabled}
+          onClick={handleToggleDynamicCover}
+          className={cn(
+            'bg-muted/60 relative h-9 w-full rounded-full px-1 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
+            dynamicCoverEnabled
+              ? 'text-primary-foreground bg-primary/90'
+              : 'text-muted-foreground'
+          )}
+        >
+          <span
+            aria-hidden
+            className={cn(
+              'bg-background absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-full shadow-sm transition-transform duration-300',
+              dynamicCoverEnabled ? 'translate-x-full' : 'translate-x-0'
+            )}
+          />
+          <span className='relative z-10 grid h-full grid-cols-2 items-center'>
+            <span
+              className={cn(
+                'transition-colors',
+                !dynamicCoverEnabled && 'text-foreground'
+              )}
+            >
+              关闭
+            </span>
+            <span
+              className={cn(
+                'transition-colors',
+                dynamicCoverEnabled && 'text-foreground'
+              )}
+            >
+              开启
+            </span>
+          </span>
+        </button>
       </div>
       <Separator />
 

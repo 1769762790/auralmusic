@@ -8,6 +8,7 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from '@/components/ui/drawer'
+import { useConfigStore } from '@/stores/config-store'
 import { usePlaybackStore } from '@/stores/playback-store'
 import PlayerSceneArtwork from './PlayerSceneArtwork'
 import PlayerSceneControls from './PlayerSceneControls'
@@ -60,6 +61,9 @@ const PlayerScene = () => {
   const playPrevious = usePlaybackStore(state => state.playPrevious)
   const playNext = usePlaybackStore(state => state.playNext)
   const seekTo = usePlaybackStore(state => state.seekTo)
+  const dynamicCoverEnabled = useConfigStore(
+    state => state.config.dynamicCoverEnabled
+  )
 
   const [lyrics, setLyrics] = useState<LyricLine[]>([])
   const [lyricsLoading, setLyricsLoading] = useState(false)
@@ -241,13 +245,14 @@ const PlayerScene = () => {
             <X className='size-5' />
           </button>
 
-          <div className='relative z-10 grid h-full grid-cols-[minmax(320px,0.86fr)_minmax(420px,1.14fr)] items-center gap-16 px-14 py-16 xl:px-24'>
-            <div className='flex flex-col items-center gap-8'>
+          <div className='relative z-10 grid h-full min-h-0 grid-cols-[minmax(320px,0.86fr)_minmax(420px,1.14fr)] items-center gap-16 px-14 py-16 xl:px-24'>
+            <div className='flex min-h-0 flex-col items-center gap-8'>
               <PlayerSceneArtwork
                 coverUrl={coverUrl}
                 title={title}
                 artistNames={artistNames}
                 isPlaying={isPlaying}
+                dynamicCoverEnabled={dynamicCoverEnabled}
               />
               <PlayerSceneControls
                 disabled={!hasTrack}
