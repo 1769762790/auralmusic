@@ -2,6 +2,7 @@ export const WINDOW_IPC_CHANNELS = {
   MINIMIZE: 'window:minimize',
   TOGGLE_MAXIMIZE: 'window:toggle-maximize',
   CLOSE: 'window:close',
+  QUIT_APP: 'window:quit-app',
   HIDE_TO_TRAY: 'window:hide-to-tray',
   SHOW: 'window:show',
   CLOSE_REQUESTED: 'window:close-requested',

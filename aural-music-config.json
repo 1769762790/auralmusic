@@ -59,6 +59,10 @@
     "togglePlayer": {
       "local": "Ctrl+M",
       "global": "Alt+Ctrl+M"
+    },
+    "openSearch": {
+      "local": "Ctrl+K",
+      "global": "Alt+Ctrl+K"
     }
   },
   "autoStartEnabled": false,

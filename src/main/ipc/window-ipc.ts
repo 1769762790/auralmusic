@@ -2,7 +2,7 @@ import electron, { type IpcMainInvokeEvent, type BrowserWindow } from 'electron'
 
 import { WINDOW_IPC_CHANNELS } from '../window/types'
 
-const { ipcMain } = electron
+const { app, ipcMain } = electron
 
 function getEventWindow(event: IpcMainInvokeEvent) {
   return electron.BrowserWindow.fromWebContents(event.sender)
@@ -21,7 +21,9 @@ function showWindow(window: BrowserWindow | null) {
   window.focus()
 }
 
-export function registerWindowIpc() {
+export function registerWindowIpc(
+  options: { onQuitRequested?: () => void } = {}
+) {
   ipcMain.handle(WINDOW_IPC_CHANNELS.MINIMIZE, event => {
     const window = getEventWindow(event)
     window?.minimize()
@@ -45,6 +47,11 @@ export function registerWindowIpc() {
   ipcMain.handle(WINDOW_IPC_CHANNELS.CLOSE, event => {
     const window = getEventWindow(event)
     window?.close()
+  })
+
+  ipcMain.handle(WINDOW_IPC_CHANNELS.QUIT_APP, () => {
+    options.onQuitRequested?.()
+    app.quit()
   })
 
   ipcMain.handle(WINDOW_IPC_CHANNELS.HIDE_TO_TRAY, event => {

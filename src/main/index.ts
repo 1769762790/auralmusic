@@ -22,6 +22,7 @@ import {
   applyWindowTitleBarTheme,
   syncNativeThemeSource,
 } from './window/titlebar-theme'
+import { resolveWindowCloseBehavior } from './window/close-behavior'
 import { WINDOW_IPC_CHANNELS } from './window/types'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -200,19 +201,18 @@ function createTray(): InstanceType<typeof Tray> {
 
 function registerWindowCloseBehavior(window: BrowserWindow) {
   window.on('close', event => {
-    if (isQuitting) {
-      return
-    }
+    const nextBehavior = resolveWindowCloseBehavior({
+      isQuitting,
+      closeBehavior: getConfig('closeBehavior'),
+    })
 
-    const closeBehavior = getConfig('closeBehavior')
-
-    if (closeBehavior === 'quit') {
+    if (nextBehavior === 'allow-close') {
       return
     }
 
     event.preventDefault()
 
-    if (closeBehavior === 'minimize') {
+    if (nextBehavior === 'hide-to-tray') {
       hideMainWindowToTray()
       return
     }
@@ -285,7 +285,11 @@ app.whenReady().then(async () => {
   registerAuthIpc()
   registerCacheIpc()
   registerMusicSourceIpc()
-  registerWindowIpc()
+  registerWindowIpc({
+    onQuitRequested: () => {
+      isQuitting = true
+    },
+  })
   registerPermissionHandlers()
   createTray()
 

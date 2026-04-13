@@ -19,7 +19,7 @@ import {
   type ShortcutScope,
 } from '../../../../shared/shortcut-keys'
 
-const SHORTCUT_ACTION_LABELS: Record<ShortcutActionId, string> = {
+const SHORTCUT_ACTION_LABELS = {
   playPause: '播放/暂停',
   nextTrack: '下一首',
   previousTrack: '上一首',
@@ -27,7 +27,9 @@ const SHORTCUT_ACTION_LABELS: Record<ShortcutActionId, string> = {
   volumeDown: '减少音量',
   likeSong: '喜欢歌曲',
   togglePlayer: '隐藏/显示播放器',
-}
+} as Record<ShortcutActionId, string>
+
+SHORTCUT_ACTION_LABELS.openSearch = '呼出搜索'
 
 const MODIFIER_KEY_NAMES = new Set(['Alt', 'Control', 'Meta', 'Shift'])
 

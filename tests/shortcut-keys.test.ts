@@ -15,7 +15,7 @@ import {
 } from '../src/shared/shortcut-keys.ts'
 
 test('default shortcut bindings include all supported actions', () => {
-  assert.equal(Object.keys(DEFAULT_SHORTCUT_BINDINGS).length, 7)
+  assert.equal(Object.keys(DEFAULT_SHORTCUT_BINDINGS).length, 8)
   assert.deepEqual(DEFAULT_SHORTCUT_BINDINGS.playPause, {
     local: 'Ctrl+P',
     global: 'Alt+Ctrl+P',
@@ -23,6 +23,10 @@ test('default shortcut bindings include all supported actions', () => {
   assert.deepEqual(DEFAULT_SHORTCUT_BINDINGS.nextTrack, {
     local: 'Ctrl+ArrowRight',
     global: 'Alt+Ctrl+ArrowRight',
+  })
+  assert.deepEqual(DEFAULT_SHORTCUT_BINDINGS.openSearch, {
+    local: 'Ctrl+K',
+    global: 'Alt+Ctrl+K',
   })
 })
 
@@ -163,7 +167,7 @@ test('resolveEnabledGlobalShortcutRegistrations returns normalized unique global
     registrations.some(registration => registration.actionId === 'nextTrack'),
     false
   )
-  assert.equal(registrations.length, 6)
+  assert.equal(registrations.length, 7)
 })
 
 test('normalizeShortcutForElectronAccelerator maps browser arrow key names for global shortcuts', () => {

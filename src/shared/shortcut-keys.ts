@@ -6,6 +6,7 @@ export const SHORTCUT_ACTIONS = [
   'volumeDown',
   'likeSong',
   'togglePlayer',
+  'openSearch',
 ] as const
 
 export const SHORTCUT_ACTION_CHANNEL = 'shortcut:action'
@@ -54,6 +55,10 @@ export const DEFAULT_SHORTCUT_BINDINGS: ShortcutBindings = {
   togglePlayer: {
     local: 'Ctrl+M',
     global: 'Alt+Ctrl+M',
+  },
+  openSearch: {
+    local: 'Ctrl+K',
+    global: 'Alt+Ctrl+K',
   },
 }
 

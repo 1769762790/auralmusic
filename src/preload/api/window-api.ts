@@ -33,7 +33,7 @@ const windowApi: WindowApi = {
     await ipcRenderer.invoke(WINDOW_IPC_CHANNELS.SHOW)
   },
   quitApp: async () => {
-    await ipcRenderer.invoke(WINDOW_IPC_CHANNELS.CLOSE)
+    await ipcRenderer.invoke(WINDOW_IPC_CHANNELS.QUIT_APP)
   },
   isMaximized: async () => {
     return ipcRenderer.invoke(WINDOW_IPC_CHANNELS.IS_MAXIMIZED)

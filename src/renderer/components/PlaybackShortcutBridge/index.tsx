@@ -5,6 +5,7 @@ import { toggleSongLike } from '@/api/list'
 import { useAuthStore } from '@/stores/auth-store'
 import { useConfigStore } from '@/stores/config-store'
 import { usePlaybackStore } from '@/stores/playback-store'
+import { useSearchDialogStore } from '@/stores/search-dialog-store'
 import { useUserStore } from '@/stores/user'
 import {
   findShortcutActionByAccelerator,
@@ -116,6 +117,11 @@ const PlaybackShortcutBridge = () => {
 
       if (actionId === 'togglePlayer') {
         playbackState.setPlayerSceneOpen(!playbackState.isPlayerSceneOpen)
+        return
+      }
+
+      if (actionId === 'openSearch') {
+        useSearchDialogStore.getState().openDialog()
       }
     },
     [setConfig]

@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom'
 
 import { searchResources } from '@/api/search'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
 import { usePlaybackStore } from '@/stores/playback-store'
+import { useSearchDialogStore } from '@/stores/search-dialog-store'
 
 import SearchInputBar from './components/SearchInputBar'
 import SearchResultList from './components/SearchResultList'
@@ -23,8 +24,9 @@ const SEARCH_DEBOUNCE_MS = 350
 const SearchDialog = () => {
   const navigate = useNavigate()
   const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
-
-  const [open, setOpen] = useState(false)
+  const open = useSearchDialogStore(state => state.open)
+  const setOpen = useSearchDialogStore(state => state.setOpen)
+  const openDialog = useSearchDialogStore(state => state.openDialog)
   const [keyword, setKeyword] = useState('')
   const [activeQuery, setActiveQuery] = useState('')
   const [type, setType] = useState<SearchType>('song')
@@ -115,7 +117,7 @@ const SearchDialog = () => {
         size='icon-sm'
         className='window-no-drag mr-3 cursor-pointer rounded-full'
         aria-label='打开搜索'
-        onClick={() => setOpen(true)}
+        onClick={openDialog}
       >
         <SearchIcon className='size-5' />
       </Button>
