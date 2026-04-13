@@ -11,6 +11,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import {
+  buildCreatePlaylistPayload,
+  CREATE_PLAYLIST_TITLE_MAX_LENGTH,
+} from '@/model/create-playlist-form.model'
 import { Separator } from '@/components/ui/separator'
 
 interface CreatePlaylistDialogProps {
@@ -36,23 +40,23 @@ const CreatePlaylistDialog = ({
     }
   }, [open])
 
+  const payload = useMemo(
+    () => buildCreatePlaylistPayload(title, isPrivate),
+    [isPrivate, title]
+  )
+
   const isCreateDisabled = useMemo(
-    () => !title.trim() || submitting,
-    [submitting, title]
+    () => !payload || submitting,
+    [payload, submitting]
   )
 
   const handleSubmit = async () => {
-    const nextTitle = title.trim()
-
-    if (!nextTitle || submitting) {
+    if (!payload || submitting) {
       return
     }
 
     try {
-      await onSubmit({
-        name: nextTitle,
-        privacy: isPrivate ? '10' : undefined,
-      })
+      await onSubmit(payload)
     } catch {
       // Parent handler owns the error toast; keep dialog state intact here.
     }
@@ -93,7 +97,7 @@ const CreatePlaylistDialog = ({
                 }
               }}
               placeholder='歌单标题'
-              maxLength={40}
+              maxLength={CREATE_PLAYLIST_TITLE_MAX_LENGTH}
               className='text-primary focus-visible:border-primary/20 focus-visible:ring-primary/10 h-12 rounded-[14px] border-neutral-100 bg-neutral-100 px-4 text-[15px] placeholder:text-neutral-400'
             />
 

@@ -28,6 +28,57 @@ export function createPlaylist(params: CreatePlaylistParams) {
   })
 }
 
+export interface UpdatePlaylistTracksParams {
+  op: 'add' | 'del'
+  pid: number | string
+  tracks: Array<number | string> | number | string
+  timestamp?: number
+}
+
+export function updatePlaylistTracks(params: UpdatePlaylistTracksParams) {
+  const tracks = Array.isArray(params.tracks)
+    ? params.tracks.join(',')
+    : params.tracks
+
+  return request.get('/playlist/tracks', {
+    params: {
+      op: params.op,
+      pid: params.pid,
+      tracks,
+      timestamp: params.timestamp,
+    },
+  })
+}
+
+export interface AddSongToPlaylistParams {
+  playlistId: number | string
+  trackId: number | string
+  isLikedPlaylist?: boolean
+  userId?: number | string
+  timestamp?: number
+}
+
+export function addSongToPlaylist(params: AddSongToPlaylistParams) {
+  if (params.isLikedPlaylist) {
+    if (!params.userId) {
+      throw new Error('liked playlist add requires user id')
+    }
+
+    return toggleSongLike({
+      id: params.trackId,
+      uid: params.userId,
+      like: true,
+    })
+  }
+
+  return updatePlaylistTracks({
+    op: 'add',
+    pid: params.playlistId,
+    tracks: params.trackId,
+    timestamp: params.timestamp,
+  })
+}
+
 // 获取推荐歌单
 export function getRecommendPlayList(limit: number = 1) {
   return request.get('/personalized', {
@@ -213,4 +264,47 @@ export function getPlaylistTrackAll(
       timestamp,
     },
   })
+}
+
+interface PlaylistTrackAllSong {
+  id?: number
+}
+
+interface PlaylistTrackAllResponse {
+  songs?: PlaylistTrackAllSong[]
+}
+
+export interface GetPlaylistSongIdsParams {
+  id: number
+  trackCount?: number
+  timestamp?: number
+}
+
+export async function getPlaylistSongIds(params: GetPlaylistSongIdsParams) {
+  const limit = 1000
+  const collectedIds: number[] = []
+  const total = Math.max(params.trackCount || 0, 1)
+
+  for (let offset = 0; offset < total; offset += limit) {
+    const response = await getPlaylistTrackAll(
+      params.id,
+      limit,
+      offset,
+      params.timestamp
+    )
+
+    const songs =
+      (response.data as PlaylistTrackAllResponse | undefined)?.songs || []
+    const ids = songs
+      .map(song => song.id)
+      .filter((id): id is number => Number.isFinite(id))
+
+    collectedIds.push(...ids)
+
+    if (songs.length < limit) {
+      break
+    }
+  }
+
+  return collectedIds
 }

@@ -1,4 +1,5 @@
 import request from '@/lib/request'
+import { normalizeCollectPlaylistTargets } from '@/model/collect-to-playlist.model'
 
 /**
  * 获取用户歌单
@@ -24,4 +25,9 @@ export function userPlaylist(params: UserPlaylistParams) {
     method: 'get',
     params,
   })
+}
+
+export async function getCollectPlaylistTargets(params: UserPlaylistParams) {
+  const response = await userPlaylist(params)
+  return normalizeCollectPlaylistTargets(response.data)
 }

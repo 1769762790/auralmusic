@@ -25,6 +25,7 @@ import {
   normalizePlaybackMode,
   normalizePlaybackVolume,
 } from '../../shared/playback'
+import { normalizeThemeColor } from '../theme/theme-color'
 
 function normalizeQuality(value: unknown): AudioQualityLevel {
   if (value === 'high') {
@@ -93,6 +94,7 @@ function normalizeConfig(config: AppConfig): AppConfig {
   return {
     ...defaultConfig,
     ...config,
+    themeColor: normalizeThemeColor(config.themeColor),
     quality: normalizeQuality(config.quality),
     playbackVolume: normalizePlaybackVolume(config.playbackVolume),
     playbackMode: normalizePlaybackMode(config.playbackMode),

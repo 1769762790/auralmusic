@@ -107,7 +107,7 @@ const LibraryTabsSection = ({
                 </DropdownMenu>
 
                 {activeTab === 'playlists' ? (
-                  <span className='bg-foreground absolute right-0 bottom-[-5px] left-0 h-0.5' />
+                  <span className='bg-primary absolute right-0 bottom-[-5px] left-0 h-0.5' />
                 ) : null}
               </div>
 

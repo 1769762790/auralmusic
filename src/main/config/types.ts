@@ -37,6 +37,7 @@ export const DEFAULT_DISK_CACHE_MAX_BYTES = 1024 * 1024 * 1024
 
 export interface AppConfig {
   theme: 'light' | 'dark' | 'system'
+  themeColor: string | null
   fontFamily: string
   audioOutputDeviceId: string
   playbackVolume: number
@@ -68,6 +69,7 @@ export interface AppConfig {
 
 export const defaultConfig: AppConfig = {
   theme: 'system',
+  themeColor: null,
   fontFamily: 'Inter Variable',
   audioOutputDeviceId: 'default',
   playbackVolume: 70,

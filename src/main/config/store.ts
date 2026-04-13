@@ -99,6 +99,9 @@ function createConfigStore() {
     defaults: defaultConfig,
     schema: {
       theme: { type: 'string', enum: ['light', 'dark', 'system'] },
+      themeColor: {
+        anyOf: [{ type: 'string' }, { type: 'null' }],
+      },
       fontFamily: { type: 'string' },
       audioOutputDeviceId: { type: 'string' },
       playbackVolume: { type: 'number', minimum: 0, maximum: 100 },

@@ -9,6 +9,8 @@ import { Separator } from '@/components/ui/separator'
 import { useTheme } from '@/hooks/useTheme'
 import { useConfigStore } from '@/stores/config-store'
 
+import ThemeColorField from './ThemeColorField'
+
 type ThemeValue = 'system' | 'light' | 'dark'
 type PlayerBackgroundMode = 'off' | 'static' | 'dynamic'
 
@@ -89,6 +91,20 @@ const BasicSettings = () => {
         </Select>
       </div>
       <Separator />
+
+      <div className='grid grid-cols-[minmax(0,1fr)_minmax(180px,240px)] items-center gap-6 py-3'>
+        <div className='space-y-1'>
+          <div className='text-muted-foreground text-sm font-medium'>
+            主题色
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            自定义应用的主色、强调色和侧边栏高亮颜色。
+          </p>
+        </div>
+        <ThemeColorField />
+      </div>
+      <Separator />
+
       <div className='grid grid-cols-[minmax(0,1fr)_minmax(180px,240px)] items-center gap-6 py-3'>
         <div className='space-y-1'>
           <div className='text-muted-foreground text-sm font-medium'>

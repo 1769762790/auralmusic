@@ -35,8 +35,8 @@ const SceneControlButton = ({
       className={cn(
         'flex cursor-pointer items-center justify-center rounded-full transition-all duration-200',
         variant === 'primary'
-          ? 'text-background size-15 bg-[var(--player-foreground)] shadow-[0_22px_48px_rgba(0,0,0,0.28)] hover:scale-105'
-          : 'size-13 text-[var(--player-muted)] hover:bg-white/12 hover:text-[var(--player-foreground)]',
+          ? 'text-primary-foreground bg-primary hover:bg-primary/90 size-15 shadow-[0_22px_48px_rgba(0,0,0,0.28)] hover:scale-105'
+          : 'text-primary/72 hover:bg-primary/12 hover:text-primary size-13',
         disabled &&
           'cursor-not-allowed opacity-45 hover:scale-100 hover:bg-transparent'
       )}

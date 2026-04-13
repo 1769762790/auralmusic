@@ -1,4 +1,5 @@
 import Header from '@/components/Header'
+import CollectToPlaylistDrawer from '@/components/CollectToPlaylistDrawer'
 import PlaybackControl from '@/components/PlaybackControl'
 import PlaybackEngine from '@/components/PlaybackControl/PlaybackEngine'
 import PlaybackShortcutBridge from '@/components/PlaybackShortcutBridge'
@@ -28,6 +29,7 @@ const AppLayout = () => {
       <PlaybackShortcutBridge />
       <PlaybackControl />
       <PlayerScene />
+      <CollectToPlaylistDrawer />
       <Toaster />
       <ScrollToTopButton />
     </main>

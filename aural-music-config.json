@@ -1,8 +1,9 @@
 {
   "theme": "light",
+  "themeColor": null,
   "fontFamily": "system-ui",
   "audioOutputDeviceId": "default",
-  "playbackVolume": 26,
+  "playbackVolume": 36,
   "playbackMode": "shuffle",
   "playbackSpeed": 1,
   "dynamicCoverEnabled": false,

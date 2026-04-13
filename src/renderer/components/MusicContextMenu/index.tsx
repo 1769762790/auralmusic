@@ -13,8 +13,10 @@ import {
   PlaySquareIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { CollectPlaylistSongContext } from '@/model/collect-to-playlist.model'
 
 interface MusicContextMenuProps {
+  songId: number | undefined
   name: string | undefined
   artistName: string | undefined
   coverUrl: string | undefined
@@ -22,16 +24,33 @@ interface MusicContextMenuProps {
   children: ReactElement
   onPlayClick: () => void
   onToggleClick: () => void
+  onCollectToPlaylist?: (song: CollectPlaylistSongContext) => void
 }
+
 const MusicContextMenu = ({
   children,
   onPlayClick,
   onToggleClick,
+  onCollectToPlaylist,
   coverUrl,
   artistName,
   name,
   likeStatus,
+  songId,
 }: MusicContextMenuProps) => {
+  const handleCollectToPlaylist = () => {
+    if (!songId || !name) {
+      return
+    }
+
+    onCollectToPlaylist?.({
+      songId,
+      songName: name,
+      artistName: artistName || '未知歌手',
+      coverUrl: coverUrl || '',
+    })
+  }
+
   return (
     <ContextMenu>
       <ContextMenuTrigger>{children}</ContextMenuTrigger>
@@ -67,7 +86,7 @@ const MusicContextMenu = ({
           {likeStatus ? '取消喜欢' : '喜欢'}
         </ContextMenuItem>
 
-        <ContextMenuItem onClick={onPlayClick}>
+        <ContextMenuItem onClick={handleCollectToPlaylist}>
           <CopyPlusIcon size='4' />
           收藏到歌单
         </ContextMenuItem>

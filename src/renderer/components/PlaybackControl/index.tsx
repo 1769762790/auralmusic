@@ -79,8 +79,8 @@ const ControlButton = ({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'text-foreground/75 hover:text-foreground flex size-9 items-center justify-center rounded-full transition-colors',
-        'hover:bg-foreground/8',
+        'text-primary/72 hover:text-primary flex size-9 items-center justify-center rounded-full transition-colors',
+        'hover:bg-primary/10',
         disabled && 'cursor-not-allowed opacity-45 hover:bg-transparent',
         className
       )}
@@ -300,7 +300,7 @@ const PlaybackControl = () => {
               label={isPlaying ? '暂停' : '播放'}
               disabled={!hasTrack}
               onClick={togglePlay}
-              className='bg-foreground text-background hover:bg-foreground/90 hover:text-background size-11'
+              className='bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground size-11'
             >
               {isPlaying ? (
                 <Pause className='size-5 fill-current' />
@@ -360,7 +360,7 @@ const PlaybackControl = () => {
               value={[volumePercent]}
               onValueChange={handleVolumeChange}
               onValueCommit={handleVolumeCommit}
-              className='**:data-[slot=slider-range]:bg-foreground **:data-[slot=slider-thumb]:bg-primary **:data-[slot=slider-track]:bg-foreground/18 w-24'
+              className='**:data-[slot=slider-range]:bg-primary **:data-[slot=slider-thumb]:bg-primary **:data-[slot=slider-track]:bg-foreground/18 w-24'
             />
           </div>
         </div>

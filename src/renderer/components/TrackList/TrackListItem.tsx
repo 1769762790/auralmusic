@@ -8,6 +8,7 @@ import { Heart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import MusicContextMenu from '../MusicContextMenu'
+import { useCollectToPlaylistStore } from '@/stores/collect-to-playlist-store'
 
 export interface songProps {
   artists?: Artist[] | null
@@ -48,6 +49,9 @@ const TrackListItem = ({
   const fetchLikedSongs = useUserStore(state => state.fetchLikedSongs)
   const toggleLikedSong = useUserStore(state => state.toggleLikedSong)
   const setSongLikePending = useUserStore(state => state.setSongLikePending)
+  const openCollectToPlaylistDrawer = useCollectToPlaylistStore(
+    state => state.openDrawer
+  )
   const isLiked = useUserStore(state =>
     item.id ? state.likedSongIds.has(item.id) : false
   )
@@ -104,12 +108,32 @@ const TrackListItem = ({
     }
   }
 
+  const handleCollectToPlaylist = () => {
+    if (!item.id) {
+      return
+    }
+
+    if (!hasHydrated || !userId) {
+      openLoginDialog('email')
+      return
+    }
+
+    openCollectToPlaylistDrawer({
+      songId: item.id,
+      songName: item.name,
+      artistName: item.artistNames || formatArtistNames(item.artists),
+      coverUrl: item.coverUrl || coverUrl || '',
+    })
+  }
+
   return (
     <MusicContextMenu
+      songId={item.id}
       coverUrl={item.coverUrl || coverUrl}
-      artistName={item?.artistNames}
+      artistName={item.artistNames || formatArtistNames(item.artists)}
       onPlayClick={() => onPlay?.()}
       onToggleClick={handleToggleSongLike}
+      onCollectToPlaylist={handleCollectToPlaylist}
       name={item.name}
       likeStatus={isLiked}
     >
