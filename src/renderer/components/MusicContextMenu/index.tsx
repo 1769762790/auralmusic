@@ -6,7 +6,12 @@ import {
   ContextMenuSeparator,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu'
-import { CopyPlusIcon, Heart, PlaySquareIcon } from 'lucide-react'
+import {
+  CopyPlusIcon,
+  DownloadCloudIcon,
+  Heart,
+  PlaySquareIcon,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface MusicContextMenuProps {
@@ -48,7 +53,10 @@ const MusicContextMenu = ({
           <PlaySquareIcon size='4' />
           播放
         </ContextMenuItem>
-
+        <ContextMenuItem onClick={onPlayClick}>
+          <CopyPlusIcon size='4' />
+          添加到播放队列中
+        </ContextMenuItem>
         <ContextMenuItem onClick={() => onToggleClick?.()}>
           <Heart
             className={cn(
@@ -58,9 +66,15 @@ const MusicContextMenu = ({
           />
           {likeStatus ? '取消喜欢' : '喜欢'}
         </ContextMenuItem>
+
         <ContextMenuItem onClick={onPlayClick}>
           <CopyPlusIcon size='4' />
           收藏到歌单
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem onClick={onPlayClick}>
+          <DownloadCloudIcon size='4' />
+          下载
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

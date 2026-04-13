@@ -149,20 +149,20 @@ const PlayerSceneLyrics = ({
                 lineRefs.current[index] = node
               }}
               className={cn(
-                'text-md md:text-2xl 2xl:text-3xl',
+                'text-md md:text-xl 2xl:text-3xl',
                 'leading-[1.45] 2xl:leading-loose',
                 'font-extrabold tracking-tight',
-                'flex min-h-[1.5em] flex-col items-start justify-center',
+                'flex min-h-[2.5em] w-full flex-col items-start justify-center',
                 'pr-10 pl-8 md:pr-19 md:pl-10',
                 'origin-left',
                 'transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
                 'will-change-opacity will-change-color will-change-transform',
                 isActive
-                  ? 'scale-[1.3] font-black tracking-normal text-(--player-foreground)'
+                  ? 'scale-[1.15] font-black tracking-normal text-(--player-foreground)'
                   : 'scale-100 font-extrabold tracking-tight text-(--player-soft)'
               )}
             >
-              <div className='flex min-h-[1.45em] items-center'>
+              <div className='flex min-h-[1.45em] w-full flex-wrap items-center'>
                 {renderKaraoke
                   ? renderKaraokeText(line, progressMs)
                   : line.text}

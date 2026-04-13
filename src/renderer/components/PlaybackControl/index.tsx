@@ -360,7 +360,7 @@ const PlaybackControl = () => {
               value={[volumePercent]}
               onValueChange={handleVolumeChange}
               onValueCommit={handleVolumeCommit}
-              className='[&_[data-slot=slider-range]]:bg-foreground [&_[data-slot=slider-track]]:bg-foreground/18 w-24'
+              className='**:data-[slot=slider-range]:bg-foreground **:data-[slot=slider-thumb]:bg-primary **:data-[slot=slider-track]:bg-foreground/18 w-24'
             />
           </div>
         </div>
