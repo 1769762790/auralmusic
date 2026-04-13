@@ -31,3 +31,23 @@ export function chunkArray<T>(arr: T[], count: number): T[][] {
 export function isDef<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
+
+export function formatPlayCount(playCount?: number): string {
+  if (!playCount || playCount <= 0) return ''
+
+  // 1亿及以上
+  if (playCount >= 100000000) {
+    const yi = playCount / 100000000
+    // 如果是整数（如2亿），不显示小数；否则保留1位小数
+    return yi % 1 === 0 ? `${yi}亿` : `${yi.toFixed(1)}亿`
+  }
+
+  // 1万及以上
+  if (playCount >= 10000) {
+    const wan = playCount / 10000
+    return wan % 1 === 0 ? `${wan}万` : `${wan.toFixed(1)}万`
+  }
+
+  // 1万以下，使用千分位
+  return new Intl.NumberFormat('zh-CN').format(playCount)
+}

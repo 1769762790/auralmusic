@@ -8,6 +8,7 @@ import {
   type ArtistMvItem,
   type ArtistSimilarItem,
 } from '@/pages/Artists/artist-detail.model'
+import { formatPlayCount } from '@/lib/utils'
 
 interface ArtistMediaTabsProps {
   albums: ArtistAlbumItem[]
@@ -23,11 +24,6 @@ interface ArtistMediaTabsProps {
   onToAlbumDetail: (id: number) => void
   onToMvDetail: (id: number) => void
   onToArtistDetail: (id: number) => void
-}
-
-function formatPlayCount(playCount?: number) {
-  if (!playCount) return '暂无播放'
-  return new Intl.NumberFormat('zh-CN').format(playCount)
 }
 
 const ArtistMediaTabs = ({
@@ -154,7 +150,7 @@ const ArtistMediaTabs = ({
                         {formatArtistPublishDate(mv.publishTime)}
                       </p>
                       <p className='text-muted-foreground text-sm'>
-                        播放次数 {formatPlayCount(mv.playCount)}
+                        播放次数 {formatPlayCount(mv.playCount) || '暂无播放'}
                       </p>
                     </div>
                   </article>
@@ -187,7 +183,7 @@ const ArtistMediaTabs = ({
           ) : null}
 
           {!similarArtistsLoading && similarArtists.length > 0 ? (
-            <div className='grid grid-cols-2 gap-10 sm:grid-cols-3 md:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8'>
+            <div className='grid grid-cols-2 gap-10 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7'>
               {similarArtists.map(artist => (
                 <ArtistCover
                   key={artist.id}

@@ -119,7 +119,7 @@ const TrackListItem = ({
           'hover:bg-primary/5 grid cursor-pointer grid-cols-3 items-center rounded-[15px] px-4 py-4 transition-colors',
           isActive && 'bg-primary/8',
           type === 'default'
-            ? 'grid-cols-[2.5fr_1fr_auto] gap-4'
+            ? 'grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_120px] gap-4'
             : 'grid-cols-[1.5fr_auto] gap-2'
         )}
       >

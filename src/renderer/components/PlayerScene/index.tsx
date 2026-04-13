@@ -130,13 +130,16 @@ const PlayerScene = () => {
       try {
         const response = await getLyric({ id: currentTrack.id })
         const nextLyrics = parseLrc(readLyricText(response.data))
-
         if (cancelled) {
           return
         }
 
         setLyrics(nextLyrics)
-        setLyricsError(nextLyrics.length ? '' : '暂无歌词')
+        setLyricsError(
+          nextLyrics.length && !JSON.stringify(nextLyrics).includes('暂无歌词')
+            ? ''
+            : '暂无歌词'
+        )
       } catch (error) {
         if (cancelled) {
           return
@@ -245,8 +248,8 @@ const PlayerScene = () => {
             <X className='size-5' />
           </button>
 
-          <div className='relative z-10 grid h-full min-h-0 grid-cols-[minmax(320px,0.86fr)_minmax(420px,1.14fr)] items-center gap-16 px-14 py-16 xl:px-24'>
-            <div className='flex min-h-0 flex-col items-center gap-8'>
+          <div className='relative z-10 grid h-full min-h-0 grid-cols-[minmax(320px,0.86fr)_minmax(420px,1.14fr)] items-center gap-16 px-14 py-16 xl:px-20'>
+            <div className='flex min-h-0 flex-col items-center gap-8 2xl:gap-12'>
               <PlayerSceneArtwork
                 coverUrl={coverUrl}
                 title={title}

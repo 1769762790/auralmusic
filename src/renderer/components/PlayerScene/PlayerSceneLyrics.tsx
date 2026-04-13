@@ -47,15 +47,15 @@ const PlayerSceneLyrics = ({
 
   return (
     <section
-      className='no-scrollbar max-h-[72vh] overflow-y-auto py-[28vh] pr-6 2xl:max-h-[81vh]'
+      className='no-scrollbar max-h-[72vh] overflow-y-auto py-[28vh] pr-16 2xl:max-h-[81vh]'
       style={{
         maskImage:
-          'linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%)',
+          'linear-gradient(to bottom, transparent 0%, black 25%, black 70%, transparent 100%)',
         WebkitMaskImage:
-          'linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%)',
+          'linear-gradient(to bottom, transparent 0%, black 25%, black 70%, transparent 100%)',
       }}
     >
-      <div className='space-y-9'>
+      <div className='space-y-8'>
         {lines.map((line, index) => {
           const isActive = index === activeIndex
 
@@ -66,10 +66,17 @@ const PlayerSceneLyrics = ({
                 lineRefs.current[index] = node
               }}
               className={cn(
-                'tracking-tight transition-all duration-300 ease-in-out',
+                'text-md opacity-50 md:text-2xl 2xl:text-3xl',
+                'leading-[1.45] 2xl:leading-loose',
+                'font-extrabold tracking-tight',
+                'flex min-h-[1.5em] items-center',
+                'pr-10 pl-8 md:pr-19 md:pl-10',
+                'origin-left',
+                'transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+                'will-change-opacity will-change-color will-change-transform',
                 isActive
-                  ? 'text-[1.3rem] leading-[1.62] font-black text-(--player-foreground) opacity-100 md:text-[2.8rem] 2xl:text-[3.55rem] 2xl:leading-[1.6]'
-                  : 'text-md leading-[1.45] font-extrabold text-(--player-soft) opacity-35 md:text-3xl 2xl:text-3xl 2xl:leading-loose'
+                  ? 'scale-[1.3] font-black tracking-normal text-(--player-foreground) opacity-100'
+                  : 'scale-100 font-extrabold tracking-tight text-(--player-soft)'
               )}
             >
               {line.text}

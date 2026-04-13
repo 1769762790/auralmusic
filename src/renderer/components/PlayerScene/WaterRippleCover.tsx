@@ -39,7 +39,7 @@ export default function WaterRipple3DCover({
           height: '100%',
         }}
       >
-        <ambientLight intensity={1.2} />
+        <ambientLight intensity={2.0} />
         <WaterSurface
           url={src}
           playBeat={playBeat}
@@ -103,7 +103,7 @@ function WaterSurface({ url, playBeat, onLoad }) {
     // ✅ 固定正方形平面，无需缩放
     <Plane
       ref={meshRef}
-      args={[2, 2, 42, 42]}
+      args={[2, 2, 64, 64]}
       onPointerDown={handlePointerDown}
     >
       <meshStandardMaterial

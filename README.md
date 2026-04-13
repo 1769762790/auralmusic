@@ -170,3 +170,5 @@ If you want, I can also add a short `CONTRIBUTING.md` for team collaboration rul
 播放私人fm时，底部控制栏切歌和私人FM卡片切哥逻辑不一致
 
 MV 播放器全屏按钮失效
+
+播放设置增加歌词翻译开关并完成相应功能

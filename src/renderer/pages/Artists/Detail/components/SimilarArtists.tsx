@@ -8,12 +8,10 @@ interface SimilarArtistsProps {
 const SimilarArtists = ({ artists }: SimilarArtistsProps) => {
   return (
     <section className='space-y-5'>
-      <h2 className='text-foreground text-3xl font-bold tracking-tight'>
-        ���Ƹ���
-      </h2>
+      <h2 className='text-foreground text-3xl font-bold tracking-tight'></h2>
       {artists.length === 0 ? (
         <div className='border-border/60 bg-card/68 text-muted-foreground rounded-[30px] border px-6 py-10 text-sm'>
-          �������Ƹ���
+          暂无数据
         </div>
       ) : (
         <div className='grid grid-cols-2 gap-6 sm:grid-cols-3 xl:grid-cols-5'>

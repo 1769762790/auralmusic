@@ -18,7 +18,7 @@ const PlayerSceneArtwork = ({
   dynamicCoverEnabled,
 }: PlayerSceneArtworkProps) => {
   return (
-    <section className='flex min-w-0 flex-col items-center gap-6 text-center'>
+    <section className='flex min-w-0 flex-col items-center gap-6 text-center 2xl:gap-15'>
       {/* 外层控制响应式最大宽度 + 正方形比例 */}
       <div
         className={cn(
@@ -32,7 +32,6 @@ const PlayerSceneArtwork = ({
         {/* 封面容器：宽高100%，确保尺寸传递 */}
         <div className='relative h-full w-full overflow-hidden rounded-[20px] border border-white/18 bg-white/10 shadow-[0_42px_120px_rgba(0,0,0,0.35)] backdrop-blur-xl'>
           {coverUrl && dynamicCoverEnabled ? (
-            // ✅ 关键：传递 w-full h-full 强制铺满
             <WaterRipple3DCover
               src={coverUrl}
               // playBeat={isPlaying}
