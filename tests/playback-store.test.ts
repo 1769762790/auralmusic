@@ -45,6 +45,53 @@ test('playQueueFromIndex sets queue and starts loading selected track', () => {
   assert.equal(state.requestId, 1)
 })
 
+test('appendToQueue appends tracks without interrupting current playback', () => {
+  usePlaybackStore.getState().resetPlayback()
+  usePlaybackStore.getState().playQueueFromIndex(tracks, 1)
+
+  usePlaybackStore.getState().appendToQueue([
+    {
+      id: 4,
+      name: 'Track 4',
+      artistNames: 'Artist 4',
+      albumName: 'Album 4',
+      coverUrl: 'cover-4',
+      duration: 220000,
+    },
+  ])
+
+  const state = usePlaybackStore.getState()
+  assert.equal(state.queue.length, 4)
+  assert.equal(state.currentIndex, 1)
+  assert.equal(state.currentTrack?.id, 2)
+  assert.equal(state.status, 'loading')
+  assert.equal(state.requestId, 1)
+  assert.equal(state.queue[3]?.id, 4)
+})
+
+test('appendToQueue seeds the queue without auto-playing when idle', () => {
+  usePlaybackStore.getState().resetPlayback()
+
+  usePlaybackStore.getState().appendToQueue([
+    tracks[0],
+    {
+      id: 4,
+      name: 'Track 4',
+      artistNames: 'Artist 4',
+      albumName: 'Album 4',
+      coverUrl: 'cover-4',
+      duration: 220000,
+    },
+  ])
+
+  const state = usePlaybackStore.getState()
+  assert.equal(state.queue.length, 2)
+  assert.equal(state.currentIndex, -1)
+  assert.equal(state.currentTrack, null)
+  assert.equal(state.status, 'idle')
+  assert.equal(state.requestId, 0)
+})
+
 test('playNext and playPrevious loop queue boundaries in repeat-all mode', () => {
   usePlaybackStore.getState().resetPlayback()
   usePlaybackStore.getState().playQueueFromIndex(tracks, 0)

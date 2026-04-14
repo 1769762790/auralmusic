@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
-import { WINDOW_IPC_CHANNELS } from '../../main/window/types'
+import { WINDOW_IPC_CHANNELS } from '../../shared/ipc/window.ts'
 
 export type WindowApi = {
   minimize: () => Promise<void>

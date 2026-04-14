@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { getElectronWindowApi, isWindowsPlatform } from '@/lib/electron-runtime'
 import { useTheme } from '@/hooks/useTheme'
 import Account from '../Account'
 import LoginDialog from '../LoginDialog'
@@ -15,7 +16,8 @@ interface HeaderProps {
 const Header = ({ className = '' }: HeaderProps) => {
   const { currentTheme, setDarkTheme, setLightTheme } = useTheme()
   const hydrateAuth = useAuthStore(state => state.hydrateAuth)
-  const isWindows = window.appRuntime.getPlatform() === 'win32'
+  const isWindows = isWindowsPlatform()
+  const electronWindow = getElectronWindowApi()
 
   useEffect(() => {
     void hydrateAuth()
@@ -40,7 +42,7 @@ const Header = ({ className = '' }: HeaderProps) => {
         }
 
         if (isWindows) {
-          void window.electronWindow.toggleMaximize()
+          void electronWindow?.toggleMaximize()
         }
       }}
     >

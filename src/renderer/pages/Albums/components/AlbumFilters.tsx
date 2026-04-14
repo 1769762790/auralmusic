@@ -20,10 +20,8 @@ const AlbumFilters = ({ options, value, onChange }: AlbumFiltersProps) => {
             type='button'
             variant='ghost'
             className={cn(
-              'text-foreground/78 hover:text-foreground h-11 cursor-pointer rounded-full border border-transparent px-5 text-base font-medium shadow-md transition-all hover:-translate-y-0.5 hover:bg-white',
-              isActive
-                ? 'bg-primary hover:bg-primary shadow-2xl] text-white hover:text-white'
-                : 'bg-white/92'
+              'text-foreground/78 hover:bg-foreground! hover:text-background h-11 cursor-pointer rounded-full border border-transparent px-5 text-base font-medium shadow-md transition-all hover:-translate-y-0.5',
+              isActive ? 'bg-foreground text-background shadow-2xl' : ''
             )}
             onClick={() => onChange(option.value)}
           >

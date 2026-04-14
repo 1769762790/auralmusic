@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { AUTH_IPC_CHANNELS } from '../../main/auth/types'
+import { AUTH_IPC_CHANNELS } from '../../shared/ipc/auth.ts'
 import type { AuthSession } from '../../shared/auth'
 
 export type AuthApi = {

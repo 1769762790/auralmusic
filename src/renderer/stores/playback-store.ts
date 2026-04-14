@@ -32,6 +32,7 @@ interface PlaybackStoreState {
   isPlayerSceneOpen: boolean
   isPlayerSceneFullscreen: boolean
   playQueueFromIndex: (tracks: PlaybackTrack[], startIndex: number) => void
+  appendToQueue: (tracks: PlaybackTrack[]) => void
   togglePlay: () => void
   setPlaybackMode: (mode: PlaybackMode) => void
   playNext: (reason?: PlaybackAdvanceReason) => boolean
@@ -124,6 +125,41 @@ export const usePlaybackStore = create<PlaybackStoreState>((set, get) => ({
       error: '',
       requestId: snapshot.currentTrack ? state.requestId + 1 : state.requestId,
     }))
+  },
+
+  appendToQueue: tracks => {
+    const appendedTracks = createPlaybackQueueSnapshot(tracks, 0).queue
+
+    if (!appendedTracks.length) {
+      return
+    }
+
+    set(state => {
+      const nextQueue = [...state.queue, ...appendedTracks]
+      const hasCurrentTrack = Boolean(state.currentTrack)
+
+      return {
+        queue: nextQueue,
+        currentIndex: hasCurrentTrack ? state.currentIndex : -1,
+        currentTrack: hasCurrentTrack ? state.currentTrack : null,
+        shuffleOrder:
+          state.playbackMode === 'shuffle' && hasCurrentTrack
+            ? createShuffleOrder(nextQueue.length, state.currentIndex)
+            : [],
+        shuffleCursor: 0,
+        status: hasCurrentTrack ? state.status : 'idle',
+        shouldAutoPlayOnLoad: hasCurrentTrack
+          ? state.shouldAutoPlayOnLoad
+          : false,
+        progress: hasCurrentTrack ? state.progress : 0,
+        pendingRestoreProgress: hasCurrentTrack
+          ? state.pendingRestoreProgress
+          : 0,
+        duration: hasCurrentTrack ? state.duration : 0,
+        error: hasCurrentTrack ? state.error : '',
+        requestId: state.requestId,
+      }
+    })
   },
 
   togglePlay: () => {

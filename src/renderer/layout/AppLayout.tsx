@@ -8,10 +8,11 @@ import PlayerScene from '@/components/PlayerScene'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import KeepAliveRouteOutlet from 'keepalive-for-react-router'
 import { Toaster } from '@/components/ui/sonner'
+import { isWindowsPlatform } from '@/lib/electron-runtime'
 import { useSystemFont } from '@/hooks/useSystemFont'
 
 const AppLayout = () => {
-  const isWindows = window.appRuntime.getPlatform() === 'win32'
+  const isWindows = isWindowsPlatform()
   useSystemFont()
 
   return (

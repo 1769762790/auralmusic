@@ -21,7 +21,7 @@ const SongItem = ({ song, onPlay }: SongItemProps) => {
       <Button
         type='button'
         size='icon'
-        className='bg-primary size-10 flex-shrink-0 scale-95 cursor-pointer rounded-full border border-white/10 text-white opacity-0 backdrop-blur-md transition-all duration-300 group-hover:scale-100 group-hover:opacity-100'
+        className='bg-primary text-background size-10 flex-shrink-0 scale-95 cursor-pointer rounded-full border border-white/10 opacity-0 backdrop-blur-md transition-all duration-300 group-hover:scale-100 group-hover:opacity-100'
         onClick={event => {
           event.stopPropagation()
           onPlay?.()

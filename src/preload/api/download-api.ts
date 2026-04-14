@@ -1,10 +1,10 @@
 import electron from 'electron'
 
 import {
-  DOWNLOAD_IPC_CHANNELS,
   type DownloadTask,
   type SongDownloadPayload,
 } from '../../main/download/download-types.ts'
+import { DOWNLOAD_IPC_CHANNELS } from '../../shared/ipc/download.ts'
 
 export type DownloadApi = {
   getDefaultDirectory: () => Promise<string>

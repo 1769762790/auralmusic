@@ -32,6 +32,7 @@ interface TrackListItemProps {
   isActive?: boolean
   isPlaying?: boolean
   onPlay?: () => void
+  onAddToQueue?: () => void
   onLikeChangeSuccess?: (songId: number, nextLiked: boolean) => void
 }
 
@@ -55,6 +56,7 @@ const TrackListItem = ({
   isActive = false,
   isPlaying = false,
   onPlay,
+  onAddToQueue,
   onLikeChangeSuccess,
 }: TrackListItemProps) => {
   const userId = useAuthStore(state => state.user?.userId)
@@ -181,6 +183,7 @@ const TrackListItem = ({
       coverUrl={item.coverUrl || coverUrl}
       likeStatus={isLiked}
       onPlayClick={() => onPlay?.()}
+      onAddToQueueClick={() => onAddToQueue?.()}
       onToggleClick={handleToggleSongLike}
       onCollectToPlaylist={handleCollectToPlaylist}
       onDownload={
@@ -190,11 +193,11 @@ const TrackListItem = ({
       <div
         onDoubleClick={() => onPlay?.()}
         className={cn(
-          'hover:bg-primary/5 grid cursor-pointer grid-cols-3 items-center rounded-[15px] px-4 py-4 transition-colors',
+          'hover:bg-primary/5 grid cursor-pointer items-center rounded-[15px] px-4 py-4 transition-colors',
           isActive && 'bg-primary/8',
           type === 'default'
             ? 'grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_120px] gap-4'
-            : 'grid-cols-[1.5fr_auto] gap-2'
+            : 'grid-cols-[minmax(0,1fr)_30px] gap-0'
         )}
       >
         <div className='flex items-center gap-4'>

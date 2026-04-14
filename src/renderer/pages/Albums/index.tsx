@@ -91,7 +91,7 @@ const Albums = () => {
             当前分类下暂无新专辑数据
           </div>
         ) : (
-          <div className='grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
+          <div className='3xl:grid-cols-6 4xl:grid-cols-7 grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
             {albums.map(item => (
               <ArtistCover
                 artistCoverUrl={item.picUrl}

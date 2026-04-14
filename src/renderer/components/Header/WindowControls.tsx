@@ -1,6 +1,7 @@
 import { Copy, Minus, Square, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
+import { getElectronWindowApi } from '@/lib/electron-runtime'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/stores/config-store'
 
@@ -15,17 +16,22 @@ const WindowControls = ({ className = '' }: WindowControlsProps) => {
   const [isMaximized, setIsMaximized] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const closeBehavior = useConfigStore(state => state.config.closeBehavior)
+  const electronWindow = getElectronWindowApi()
 
   useEffect(() => {
+    if (!electronWindow) {
+      return
+    }
+
     let isMounted = true
 
-    void window.electronWindow.isMaximized().then(value => {
+    void electronWindow.isMaximized().then(value => {
       if (isMounted) {
         setIsMaximized(value)
       }
     })
 
-    const unsubscribe = window.electronWindow.onMaximizeChange(value => {
+    const unsubscribe = electronWindow.onMaximizeChange(value => {
       setIsMaximized(value)
     })
 
@@ -33,15 +39,19 @@ const WindowControls = ({ className = '' }: WindowControlsProps) => {
       isMounted = false
       unsubscribe()
     }
-  }, [])
+  }, [electronWindow])
 
   useEffect(() => {
-    const unsubscribe = window.electronWindow.onCloseRequested(() => {
+    if (!electronWindow) {
+      return
+    }
+
+    const unsubscribe = electronWindow.onCloseRequested(() => {
       setIsOpen(true)
     })
 
     return unsubscribe
-  }, [])
+  }, [electronWindow])
 
   const maximizeLabel = useMemo(
     () => (isMaximized ? '还原窗口' : '最大化窗口'),
@@ -63,11 +73,15 @@ const WindowControls = ({ className = '' }: WindowControlsProps) => {
   }
 
   const handleCloseWindow = () => {
-    void window.electronWindow.quitApp()
+    void electronWindow?.quitApp()
   }
 
   const handleMiniWindow = () => {
-    void window.electronWindow.hideToTray()
+    void electronWindow?.hideToTray()
+  }
+
+  if (!electronWindow) {
+    return null
   }
 
   return (
@@ -76,7 +90,7 @@ const WindowControls = ({ className = '' }: WindowControlsProps) => {
         type='button'
         aria-label='最小化窗口'
         className='hover:bg-foreground/8 flex h-13 w-13 items-center justify-center rounded-[15px] transition-colors'
-        onClick={() => void window.electronWindow.minimize()}
+        onClick={() => void electronWindow.minimize()}
       >
         <Minus className='size-4' />
       </button>
@@ -84,7 +98,7 @@ const WindowControls = ({ className = '' }: WindowControlsProps) => {
         type='button'
         aria-label={maximizeLabel}
         className='hover:bg-foreground/8 flex h-13 w-13 items-center justify-center rounded-[15px] transition-colors'
-        onClick={() => void window.electronWindow.toggleMaximize()}
+        onClick={() => void electronWindow.toggleMaximize()}
       >
         {isMaximized ? (
           <Copy className='size-3.5 rotate-180' />

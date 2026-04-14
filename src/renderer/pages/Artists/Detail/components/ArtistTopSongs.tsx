@@ -11,6 +11,7 @@ interface ArtistTopSongsProps {
 const ArtistTopSongs = ({ songs }: ArtistTopSongsProps) => {
   const [isMore, setIsMore] = useState(false)
   const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
+  const appendToQueue = usePlaybackStore(state => state.appendToQueue)
   const currentTrackId = usePlaybackStore(state => state.currentTrack?.id)
   const playbackStatus = usePlaybackStore(state => state.status)
   const onToggleMore = () => {
@@ -84,6 +85,7 @@ const ArtistTopSongs = ({ songs }: ArtistTopSongsProps) => {
                     song.id === currentTrackId && playbackStatus === 'playing'
                   }
                   onPlay={() => playQueueFromIndex(playbackQueue, index)}
+                  onAddToQueue={() => appendToQueue([playbackQueue[index]])}
                 />
               ))}
             </div>

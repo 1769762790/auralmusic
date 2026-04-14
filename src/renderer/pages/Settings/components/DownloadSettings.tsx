@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FolderOpen, PencilLine } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -205,7 +205,6 @@ const DownloadSettings = () => {
   const [loadingDefaultDir, setLoadingDefaultDir] = useState(false)
   const [selectingDownloadDir, setSelectingDownloadDir] = useState(false)
   const [openingDownloadDir, setOpeningDownloadDir] = useState(false)
-  const hasSyncedDefaultDirRef = useRef(false)
 
   const resolvedDownloadDir = downloadDir.trim() || defaultDownloadDir.trim()
   const downloadDirDescription = resolvedDownloadDir
@@ -232,11 +231,6 @@ const DownloadSettings = () => {
         }
 
         setDefaultDownloadDir(directory)
-
-        if (!downloadDir.trim() && !hasSyncedDefaultDirRef.current) {
-          hasSyncedDefaultDirRef.current = true
-          await setConfig('downloadDir', directory)
-        }
       } catch (error) {
         if (!cancelled) {
           console.error('failed to load default download directory', error)
@@ -253,7 +247,7 @@ const DownloadSettings = () => {
     return () => {
       cancelled = true
     }
-  }, [downloadDir, setConfig])
+  }, [])
 
   const handleOpenDownloadDirectory = async () => {
     const electronDownload = getElectronDownloadApi()
@@ -407,6 +401,16 @@ const DownloadSettings = () => {
           >
             <PencilLine />
             修改下载目录
+          </Button>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='rounded-xl'
+            disabled={!downloadDir.trim() || isConfigLoading}
+            onClick={() => void setConfig('downloadDir', '')}
+          >
+            恢复系统默认
           </Button>
         </div>
       </div>

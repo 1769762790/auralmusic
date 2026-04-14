@@ -32,6 +32,7 @@ const TrackList = ({
   onLikeChangeSuccess,
 }: TrackListProps) => {
   const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
+  const appendToQueue = usePlaybackStore(state => state.appendToQueue)
   const currentTrackId = usePlaybackStore(state => state.currentTrack?.id)
   const playbackStatus = usePlaybackStore(state => state.status)
   const playbackQueue = useMemo(
@@ -54,6 +55,7 @@ const TrackList = ({
                   item.id === currentTrackId && playbackStatus === 'playing'
                 }
                 onPlay={() => playQueueFromIndex(playbackQueue, index)}
+                onAddToQueue={() => appendToQueue([playbackQueue[index]])}
                 onLikeChangeSuccess={onLikeChangeSuccess}
               />
             )

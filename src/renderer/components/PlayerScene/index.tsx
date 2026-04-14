@@ -7,6 +7,7 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from '@/components/ui/drawer'
+import { getElectronWindowApi } from '@/lib/electron-runtime'
 import { useResolvedDarkTheme } from '@/hooks/useResolvedDarkTheme'
 import { useConfigStore } from '@/stores/config-store'
 import { usePlaybackStore } from '@/stores/playback-store'
@@ -52,6 +53,7 @@ const PlayerScene = () => {
     isOpen,
     trackId: currentTrack?.id,
   })
+  const electronWindow = getElectronWindowApi()
   const isDarkTheme = useResolvedDarkTheme()
 
   const hasTrack = Boolean(currentTrack)
@@ -76,15 +78,19 @@ const PlayerScene = () => {
   }, [closePlayerScene, isFullscreen, isOpen])
 
   useEffect(() => {
+    if (!electronWindow) {
+      return
+    }
+
     let isMounted = true
 
-    void window.electronWindow.isFullScreen().then(value => {
+    void electronWindow.isFullScreen().then(value => {
       if (isMounted) {
         setPlayerSceneFullscreen(value)
       }
     })
 
-    const unsubscribe = window.electronWindow.onFullScreenChange(value => {
+    const unsubscribe = electronWindow.onFullScreenChange(value => {
       setPlayerSceneFullscreen(value)
     })
 
@@ -92,11 +98,11 @@ const PlayerScene = () => {
       isMounted = false
       unsubscribe()
     }
-  }, [setPlayerSceneFullscreen])
+  }, [electronWindow, setPlayerSceneFullscreen])
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen && isFullscreen) {
-      void window.electronWindow.toggleFullScreen().then(value => {
+    if (!nextOpen && isFullscreen && electronWindow) {
+      void electronWindow.toggleFullScreen().then(value => {
         setPlayerSceneFullscreen(value)
       })
     }
@@ -105,8 +111,8 @@ const PlayerScene = () => {
   }
 
   const handleClose = () => {
-    if (isFullscreen) {
-      void window.electronWindow
+    if (isFullscreen && electronWindow) {
+      void electronWindow
         .toggleFullScreen()
         .then(value => {
           setPlayerSceneFullscreen(value)
@@ -121,7 +127,11 @@ const PlayerScene = () => {
   }
 
   const handleToggleFullscreen = () => {
-    void window.electronWindow
+    if (!electronWindow) {
+      return
+    }
+
+    void electronWindow
       .toggleFullScreen()
       .then(value => {
         setPlayerSceneFullscreen(value)

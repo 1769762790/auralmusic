@@ -8,6 +8,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --breakpoint-3xl: 125.5rem;
+  --breakpoint-4xl: 137.5rem;
+}
+
 @theme inline {
   --font-sans: 'Inter Variable', sans-serif;
   --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;

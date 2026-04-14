@@ -1,8 +1,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import path from 'node:path'
 
 import {
   defaultConfig,
+  normalizeDownloadDir,
   normalizeDiskCacheDir,
   normalizeDiskCacheEnabled,
   normalizeDiskCacheMaxBytes,
@@ -76,4 +78,11 @@ test('normalizeDiskCacheMaxBytes keeps positive numbers and falls back for inval
   assert.equal(normalizeDiskCacheMaxBytes(0), 1024 * 1024 * 1024)
   assert.equal(normalizeDiskCacheMaxBytes(-1), 1024 * 1024 * 1024)
   assert.equal(normalizeDiskCacheMaxBytes(Number.NaN), 1024 * 1024 * 1024)
+})
+
+test('normalizeDownloadDir migrates the legacy project downloads folder back to system default', () => {
+  assert.equal(normalizeDownloadDir(path.join(process.cwd(), 'downloads')), '')
+  assert.equal(normalizeDownloadDir('D:\\Music'), 'D:\\Music')
+  assert.equal(normalizeDownloadDir('   '), '')
+  assert.equal(normalizeDownloadDir(undefined), '')
 })

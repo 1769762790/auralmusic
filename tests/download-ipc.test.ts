@@ -117,3 +117,25 @@ test('createDownloadIpc registers handlers and broadcasts task changes', async (
     },
   ])
 })
+
+test('createDownloadIpc resolves the system downloads directory when no custom service is provided', async () => {
+  const handlers = new Map<string, (...args: unknown[]) => unknown>()
+
+  createDownloadIpc({
+    ipcMain: {
+      handle: (channel, handler) => {
+        handlers.set(channel, handler)
+      },
+    },
+    appGetPath: name => {
+      assert.equal(name, 'downloads')
+      return 'C:\\Users\\tester\\Downloads'
+    },
+    getAllWindows: () => [],
+  }).register()
+
+  assert.equal(
+    await handlers.get(DOWNLOAD_IPC_CHANNELS.GET_DEFAULT_DIRECTORY)?.(),
+    'C:\\Users\\tester\\Downloads'
+  )
+})

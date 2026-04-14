@@ -1,3 +1,6 @@
+import path from 'node:path'
+
+import { IPC_CHANNELS } from '../../shared/ipc/config.ts'
 import type { ImportedLxMusicSource } from '../../shared/lx-music-source.ts'
 import type { PlaybackMode } from '../../shared/playback.ts'
 import {
@@ -195,7 +198,23 @@ export function normalizeDownloadSkipExisting(value: unknown) {
 }
 
 export function normalizeDownloadDir(value: unknown) {
-  return typeof value === 'string' ? value : defaultConfig.downloadDir
+  if (typeof value !== 'string') {
+    return defaultConfig.downloadDir
+  }
+
+  const normalizedValue = value.trim()
+  if (!normalizedValue) {
+    return defaultConfig.downloadDir
+  }
+
+  const legacyProjectDownloadsDir = path.join(process.cwd(), 'downloads')
+  if (
+    path.resolve(normalizedValue) === path.resolve(legacyProjectDownloadsDir)
+  ) {
+    return defaultConfig.downloadDir
+  }
+
+  return normalizedValue
 }
 
 export function normalizeDownloadConcurrency(value: unknown) {
@@ -234,18 +253,4 @@ export function normalizeDownloadEmbedTranslatedLyrics(
     : defaultConfig.downloadEmbedTranslatedLyrics
 }
 
-export const IPC_CHANNELS = {
-  CONFIG: {
-    GET: 'config:get',
-    SET: 'config:set',
-    RESET: 'config:reset',
-  },
-  MUSIC_SOURCE: {
-    SELECT_LX_SCRIPT: 'music-source:select-lx-script',
-    SAVE_LX_SCRIPT: 'music-source:save-lx-script',
-    READ_LX_SCRIPT: 'music-source:read-lx-script',
-    REMOVE_LX_SCRIPT: 'music-source:remove-lx-script',
-    DOWNLOAD_LX_SCRIPT: 'music-source:download-lx-script',
-    LX_HTTP_REQUEST: 'music-source:lx-http-request',
-  },
-} as const
+export { IPC_CHANNELS }

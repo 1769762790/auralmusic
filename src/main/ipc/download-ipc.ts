@@ -1,5 +1,4 @@
 import electron from 'electron'
-import path from 'node:path'
 
 import { getConfig } from '../config/store.ts'
 import { DownloadService } from '../download/download-service.ts'
@@ -31,28 +30,33 @@ type DownloadIpcRegistrationOptions = {
       send: (channel: string, payload: unknown) => void
     }
   }>
+  appGetPath?: (name: 'downloads') => string
   downloadService?: DownloadService
 }
 
-const defaultDownloadService = new DownloadService({
-  defaultRootDir: path.join(process.cwd(), 'downloads'),
-  readConfig: () => ({
-    downloadDir: getConfig('downloadDir'),
-    downloadQuality: getConfig('downloadQuality'),
-    downloadSkipExisting: getConfig('downloadSkipExisting'),
-    downloadConcurrency: getConfig('downloadConcurrency'),
-    downloadFileNamePattern: getConfig('downloadFileNamePattern'),
-    downloadEmbedCover: getConfig('downloadEmbedCover'),
-    downloadEmbedLyrics: getConfig('downloadEmbedLyrics'),
-    downloadEmbedTranslatedLyrics: getConfig('downloadEmbedTranslatedLyrics'),
-  }),
-  openPath: async targetPath => {
-    return electron.shell.openPath(targetPath)
-  },
-  showItemInFolder: targetPath => {
-    electron.shell.showItemInFolder(targetPath)
-  },
-})
+function createDefaultDownloadService(
+  appGetPath: (name: 'downloads') => string
+) {
+  return new DownloadService({
+    defaultRootDir: appGetPath('downloads'),
+    readConfig: () => ({
+      downloadDir: getConfig('downloadDir'),
+      downloadQuality: getConfig('downloadQuality'),
+      downloadSkipExisting: getConfig('downloadSkipExisting'),
+      downloadConcurrency: getConfig('downloadConcurrency'),
+      downloadFileNamePattern: getConfig('downloadFileNamePattern'),
+      downloadEmbedCover: getConfig('downloadEmbedCover'),
+      downloadEmbedLyrics: getConfig('downloadEmbedLyrics'),
+      downloadEmbedTranslatedLyrics: getConfig('downloadEmbedTranslatedLyrics'),
+    }),
+    openPath: async targetPath => {
+      return electron.shell.openPath(targetPath)
+    },
+    showItemInFolder: targetPath => {
+      electron.shell.showItemInFolder(targetPath)
+    },
+  })
+}
 
 export function createDownloadIpc(
   options: DownloadIpcRegistrationOptions = {}
@@ -67,7 +71,10 @@ export function createDownloadIpc(
       ))
   const getAllWindows =
     options.getAllWindows ?? (() => electron.BrowserWindow.getAllWindows())
-  const downloadService = options.downloadService ?? defaultDownloadService
+  const appGetPath =
+    options.appGetPath ?? ((name: 'downloads') => electron.app.getPath(name))
+  const downloadService =
+    options.downloadService ?? createDefaultDownloadService(appGetPath)
 
   return {
     register() {

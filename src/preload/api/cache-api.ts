@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { CACHE_IPC_CHANNELS } from '../../main/cache/cache-types'
+import { CACHE_IPC_CHANNELS } from '../../shared/ipc/cache.ts'
 import type {
   CacheStatus,
   ResolveAudioSourceResult,

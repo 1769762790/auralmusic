@@ -12,8 +12,10 @@ import {
   Heart,
   PlaySquareIcon,
 } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import type { CollectPlaylistSongContext } from '@/model/collect-to-playlist.model'
+
 import {
   getMusicContextMenuDownloadHandler,
   shouldShowMusicContextMenuDownload,
@@ -27,6 +29,7 @@ interface MusicContextMenuProps {
   likeStatus: boolean
   children: ReactElement
   onPlayClick: () => void
+  onAddToQueueClick?: () => void
   onToggleClick: () => void
   onCollectToPlaylist?: (song: CollectPlaylistSongContext) => void
   onDownload?: () => void
@@ -35,6 +38,7 @@ interface MusicContextMenuProps {
 const MusicContextMenu = ({
   children,
   onPlayClick,
+  onAddToQueueClick,
   onToggleClick,
   onCollectToPlaylist,
   onDownload,
@@ -81,9 +85,9 @@ const MusicContextMenu = ({
           <PlaySquareIcon size='4' />
           播放
         </ContextMenuItem>
-        <ContextMenuItem onClick={onPlayClick}>
+        <ContextMenuItem onClick={onAddToQueueClick}>
           <CopyPlusIcon size='4' />
-          添加到播放队列中
+          添加到播放列表中
         </ContextMenuItem>
         <ContextMenuItem onClick={() => onToggleClick?.()}>
           <Heart

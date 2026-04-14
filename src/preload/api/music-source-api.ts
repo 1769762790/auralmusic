@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { IPC_CHANNELS } from '../../main/config/types'
+import { IPC_CHANNELS } from '../../shared/ipc/config.ts'
 import type {
   ImportedLxMusicSource,
   LxInitedData,
