@@ -5,6 +5,7 @@ import type { WindowApi } from '@preload/api/window-api'
 import type { MusicSourceApi } from '@preload/api/music-source-api'
 import type { ShortcutApi } from '@preload/api/shortcut-api'
 import type { CacheApi } from '@preload/api/cache-api'
+import type { DownloadApi } from '@preload/api/download-api'
 
 declare global {
   interface Window {
@@ -13,6 +14,7 @@ declare global {
     electronConfig: ConfigApi
     electronCache: CacheApi
     electronMusicSource: MusicSourceApi
+    electronDownload: DownloadApi
     electronShortcut: ShortcutApi
     electronWindow: WindowApi
   }

@@ -1,6 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { toast } from 'sonner'
-
 import { getSongUrlV1 } from '@/api/list'
 import { applyAudioOutputDevice } from '@/lib/audio-output'
 import { resolveTrackWithLxMusicSource } from '@/services/music-source/lx-playback-resolver'
@@ -17,9 +16,47 @@ import {
 
 const PLAYBACK_UNAVAILABLE_MESSAGE = '暂时无法播放'
 
-// 定义暴露的方法类型
 interface PlaybackEngineRef {
   getAudioElement: () => HTMLAudioElement | null
+}
+
+async function applyPersistedProgress(
+  audio: HTMLAudioElement,
+  progressMs: number
+) {
+  if (!Number.isFinite(progressMs) || progressMs <= 0) {
+    return
+  }
+
+  const nextTime = progressMs / 1000
+
+  if (audio.readyState < 1) {
+    await new Promise<void>((resolve, reject) => {
+      const handleLoadedMetadata = () => {
+        cleanup()
+        resolve()
+      }
+
+      const handleError = () => {
+        cleanup()
+        reject(new Error('failed to load audio metadata'))
+      }
+
+      const cleanup = () => {
+        audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
+        audio.removeEventListener('error', handleError)
+      }
+
+      audio.addEventListener('loadedmetadata', handleLoadedMetadata, {
+        once: true,
+      })
+      audio.addEventListener('error', handleError, {
+        once: true,
+      })
+    })
+  }
+
+  audio.currentTime = nextTime
 }
 
 const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
@@ -51,7 +88,6 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
     state => state.config.audioOutputDeviceId
   )
 
-  // 🔥 暴露获取 audio 实例的方法
   useImperativeHandle(
     ref,
     () => ({
@@ -77,7 +113,6 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
     playbackSpeedRef.current = normalizedPlaybackSpeed
 
     const audio = audioRef.current
-
     if (!audio) {
       return
     }
@@ -112,6 +147,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
     audio.volume = volumeRef.current / 100
     applyPlaybackSpeedToAudio(audio, playbackSpeedRef.current)
     audioRef.current = audio
+
     let frameId = 0
 
     const stopProgressSync = () => {
@@ -207,7 +243,9 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
     const expectedTrackId = currentTrack.id
 
     const loadAndPlay = async () => {
-      usePlaybackStore.getState().markPlaybackLoading()
+      if (usePlaybackStore.getState().shouldAutoPlayOnLoad) {
+        usePlaybackStore.getState().markPlaybackLoading()
+      }
 
       try {
         let result = null
@@ -273,8 +311,22 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
         audio.currentTime = 0
         audio.volume = volumeRef.current / 100
         applyPlaybackSpeedToAudio(audio, playbackSpeedRef.current)
-        latestState.setProgress(0)
         latestState.setDuration(result.time || currentTrack.duration)
+
+        const restoreProgress = latestState.pendingRestoreProgress
+        if (restoreProgress > 0) {
+          try {
+            await applyPersistedProgress(audio, restoreProgress)
+            usePlaybackStore.getState().setProgress(restoreProgress)
+          } catch (error) {
+            console.error('restore playback progress failed', error)
+            usePlaybackStore.getState().setProgress(0)
+          } finally {
+            usePlaybackStore.getState().clearPendingRestoreProgress()
+          }
+        } else {
+          latestState.setProgress(0)
+        }
 
         try {
           await applyAudioOutputDevice(audio, audioOutputDeviceIdRef.current)
@@ -283,7 +335,15 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
           toast.error('音频输出设备切换失败，将使用默认输出设备播放')
         }
 
-        if (usePlaybackStore.getState().status === 'paused') {
+        const currentPlaybackState = usePlaybackStore.getState()
+
+        if (!currentPlaybackState.shouldAutoPlayOnLoad) {
+          currentPlaybackState.markPlaybackPaused()
+          audio.pause()
+          return
+        }
+
+        if (currentPlaybackState.status === 'paused') {
           audio.pause()
           return
         }

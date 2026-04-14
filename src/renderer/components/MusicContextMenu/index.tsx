@@ -1,4 +1,4 @@
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -14,6 +14,10 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { CollectPlaylistSongContext } from '@/model/collect-to-playlist.model'
+import {
+  getMusicContextMenuDownloadHandler,
+  shouldShowMusicContextMenuDownload,
+} from './music-context-menu.model'
 
 interface MusicContextMenuProps {
   songId: number | undefined
@@ -25,6 +29,7 @@ interface MusicContextMenuProps {
   onPlayClick: () => void
   onToggleClick: () => void
   onCollectToPlaylist?: (song: CollectPlaylistSongContext) => void
+  onDownload?: () => void
 }
 
 const MusicContextMenu = ({
@@ -32,12 +37,16 @@ const MusicContextMenu = ({
   onPlayClick,
   onToggleClick,
   onCollectToPlaylist,
+  onDownload,
   coverUrl,
   artistName,
   name,
   likeStatus,
   songId,
 }: MusicContextMenuProps) => {
+  const downloadHandler = getMusicContextMenuDownloadHandler(onDownload)
+  const showDownloadAction = shouldShowMusicContextMenuDownload(onDownload)
+
   const handleCollectToPlaylist = () => {
     if (!songId || !name) {
       return
@@ -85,16 +94,19 @@ const MusicContextMenu = ({
           />
           {likeStatus ? '取消喜欢' : '喜欢'}
         </ContextMenuItem>
-
         <ContextMenuItem onClick={handleCollectToPlaylist}>
           <CopyPlusIcon size='4' />
           收藏到歌单
         </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem onClick={onPlayClick}>
-          <DownloadCloudIcon size='4' />
-          下载
-        </ContextMenuItem>
+        {showDownloadAction ? (
+          <>
+            <ContextMenuSeparator />
+            <ContextMenuItem onClick={downloadHandler}>
+              <DownloadCloudIcon size='4' />
+              下载
+            </ContextMenuItem>
+          </>
+        ) : null}
       </ContextMenuContent>
     </ContextMenu>
   )

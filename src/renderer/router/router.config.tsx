@@ -1,19 +1,19 @@
 import type { RouteMenuConfig } from './router.type'
-
-import AppLayout from '../layout/AppLayout'
 import AlbumDetail from '@/pages/Albums/Detail'
 import Albums from '@/pages/Albums'
 import ArtistDetail from '@/pages/Artists/Detail'
 import Artists from '@/pages/Artists'
 import Charts from '@/pages/Charts'
 import DailySongs from '@/pages/DailySongs'
+import Downloads from '@/pages/Downloads'
 import Home from '@/pages/Home'
 import Library from '@/pages/Library'
 import LikedSongs from '@/pages/LikedSongs'
-import MvDetail from '@/pages/Mv/Detail'
 import PlayList from '@/pages/PlayList'
 import PlaylistDetail from '@/pages/PlayList/Detail'
 import Settings from '@/pages/Settings'
+import MvDetail from '@/pages/Mv/Detail'
+import AppLayout from '../layout/AppLayout'
 
 export const routeMenuConfig: RouteMenuConfig[] = [
   {
@@ -45,6 +45,11 @@ export const routeMenuConfig: RouteMenuConfig[] = [
         path: '/settings',
         element: <Settings />,
         meta: { title: '设置', icon: '', hidden: true },
+      },
+      {
+        path: '/downloads',
+        element: <Downloads />,
+        meta: { title: '下载管理', icon: '', hidden: true },
       },
       {
         path: '/charts',

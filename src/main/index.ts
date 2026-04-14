@@ -10,6 +10,7 @@ import {
 import { registerAuthIpc } from './ipc/auth-ipc'
 import { registerCacheIpc } from './ipc/cache-ipc'
 import { registerConfigIpc } from './ipc/config-ipc'
+import { registerDownloadIpc } from './ipc/download-ipc'
 import { registerMusicSourceIpc } from './ipc/music-source-ipc'
 import { registerWindowIpc, bindWindowStateEvents } from './ipc/window-ipc'
 import { applyMusicApiRuntimeEnv } from './music-api-runtime'
@@ -284,6 +285,7 @@ app.whenReady().then(async () => {
   })
   registerAuthIpc()
   registerCacheIpc()
+  registerDownloadIpc()
   registerMusicSourceIpc()
   registerWindowIpc({
     onQuitRequested: () => {

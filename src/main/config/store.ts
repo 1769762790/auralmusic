@@ -1,31 +1,44 @@
 import ElectronStore from 'electron-store'
 import {
-  AppConfig,
   AUDIO_QUALITY_LEVELS,
+  DOWNLOAD_FILE_NAME_PATTERNS,
   MUSIC_SOURCE_PROVIDERS,
   defaultConfig,
   normalizeDiskCacheDir,
   normalizeDiskCacheEnabled,
   normalizeDiskCacheMaxBytes,
+  normalizeDownloadConcurrency,
+  normalizeDownloadDir,
+  normalizeDownloadEmbedCover,
+  normalizeDownloadEmbedLyrics,
+  normalizeDownloadEmbedTranslatedLyrics,
+  normalizeDownloadEnabled,
+  normalizeDownloadFileNamePattern,
+  normalizeDownloadQuality,
+  normalizeDownloadSkipExisting,
   normalizeDynamicCoverEnabled,
   normalizeLyricsKaraokeEnabled,
   normalizePlaybackSpeed,
   normalizePlayerBackgroundMode,
+  normalizeRememberPlaybackSession,
   normalizeShowLyricTranslation,
-  type AudioQualityLevel,
-  type MusicSourceProvider,
-} from './types'
+} from './types.ts'
+import type {
+  AppConfig,
+  AudioQualityLevel,
+  MusicSourceProvider,
+} from './types.ts'
 import {
   normalizeImportedLxMusicSource,
   normalizeImportedLxMusicSources,
   resolveActiveLxMusicSourceScriptId,
-} from '../../shared/lx-music-source'
-import { normalizeShortcutBindings } from '../../shared/shortcut-keys'
+} from '../../shared/lx-music-source.ts'
+import { normalizeShortcutBindings } from '../../shared/shortcut-keys.ts'
 import {
   PLAYBACK_MODE_SEQUENCE,
   normalizePlaybackMode,
   normalizePlaybackVolume,
-} from '../../shared/playback'
+} from '../../shared/playback.ts'
 
 const Store =
   (
@@ -107,6 +120,7 @@ function createConfigStore() {
       playbackVolume: { type: 'number', minimum: 0, maximum: 100 },
       playbackMode: { type: 'string', enum: PLAYBACK_MODE_SEQUENCE },
       playbackSpeed: { type: 'number', minimum: 0.5, maximum: 2 },
+      rememberPlaybackSession: { type: 'boolean' },
       dynamicCoverEnabled: { type: 'boolean' },
       showLyricTranslation: { type: 'boolean' },
       lyricsKaraokeEnabled: { type: 'boolean' },
@@ -177,6 +191,18 @@ function createConfigStore() {
       diskCacheEnabled: { type: 'boolean' },
       diskCacheDir: { type: 'string' },
       diskCacheMaxBytes: { type: 'number', minimum: 1 },
+      downloadEnabled: { type: 'boolean' },
+      downloadQuality: { type: 'string', enum: AUDIO_QUALITY_LEVELS },
+      downloadSkipExisting: { type: 'boolean' },
+      downloadDir: { type: 'string' },
+      downloadConcurrency: { type: 'number', minimum: 1, maximum: 10 },
+      downloadFileNamePattern: {
+        type: 'string',
+        enum: DOWNLOAD_FILE_NAME_PATTERNS,
+      },
+      downloadEmbedCover: { type: 'boolean' },
+      downloadEmbedLyrics: { type: 'boolean' },
+      downloadEmbedTranslatedLyrics: { type: 'boolean' },
     },
   })
 }
@@ -212,6 +238,18 @@ class ConfigStore {
       const normalizedPlaybackSpeed = normalizePlaybackSpeed(playbackSpeed)
       if (playbackSpeed !== normalizedPlaybackSpeed) {
         ConfigStore.instance.set('playbackSpeed', normalizedPlaybackSpeed)
+      }
+
+      const rememberPlaybackSession = ConfigStore.instance.get(
+        'rememberPlaybackSession'
+      )
+      const normalizedRememberPlaybackSession =
+        normalizeRememberPlaybackSession(rememberPlaybackSession)
+      if (rememberPlaybackSession !== normalizedRememberPlaybackSession) {
+        ConfigStore.instance.set(
+          'rememberPlaybackSession',
+          normalizedRememberPlaybackSession
+        )
       }
 
       const dynamicCoverEnabled = ConfigStore.instance.get(
@@ -347,6 +385,102 @@ class ConfigStore {
       const normalizedDiskCacheDir = normalizeDiskCacheDir(diskCacheDir)
       if (diskCacheDir !== normalizedDiskCacheDir) {
         ConfigStore.instance.set('diskCacheDir', normalizedDiskCacheDir)
+      }
+
+      const downloadEnabled = ConfigStore.instance.get('downloadEnabled')
+      const normalizedDownloadEnabled =
+        normalizeDownloadEnabled(downloadEnabled)
+      if (downloadEnabled !== normalizedDownloadEnabled) {
+        ConfigStore.instance.set('downloadEnabled', normalizedDownloadEnabled)
+      }
+
+      const downloadQuality = ConfigStore.instance.get('downloadQuality')
+      const normalizedDownloadQuality =
+        normalizeDownloadQuality(downloadQuality)
+      if (downloadQuality !== normalizedDownloadQuality) {
+        ConfigStore.instance.set('downloadQuality', normalizedDownloadQuality)
+      }
+
+      const downloadSkipExisting = ConfigStore.instance.get(
+        'downloadSkipExisting'
+      )
+      const normalizedDownloadSkipExisting =
+        normalizeDownloadSkipExisting(downloadSkipExisting)
+      if (downloadSkipExisting !== normalizedDownloadSkipExisting) {
+        ConfigStore.instance.set(
+          'downloadSkipExisting',
+          normalizedDownloadSkipExisting
+        )
+      }
+
+      const downloadDir = ConfigStore.instance.get('downloadDir')
+      const normalizedDownloadDir = normalizeDownloadDir(downloadDir)
+      if (downloadDir !== normalizedDownloadDir) {
+        ConfigStore.instance.set('downloadDir', normalizedDownloadDir)
+      }
+
+      const downloadConcurrency = ConfigStore.instance.get(
+        'downloadConcurrency'
+      )
+      const normalizedDownloadConcurrency =
+        normalizeDownloadConcurrency(downloadConcurrency)
+      if (downloadConcurrency !== normalizedDownloadConcurrency) {
+        ConfigStore.instance.set(
+          'downloadConcurrency',
+          normalizedDownloadConcurrency
+        )
+      }
+
+      const downloadFileNamePattern = ConfigStore.instance.get(
+        'downloadFileNamePattern'
+      )
+      const normalizedDownloadFileNamePattern =
+        normalizeDownloadFileNamePattern(downloadFileNamePattern)
+      if (downloadFileNamePattern !== normalizedDownloadFileNamePattern) {
+        ConfigStore.instance.set(
+          'downloadFileNamePattern',
+          normalizedDownloadFileNamePattern
+        )
+      }
+
+      const downloadEmbedCover = ConfigStore.instance.get('downloadEmbedCover')
+      const normalizedDownloadEmbedCover =
+        normalizeDownloadEmbedCover(downloadEmbedCover)
+      if (downloadEmbedCover !== normalizedDownloadEmbedCover) {
+        ConfigStore.instance.set(
+          'downloadEmbedCover',
+          normalizedDownloadEmbedCover
+        )
+      }
+
+      const downloadEmbedLyrics = ConfigStore.instance.get(
+        'downloadEmbedLyrics'
+      )
+      const normalizedDownloadEmbedLyrics =
+        normalizeDownloadEmbedLyrics(downloadEmbedLyrics)
+      if (downloadEmbedLyrics !== normalizedDownloadEmbedLyrics) {
+        ConfigStore.instance.set(
+          'downloadEmbedLyrics',
+          normalizedDownloadEmbedLyrics
+        )
+      }
+
+      const downloadEmbedTranslatedLyrics = ConfigStore.instance.get(
+        'downloadEmbedTranslatedLyrics'
+      )
+      const normalizedDownloadEmbedTranslatedLyrics =
+        normalizeDownloadEmbedTranslatedLyrics(
+          downloadEmbedTranslatedLyrics,
+          normalizedDownloadEmbedLyrics
+        )
+      if (
+        downloadEmbedTranslatedLyrics !==
+        normalizedDownloadEmbedTranslatedLyrics
+      ) {
+        ConfigStore.instance.set(
+          'downloadEmbedTranslatedLyrics',
+          normalizedDownloadEmbedTranslatedLyrics
+        )
       }
     }
 

@@ -7,6 +7,7 @@ import {
   normalizeDiskCacheEnabled,
   normalizeDiskCacheMaxBytes,
   normalizeLyricsKaraokeEnabled,
+  normalizeRememberPlaybackSession,
   normalizePlaybackSpeed,
   normalizeShowLyricTranslation,
 } from '../src/main/config/types.ts'
@@ -15,6 +16,7 @@ test('new config defaults are safe for playback, lyrics, and cache', () => {
   assert.equal(defaultConfig.playbackSpeed, 1)
   assert.equal(defaultConfig.showLyricTranslation, false)
   assert.equal(defaultConfig.lyricsKaraokeEnabled, true)
+  assert.equal(defaultConfig.rememberPlaybackSession, false)
   assert.equal(defaultConfig.diskCacheEnabled, false)
   assert.equal(defaultConfig.diskCacheDir, '')
   assert.equal(defaultConfig.diskCacheMaxBytes, 1024 * 1024 * 1024)
@@ -42,6 +44,13 @@ test('normalizeLyricsKaraokeEnabled preserves booleans and falls back for invali
   assert.equal(normalizeLyricsKaraokeEnabled(false), false)
   assert.equal(normalizeLyricsKaraokeEnabled(undefined), true)
   assert.equal(normalizeLyricsKaraokeEnabled(1), true)
+})
+
+test('normalizeRememberPlaybackSession preserves booleans and falls back for invalid values', () => {
+  assert.equal(normalizeRememberPlaybackSession(true), true)
+  assert.equal(normalizeRememberPlaybackSession(false), false)
+  assert.equal(normalizeRememberPlaybackSession(undefined), false)
+  assert.equal(normalizeRememberPlaybackSession('true'), false)
 })
 
 test('normalizeDiskCacheEnabled preserves booleans and falls back for invalid values', () => {

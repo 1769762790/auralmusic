@@ -9,6 +9,7 @@ import {
   type PlaybackStatus,
   type PlaybackTrack,
 } from '../../shared/playback.ts'
+import type { PlaybackSessionSnapshot } from './playback-session-storage'
 
 interface PlaybackStoreState {
   queue: PlaybackTrack[]
@@ -18,7 +19,9 @@ interface PlaybackStoreState {
   shuffleOrder: number[]
   shuffleCursor: number
   status: PlaybackStatus
+  shouldAutoPlayOnLoad: boolean
   progress: number
+  pendingRestoreProgress: number
   duration: number
   volume: number
   lastAudibleVolume: number
@@ -42,6 +45,8 @@ interface PlaybackStoreState {
   setPlayerSceneFullscreen: (fullscreen: boolean) => void
   openPlayerScene: () => void
   closePlayerScene: () => void
+  restoreSession: (snapshot: PlaybackSessionSnapshot) => void
+  clearPendingRestoreProgress: () => void
   markPlaybackLoading: () => void
   markPlaybackPlaying: () => void
   markPlaybackPaused: () => void
@@ -57,7 +62,9 @@ const INITIAL_PLAYBACK_STATE = {
   shuffleOrder: [],
   shuffleCursor: 0,
   status: 'idle' as PlaybackStatus,
+  shouldAutoPlayOnLoad: true,
   progress: 0,
+  pendingRestoreProgress: 0,
   duration: 0,
   volume: 70,
   lastAudibleVolume: 70,
@@ -90,7 +97,9 @@ function createTrackPatch(
     status: currentTrack
       ? ('loading' as PlaybackStatus)
       : ('idle' as PlaybackStatus),
+    shouldAutoPlayOnLoad: true,
     progress: 0,
+    pendingRestoreProgress: 0,
     duration: currentTrack?.duration || 0,
     error: '',
     requestId: currentTrack ? requestId + 1 : requestId,
@@ -132,6 +141,7 @@ export const usePlaybackStore = create<PlaybackStoreState>((set, get) => ({
     if (state.status === 'error') {
       set({
         status: 'loading',
+        shouldAutoPlayOnLoad: true,
         error: '',
         requestId: state.requestId + 1,
       })
@@ -247,6 +257,43 @@ export const usePlaybackStore = create<PlaybackStoreState>((set, get) => ({
     set({ isPlayerSceneFullscreen: fullscreen }),
   openPlayerScene: () => set({ isPlayerSceneOpen: true }),
   closePlayerScene: () => set({ isPlayerSceneOpen: false }),
+  restoreSession: snapshot => {
+    const nextSnapshot = createPlaybackQueueSnapshot(
+      snapshot.queue,
+      snapshot.currentIndex
+    )
+
+    if (!nextSnapshot.currentTrack) {
+      return
+    }
+
+    const playbackMode = normalizePlaybackMode(snapshot.playbackMode)
+    const shuffleOrder =
+      playbackMode === 'shuffle'
+        ? createShuffleOrder(
+            nextSnapshot.queue.length,
+            nextSnapshot.currentIndex
+          )
+        : []
+
+    set(state => ({
+      ...nextSnapshot,
+      playbackMode,
+      shuffleOrder,
+      shuffleCursor: 0,
+      status: 'paused',
+      shouldAutoPlayOnLoad: false,
+      progress: Math.max(0, snapshot.progress),
+      pendingRestoreProgress: Math.max(0, snapshot.progress),
+      duration: Math.max(
+        0,
+        snapshot.duration || nextSnapshot.currentTrack?.duration || 0
+      ),
+      error: '',
+      requestId: state.requestId + 1,
+    }))
+  },
+  clearPendingRestoreProgress: () => set({ pendingRestoreProgress: 0 }),
   markPlaybackLoading: () => set({ status: 'loading', error: '' }),
   markPlaybackPlaying: () => set({ status: 'playing', error: '' }),
   markPlaybackPaused: () => set({ status: 'paused' }),

@@ -77,7 +77,7 @@ function ToggleSetting({
       className={cn(
         'bg-muted/60 relative h-9 w-full rounded-full px-1 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
         enabled
-          ? 'text-primary-foreground bg-primary/90'
+          ? 'bg-primary/90 text-primary-foreground'
           : 'text-muted-foreground'
       )}
     >
@@ -108,6 +108,9 @@ const PlaySettings = () => {
     DEFAULT_AUDIO_OUTPUT_DEVICE_ID
   const audioQuality = useConfigStore(state => state.config.quality)
   const playbackSpeed = useConfigStore(state => state.config.playbackSpeed)
+  const rememberPlaybackSession = useConfigStore(
+    state => state.config.rememberPlaybackSession
+  )
   const musicSourceEnabled = useConfigStore(
     state => state.config.musicSourceEnabled
   )
@@ -123,6 +126,7 @@ const PlaySettings = () => {
   const isConfigLoading = useConfigStore(state => state.isLoading)
   const initConfig = useConfigStore(state => state.initConfig)
   const setConfig = useConfigStore(state => state.setConfig)
+
   const [devices, setDevices] = useState<AudioOutputDeviceOption[]>([])
   const [devicesLoading, setDevicesLoading] = useState(false)
   const [playbackSpeedDragValue, setPlaybackSpeedDragValue] = useState<
@@ -167,48 +171,8 @@ const PlaySettings = () => {
 
   useEffect(() => {
     void loadAudioOutputDevices()
-    // 进入播放设置时主动读取一次，确保设备列表和权限状态及时刷新。
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const handleAudioOutputDeviceChange = (deviceId: string) => {
-    void setConfig('audioOutputDeviceId', deviceId)
-  }
-
-  const handleAudioQualityChange = (quality: AudioQualityLevel) => {
-    void setConfig('quality', quality)
-  }
-
-  const handleToggleMusicSource = () => {
-    void setConfig('musicSourceEnabled', !musicSourceEnabled)
-  }
-
-  const handleToggleDynamicCover = () => {
-    void setConfig('dynamicCoverEnabled', !dynamicCoverEnabled)
-  }
-
-  const handleToggleLyricTranslation = () => {
-    void setConfig('showLyricTranslation', !showLyricTranslation)
-  }
-
-  const handleToggleLyricsKaraoke = () => {
-    void setConfig('lyricsKaraokeEnabled', !lyricsKaraokeEnabled)
-  }
-
-  const handlePlaybackSpeedChange = (nextValue: number[]) => {
-    setPlaybackSpeedDragValue(resolvePlaybackSpeedCommitValue(nextValue))
-  }
-
-  const handlePlaybackSpeedCommit = (nextValue: number[]) => {
-    const nextPlaybackSpeed = resolvePlaybackSpeedCommitValue(nextValue)
-    setPlaybackSpeedDragValue(null)
-
-    if (nextPlaybackSpeed === normalizePlaybackSpeedValue(playbackSpeed)) {
-      return
-    }
-
-    void setConfig('playbackSpeed', nextPlaybackSpeed)
-  }
 
   const handleTestAudioOutput = async () => {
     if (testing) {
@@ -245,7 +209,9 @@ const PlaySettings = () => {
                 void loadAudioOutputDevices()
               }
             }}
-            onValueChange={handleAudioOutputDeviceChange}
+            onValueChange={deviceId => {
+              void setConfig('audioOutputDeviceId', deviceId)
+            }}
           >
             <SelectTrigger className='bg-muted/60 h-9 min-w-0 flex-1 border-none px-4 shadow-none'>
               <SelectValue placeholder='选择输出设备' />
@@ -290,9 +256,9 @@ const PlaySettings = () => {
         <Select
           value={audioQuality}
           disabled={isConfigLoading}
-          onValueChange={value =>
-            handleAudioQualityChange(value as AudioQualityLevel)
-          }
+          onValueChange={value => {
+            void setConfig('quality', value as AudioQualityLevel)
+          }}
         >
           <SelectTrigger className='bg-muted/60 h-9 w-full border-none px-4 shadow-none'>
             <SelectValue placeholder='选择播放音质' />
@@ -328,10 +294,45 @@ const PlaySettings = () => {
             step={PLAYBACK_SPEED_STEP}
             value={[playbackSpeedSliderValue]}
             disabled={isConfigLoading}
-            onValueChange={handlePlaybackSpeedChange}
-            onValueCommit={handlePlaybackSpeedCommit}
+            onValueChange={nextValue => {
+              setPlaybackSpeedDragValue(
+                resolvePlaybackSpeedCommitValue(nextValue)
+              )
+            }}
+            onValueCommit={nextValue => {
+              const nextPlaybackSpeed =
+                resolvePlaybackSpeedCommitValue(nextValue)
+              setPlaybackSpeedDragValue(null)
+
+              if (
+                nextPlaybackSpeed === normalizePlaybackSpeedValue(playbackSpeed)
+              ) {
+                return
+              }
+
+              void setConfig('playbackSpeed', nextPlaybackSpeed)
+            }}
           />
         </div>
+      </div>
+      <Separator />
+
+      <div className='grid grid-cols-[minmax(0,1fr)_minmax(220px,280px)] items-center gap-6 py-3'>
+        <div className='space-y-1'>
+          <div className='text-muted-foreground text-sm font-medium'>
+            记忆上次播放
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            开启后，下次启动会定位到上次播放的歌曲和进度，但不会自动开始播放。
+          </p>
+        </div>
+        <ToggleSetting
+          enabled={rememberPlaybackSession}
+          disabled={isConfigLoading}
+          onToggle={() =>
+            void setConfig('rememberPlaybackSession', !rememberPlaybackSession)
+          }
+        />
       </div>
       <Separator />
 
@@ -341,13 +342,15 @@ const PlaySettings = () => {
             显示歌词翻译
           </div>
           <p className='text-muted-foreground text-xs'>
-            开启后，播放器歌词区域显示翻译文本
+            开启后，播放器歌词区域会显示翻译文本。
           </p>
         </div>
         <ToggleSetting
           enabled={showLyricTranslation}
           disabled={isConfigLoading}
-          onToggle={handleToggleLyricTranslation}
+          onToggle={() =>
+            void setConfig('showLyricTranslation', !showLyricTranslation)
+          }
         />
       </div>
       <Separator />
@@ -358,13 +361,15 @@ const PlaySettings = () => {
             卡拉 OK 模式
           </div>
           <p className='text-muted-foreground text-xs'>
-            开启后优先使用逐字歌词，没有逐字数据时回退逐行高亮
+            开启后优先使用逐字歌词，没有逐字数据时回退到逐行高亮。
           </p>
         </div>
         <ToggleSetting
           enabled={lyricsKaraokeEnabled}
           disabled={isConfigLoading}
-          onToggle={handleToggleLyricsKaraoke}
+          onToggle={() =>
+            void setConfig('lyricsKaraokeEnabled', !lyricsKaraokeEnabled)
+          }
         />
       </div>
       <Separator />
@@ -375,13 +380,15 @@ const PlaySettings = () => {
             动态封面效果
           </div>
           <p className='text-muted-foreground text-xs'>
-            开启后播放器大界面使用动态封面，关闭后使用静态封面
+            开启后播放器大界面使用动态封面，关闭后使用静态封面。
           </p>
         </div>
         <ToggleSetting
           enabled={dynamicCoverEnabled}
           disabled={isConfigLoading}
-          onToggle={handleToggleDynamicCover}
+          onToggle={() =>
+            void setConfig('dynamicCoverEnabled', !dynamicCoverEnabled)
+          }
         />
       </div>
       <Separator />
@@ -392,7 +399,7 @@ const PlaySettings = () => {
             音源设置
           </div>
           <p className='text-muted-foreground text-xs'>
-            开启后将尝试解析无法播放的音乐
+            开启后将尝试解析无法播放的音乐。
           </p>
         </div>
         <div className='flex items-center gap-2'>
@@ -400,11 +407,13 @@ const PlaySettings = () => {
             type='button'
             disabled={isConfigLoading}
             aria-pressed={musicSourceEnabled}
-            onClick={handleToggleMusicSource}
+            onClick={() =>
+              void setConfig('musicSourceEnabled', !musicSourceEnabled)
+            }
             className={cn(
               'bg-muted/60 relative h-9 min-w-28 flex-1 rounded-full px-1 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
               musicSourceEnabled
-                ? 'text-primary-foreground bg-primary/90'
+                ? 'bg-primary/90 text-primary-foreground'
                 : 'text-muted-foreground'
             )}
           >

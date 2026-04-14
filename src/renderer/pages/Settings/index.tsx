@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import BasicSettings from './components/BasicSettings'
+import DownloadSettings from './components/DownloadSettings'
 import PlaySettings from './components/PlaySettings'
 import ShortcutKeySettings from './components/ShortcutKeySettings'
 import SystemSettings from './components/SystemSettings'
@@ -64,7 +65,9 @@ const Settings = () => {
         <TabsContent value='play'>
           <PlaySettings />
         </TabsContent>
-        <TabsContent value='download'>下载管理</TabsContent>
+        <TabsContent value='download'>
+          <DownloadSettings />
+        </TabsContent>
         <TabsContent value='system'>
           <SystemSettings />
         </TabsContent>

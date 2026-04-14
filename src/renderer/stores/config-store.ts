@@ -7,10 +7,20 @@ import {
   normalizeDiskCacheDir,
   normalizeDiskCacheEnabled,
   normalizeDiskCacheMaxBytes,
+  normalizeDownloadConcurrency,
+  normalizeDownloadDir,
+  normalizeDownloadEmbedCover,
+  normalizeDownloadEmbedLyrics,
+  normalizeDownloadEmbedTranslatedLyrics,
+  normalizeDownloadEnabled,
+  normalizeDownloadFileNamePattern,
+  normalizeDownloadQuality,
+  normalizeDownloadSkipExisting,
   normalizeDynamicCoverEnabled,
   normalizeLyricsKaraokeEnabled,
   normalizePlaybackSpeed,
   normalizePlayerBackgroundMode,
+  normalizeRememberPlaybackSession,
   normalizeShowLyricTranslation,
   type AudioQualityLevel,
   type MusicSourceProvider,
@@ -99,6 +109,9 @@ function normalizeConfig(config: AppConfig): AppConfig {
     playbackVolume: normalizePlaybackVolume(config.playbackVolume),
     playbackMode: normalizePlaybackMode(config.playbackMode),
     playbackSpeed: normalizePlaybackSpeed(config.playbackSpeed),
+    rememberPlaybackSession: normalizeRememberPlaybackSession(
+      config.rememberPlaybackSession
+    ),
     dynamicCoverEnabled: normalizeDynamicCoverEnabled(
       config.dynamicCoverEnabled
     ),
@@ -154,6 +167,26 @@ function normalizeConfig(config: AppConfig): AppConfig {
     diskCacheEnabled: normalizeDiskCacheEnabled(config.diskCacheEnabled),
     diskCacheDir: normalizeDiskCacheDir(config.diskCacheDir),
     diskCacheMaxBytes: normalizeDiskCacheMaxBytes(config.diskCacheMaxBytes),
+    downloadEnabled: normalizeDownloadEnabled(config.downloadEnabled),
+    downloadQuality: normalizeDownloadQuality(config.downloadQuality),
+    downloadSkipExisting: normalizeDownloadSkipExisting(
+      config.downloadSkipExisting
+    ),
+    downloadDir: normalizeDownloadDir(config.downloadDir),
+    downloadConcurrency: normalizeDownloadConcurrency(
+      config.downloadConcurrency
+    ),
+    downloadFileNamePattern: normalizeDownloadFileNamePattern(
+      config.downloadFileNamePattern
+    ),
+    downloadEmbedCover: normalizeDownloadEmbedCover(config.downloadEmbedCover),
+    downloadEmbedLyrics: normalizeDownloadEmbedLyrics(
+      config.downloadEmbedLyrics
+    ),
+    downloadEmbedTranslatedLyrics: normalizeDownloadEmbedTranslatedLyrics(
+      config.downloadEmbedTranslatedLyrics,
+      normalizeDownloadEmbedLyrics(config.downloadEmbedLyrics)
+    ),
   }
 }
 

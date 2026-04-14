@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { LogOut, Moon, Settings, Sun } from 'lucide-react'
+import { DownloadCloudIcon, LogOut, Moon, Settings, Sun } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
+import { createAccountMenuActions } from './account-menu.model'
 
 const getAvatarFallback = (nickname: string | null) => {
   if (!nickname?.trim()) {
@@ -42,7 +43,6 @@ const AccountControl = ({
     () => getAvatarFallback(user?.nickname ?? null),
     [user?.nickname]
   )
-
   const isDark = useMemo(() => currentTheme === 'dark', [currentTheme])
 
   const clearCloseTimer = () => {
@@ -75,10 +75,25 @@ const AccountControl = ({
     await logout()
   }
 
+  const handleOpenDownloads = () => {
+    setMenuOpen(false)
+    navigate('/downloads')
+  }
+
   const handleOpenSettings = () => {
     setMenuOpen(false)
     navigate('/settings')
   }
+
+  const menuActions = createAccountMenuActions({
+    isDark,
+    isLoading,
+    hasUser: Boolean(user?.userId),
+    onToggleTheme,
+    onOpenDownloads: handleOpenDownloads,
+    onOpenSettings: handleOpenSettings,
+    onLogout: handleLogout,
+  })
 
   useEffect(() => () => clearCloseTimer(), [])
 
@@ -89,7 +104,7 @@ const AccountControl = ({
           <button
             type='button'
             aria-label={
-              user?.nickname ? `在线账号：${user.nickname}` : '打开账号菜单'
+              user?.nickname ? `当前账号：${user.nickname}` : '打开账号菜单'
             }
             className='border-border bg-background/70 hover:bg-accent/40 flex size-10 items-center justify-center rounded-full border transition-colors'
             onClick={() => setMenuOpen(current => !current)}
@@ -98,7 +113,7 @@ const AccountControl = ({
           >
             <Avatar className='size-9 border-none'>
               <AvatarImage
-                alt={user?.nickname ?? '在线账号'}
+                alt={user?.nickname ?? '当前账号'}
                 src={user?.avatarUrl || undefined}
               />
               <AvatarFallback
@@ -124,7 +139,7 @@ const AccountControl = ({
           <div className='border-border/70 bg-background/65 flex items-center gap-3 rounded-[18px] border p-3'>
             <Avatar className='border-border/60 size-12'>
               <AvatarImage
-                alt={user?.nickname ?? '在线账号'}
+                alt={user?.nickname ?? '当前账号'}
                 src={user?.avatarUrl || undefined}
               />
               <AvatarFallback className='text-sm font-bold'>
@@ -150,52 +165,38 @@ const AccountControl = ({
 
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem
-            className='rounded-[18px] px-3 py-3'
-            onSelect={event => {
-              event.preventDefault()
-              onToggleTheme()
-            }}
-          >
-            {isDark ? <Sun className='size-4' /> : <Moon className='size-4' />}
-            <div className='flex flex-col'>
-              <span className='font-semibold'>
-                {isDark ? '切换到浅色模式' : '切换到深色模式'}
-              </span>
-            </div>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            className='rounded-[18px] px-3 py-3'
-            onSelect={event => {
-              event.preventDefault()
-              handleOpenSettings()
-            }}
-          >
-            <Settings className='size-4' />
-            <div className='flex flex-col'>
-              <span className='font-semibold'>设置</span>
-            </div>
-          </DropdownMenuItem>
-
-          {user?.userId && (
-            <>
-              <DropdownMenuSeparator />
+          {menuActions.map(action => (
+            <div key={action.key}>
+              {action.requiresSeparatorBefore ? (
+                <DropdownMenuSeparator />
+              ) : null}
               <DropdownMenuItem
                 className='rounded-[18px] px-3 py-3'
-                disabled={isLoading}
+                disabled={action.disabled}
                 onSelect={event => {
                   event.preventDefault()
-                  void handleLogout()
+                  void action.onSelect()
                 }}
               >
-                <LogOut className='size-4' />
+                {action.key === 'theme' ? (
+                  isDark ? (
+                    <Sun className='size-4' />
+                  ) : (
+                    <Moon className='size-4' />
+                  )
+                ) : action.key === 'settings' ? (
+                  <Settings className='size-4' />
+                ) : action.key === 'logout' ? (
+                  <LogOut className='size-4' />
+                ) : (
+                  <DownloadCloudIcon className='size-4' />
+                )}
                 <div className='flex flex-col'>
-                  <span className='font-semibold'>退出账号</span>
+                  <span className='font-semibold'>{action.label}</span>
                 </div>
               </DropdownMenuItem>
-            </>
-          )}
+            </div>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

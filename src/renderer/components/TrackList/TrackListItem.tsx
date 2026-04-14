@@ -1,14 +1,19 @@
 import type { MouseEvent } from 'react'
-import { formatDailySongDuration } from '@/pages/DailySongs/daily-songs.model'
+import { Heart } from 'lucide-react'
+import { toast } from 'sonner'
 import { toggleSongLike } from '@/api/list'
+import { cn } from '@/lib/utils'
+import { formatDailySongDuration } from '@/pages/DailySongs/daily-songs.model'
 import { useAuthStore } from '@/stores/auth-store'
+import { useCollectToPlaylistStore } from '@/stores/collect-to-playlist-store'
+import { useConfigStore } from '@/stores/config-store'
 import { useUserStore } from '@/stores/user'
 import AvatarCover from '../AvatarCover'
-import { Heart } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { toast } from 'sonner'
 import MusicContextMenu from '../MusicContextMenu'
-import { useCollectToPlaylistStore } from '@/stores/collect-to-playlist-store'
+import {
+  handleTrackDownload,
+  TRACK_DOWNLOAD_TOASTS,
+} from './track-list-download.model'
 
 export interface songProps {
   artists?: Artist[] | null
@@ -19,6 +24,7 @@ export interface songProps {
   duration: number
   albumName?: string
 }
+
 interface TrackListItemProps {
   item: songProps
   type?: 'default' | 'hot' | 'quick'
@@ -32,6 +38,14 @@ interface TrackListItemProps {
 interface Artist {
   id?: number
   name: string
+}
+
+function formatArtistNames(artists?: Artist[] | null) {
+  if (!artists?.length) {
+    return ''
+  }
+
+  return artists.map(artist => artist.name).join(' / ')
 }
 
 const TrackListItem = ({
@@ -52,6 +66,8 @@ const TrackListItem = ({
   const openCollectToPlaylistDrawer = useCollectToPlaylistStore(
     state => state.openDrawer
   )
+  const downloadEnabled = useConfigStore(state => state.config.downloadEnabled)
+  const downloadQuality = useConfigStore(state => state.config.downloadQuality)
   const isLiked = useUserStore(state =>
     item.id ? state.likedSongIds.has(item.id) : false
   )
@@ -59,10 +75,7 @@ const TrackListItem = ({
     item.id ? state.likedSongPendingIds.has(item.id) : false
   )
 
-  const formatArtistNames = (artistNames?: Artist[] | null) => {
-    if (!artistNames || artistNames.length === 0) return ''
-    return artistNames.map(artist => artist.name).join(' / ')
-  }
+  const artistName = item.artistNames || formatArtistNames(item.artists)
 
   const handleToggleSongLike = async (
     event?: MouseEvent<HTMLButtonElement>
@@ -121,21 +134,58 @@ const TrackListItem = ({
     openCollectToPlaylistDrawer({
       songId: item.id,
       songName: item.name,
-      artistName: item.artistNames || formatArtistNames(item.artists),
+      artistName,
       coverUrl: item.coverUrl || coverUrl || '',
     })
+  }
+
+  const handleDownloadClick = async () => {
+    const electronDownload = window.electronDownload
+
+    if (!electronDownload) {
+      toast.error(TRACK_DOWNLOAD_TOASTS.unavailable)
+      return
+    }
+
+    try {
+      const didEnqueue = await handleTrackDownload({
+        item,
+        coverUrl,
+        requestedQuality: downloadQuality,
+        downloadEnabled,
+        enqueueSongDownload: payload =>
+          electronDownload.enqueueSongDownload(payload),
+        toastError: message => {
+          toast.error(message)
+        },
+      })
+
+      if (didEnqueue) {
+        toast.success(TRACK_DOWNLOAD_TOASTS.enqueued)
+      }
+    } catch (error) {
+      console.error('enqueue song download failed', error)
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : TRACK_DOWNLOAD_TOASTS.enqueueFailed
+      )
+    }
   }
 
   return (
     <MusicContextMenu
       songId={item.id}
+      name={item.name}
+      artistName={artistName}
       coverUrl={item.coverUrl || coverUrl}
-      artistName={item.artistNames || formatArtistNames(item.artists)}
+      likeStatus={isLiked}
       onPlayClick={() => onPlay?.()}
       onToggleClick={handleToggleSongLike}
       onCollectToPlaylist={handleCollectToPlaylist}
-      name={item.name}
-      likeStatus={isLiked}
+      onDownload={
+        downloadEnabled ? () => void handleDownloadClick() : undefined
+      }
     >
       <div
         onDoubleClick={() => onPlay?.()}
@@ -165,12 +215,11 @@ const TrackListItem = ({
               {item.name}
             </div>
             <div className='text-primary/50 truncate text-xs md:text-sm'>
-              {type === 'hot'
-                ? formatArtistNames(item.artists)
-                : item.artistNames}
+              {type === 'hot' ? formatArtistNames(item.artists) : artistName}
             </div>
           </div>
         </div>
+
         {type === 'default' && (
           <div className='text-primary/50 hidden truncate text-[15px] md:block'>
             {item.albumName}

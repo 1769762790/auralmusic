@@ -1,0 +1,150 @@
+import electron from 'electron'
+import path from 'node:path'
+
+import { getConfig } from '../config/store.ts'
+import { DownloadService } from '../download/download-service.ts'
+import { DOWNLOAD_IPC_CHANNELS } from '../download/download-types.ts'
+
+type DownloadIpcRegistrationOptions = {
+  ipcMain?: {
+    handle: (
+      channel: string,
+      handler: (...args: unknown[]) => unknown | Promise<unknown>
+    ) => void
+  }
+  dialog?: {
+    showOpenDialog: (
+      window: unknown,
+      options: {
+        title: string
+        defaultPath: string
+        properties: string[]
+      }
+    ) => Promise<{
+      canceled: boolean
+      filePaths: string[]
+    }>
+  }
+  browserWindowFromWebContents?: (webContents: unknown) => unknown
+  getAllWindows?: () => Array<{
+    webContents: {
+      send: (channel: string, payload: unknown) => void
+    }
+  }>
+  downloadService?: DownloadService
+}
+
+const defaultDownloadService = new DownloadService({
+  defaultRootDir: path.join(process.cwd(), 'downloads'),
+  readConfig: () => ({
+    downloadDir: getConfig('downloadDir'),
+    downloadQuality: getConfig('downloadQuality'),
+    downloadSkipExisting: getConfig('downloadSkipExisting'),
+    downloadConcurrency: getConfig('downloadConcurrency'),
+    downloadFileNamePattern: getConfig('downloadFileNamePattern'),
+    downloadEmbedCover: getConfig('downloadEmbedCover'),
+    downloadEmbedLyrics: getConfig('downloadEmbedLyrics'),
+    downloadEmbedTranslatedLyrics: getConfig('downloadEmbedTranslatedLyrics'),
+  }),
+  openPath: async targetPath => {
+    return electron.shell.openPath(targetPath)
+  },
+  showItemInFolder: targetPath => {
+    electron.shell.showItemInFolder(targetPath)
+  },
+})
+
+export function createDownloadIpc(
+  options: DownloadIpcRegistrationOptions = {}
+) {
+  const ipcMain = options.ipcMain ?? electron.ipcMain
+  const dialog = options.dialog ?? electron.dialog
+  const browserWindowFromWebContents =
+    options.browserWindowFromWebContents ??
+    ((webContents: unknown) =>
+      electron.BrowserWindow.fromWebContents(
+        webContents as Electron.WebContents
+      ))
+  const getAllWindows =
+    options.getAllWindows ?? (() => electron.BrowserWindow.getAllWindows())
+  const downloadService = options.downloadService ?? defaultDownloadService
+
+  return {
+    register() {
+      downloadService.subscribe(tasks => {
+        for (const window of getAllWindows()) {
+          window.webContents.send(DOWNLOAD_IPC_CHANNELS.TASKS_CHANGED, tasks)
+        }
+      })
+
+      ipcMain.handle(DOWNLOAD_IPC_CHANNELS.GET_DEFAULT_DIRECTORY, () => {
+        return downloadService.getDefaultDirectory(getConfig('downloadDir'))
+      })
+
+      ipcMain.handle(DOWNLOAD_IPC_CHANNELS.SELECT_DIRECTORY, async event => {
+        const window = browserWindowFromWebContents(
+          (event as { sender: unknown }).sender
+        )
+        const result = await dialog.showOpenDialog(window, {
+          title: 'Select Download Directory',
+          defaultPath: downloadService.getDefaultDirectory(
+            getConfig('downloadDir')
+          ),
+          properties: ['openDirectory', 'createDirectory', 'promptToCreate'],
+        })
+
+        if (result.canceled || result.filePaths.length === 0) {
+          return null
+        }
+
+        return result.filePaths[0] ?? null
+      })
+
+      ipcMain.handle(
+        DOWNLOAD_IPC_CHANNELS.OPEN_DIRECTORY,
+        async (_event, directory?: string) => {
+          return downloadService.openDirectory(
+            directory || getConfig('downloadDir')
+          )
+        }
+      )
+
+      ipcMain.handle(
+        DOWNLOAD_IPC_CHANNELS.ENQUEUE_SONG_DOWNLOAD,
+        async (_event, payload) => {
+          return downloadService.enqueueSongDownload(
+            payload as Parameters<DownloadService['enqueueSongDownload']>[0]
+          )
+        }
+      )
+
+      ipcMain.handle(DOWNLOAD_IPC_CHANNELS.GET_TASKS, () => {
+        return downloadService.getTasks()
+      })
+
+      ipcMain.handle(DOWNLOAD_IPC_CHANNELS.REMOVE_TASK, (_event, taskId) => {
+        return downloadService.removeTask(taskId as string)
+      })
+
+      ipcMain.handle(
+        DOWNLOAD_IPC_CHANNELS.OPEN_DOWNLOADED_FILE,
+        async (_event, taskId) => {
+          return downloadService.openDownloadedFile(taskId as string)
+        }
+      )
+
+      ipcMain.handle(
+        DOWNLOAD_IPC_CHANNELS.OPEN_DOWNLOADED_FILE_FOLDER,
+        async (_event, taskId) => {
+          return downloadService.openDownloadedFileFolder(taskId as string)
+        }
+      )
+    },
+  }
+}
+
+export function registerDownloadIpc(
+  options: DownloadIpcRegistrationOptions = {}
+) {
+  createDownloadIpc(options).register()
+}

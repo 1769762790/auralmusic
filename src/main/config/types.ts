@@ -19,6 +19,14 @@ export const AUDIO_QUALITY_LEVELS = [
 
 export type AudioQualityLevel = (typeof AUDIO_QUALITY_LEVELS)[number]
 
+export const DOWNLOAD_FILE_NAME_PATTERNS = [
+  'song-artist',
+  'artist-song',
+] as const
+
+export type DownloadFileNamePattern =
+  (typeof DOWNLOAD_FILE_NAME_PATTERNS)[number]
+
 export const MUSIC_SOURCE_PROVIDERS = [
   'migu',
   'kugou',
@@ -43,6 +51,7 @@ export interface AppConfig {
   playbackVolume: number
   playbackMode: PlaybackMode
   playbackSpeed: number
+  rememberPlaybackSession: boolean
   dynamicCoverEnabled: boolean
   showLyricTranslation: boolean
   lyricsKaraokeEnabled: boolean
@@ -65,6 +74,15 @@ export interface AppConfig {
   diskCacheEnabled: boolean
   diskCacheDir: string
   diskCacheMaxBytes: number
+  downloadEnabled: boolean
+  downloadQuality: AudioQualityLevel
+  downloadSkipExisting: boolean
+  downloadDir: string
+  downloadConcurrency: number
+  downloadFileNamePattern: DownloadFileNamePattern
+  downloadEmbedCover: boolean
+  downloadEmbedLyrics: boolean
+  downloadEmbedTranslatedLyrics: boolean
 }
 
 export const defaultConfig: AppConfig = {
@@ -75,6 +93,7 @@ export const defaultConfig: AppConfig = {
   playbackVolume: 70,
   playbackMode: 'repeat-all',
   playbackSpeed: 1.0,
+  rememberPlaybackSession: false,
   dynamicCoverEnabled: true,
   showLyricTranslation: false,
   lyricsKaraokeEnabled: true,
@@ -97,10 +116,25 @@ export const defaultConfig: AppConfig = {
   diskCacheEnabled: false,
   diskCacheDir: '',
   diskCacheMaxBytes: DEFAULT_DISK_CACHE_MAX_BYTES,
+  downloadEnabled: false,
+  downloadQuality: 'higher',
+  downloadSkipExisting: true,
+  downloadDir: '',
+  downloadConcurrency: 3,
+  downloadFileNamePattern: 'song-artist',
+  downloadEmbedCover: true,
+  downloadEmbedLyrics: true,
+  downloadEmbedTranslatedLyrics: false,
 }
 
 export function normalizeDynamicCoverEnabled(value: unknown) {
   return typeof value === 'boolean' ? value : defaultConfig.dynamicCoverEnabled
+}
+
+export function normalizeRememberPlaybackSession(value: unknown) {
+  return typeof value === 'boolean'
+    ? value
+    : defaultConfig.rememberPlaybackSession
 }
 
 export function normalizePlaybackSpeed(value: unknown) {
@@ -139,6 +173,65 @@ export function normalizeDiskCacheEnabled(value: unknown) {
 
 export function normalizeDiskCacheDir(value: unknown) {
   return typeof value === 'string' ? value : defaultConfig.diskCacheDir
+}
+
+export function normalizeDownloadEnabled(value: unknown) {
+  return typeof value === 'boolean' ? value : defaultConfig.downloadEnabled
+}
+
+export function normalizeDownloadQuality(value: unknown) {
+  if (value === 'high') {
+    return 'higher'
+  }
+
+  return typeof value === 'string' &&
+    AUDIO_QUALITY_LEVELS.includes(value as AudioQualityLevel)
+    ? (value as AudioQualityLevel)
+    : defaultConfig.downloadQuality
+}
+
+export function normalizeDownloadSkipExisting(value: unknown) {
+  return typeof value === 'boolean' ? value : defaultConfig.downloadSkipExisting
+}
+
+export function normalizeDownloadDir(value: unknown) {
+  return typeof value === 'string' ? value : defaultConfig.downloadDir
+}
+
+export function normalizeDownloadConcurrency(value: unknown) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return defaultConfig.downloadConcurrency
+  }
+
+  return Math.min(10, Math.max(1, Math.floor(value)))
+}
+
+export function normalizeDownloadFileNamePattern(value: unknown) {
+  return typeof value === 'string' &&
+    DOWNLOAD_FILE_NAME_PATTERNS.includes(value as DownloadFileNamePattern)
+    ? (value as DownloadFileNamePattern)
+    : defaultConfig.downloadFileNamePattern
+}
+
+export function normalizeDownloadEmbedCover(value: unknown) {
+  return typeof value === 'boolean' ? value : defaultConfig.downloadEmbedCover
+}
+
+export function normalizeDownloadEmbedLyrics(value: unknown) {
+  return typeof value === 'boolean' ? value : defaultConfig.downloadEmbedLyrics
+}
+
+export function normalizeDownloadEmbedTranslatedLyrics(
+  value: unknown,
+  embedLyrics = defaultConfig.downloadEmbedLyrics
+) {
+  if (!embedLyrics) {
+    return false
+  }
+
+  return typeof value === 'boolean'
+    ? value
+    : defaultConfig.downloadEmbedTranslatedLyrics
 }
 
 export const IPC_CHANNELS = {

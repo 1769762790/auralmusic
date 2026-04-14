@@ -208,3 +208,26 @@ test('resetPlayback restores default playback mode and shuffle state', () => {
   assert.deepEqual(state.shuffleOrder, [])
   assert.equal(state.shuffleCursor, 0)
 })
+
+test('restoreSession rehydrates the queue and resumes at the previous progress in paused state', () => {
+  usePlaybackStore.getState().resetPlayback()
+
+  usePlaybackStore.getState().restoreSession({
+    queue: tracks,
+    currentIndex: 1,
+    progress: 42000,
+    duration: 200000,
+    playbackMode: 'shuffle',
+  })
+
+  const state = usePlaybackStore.getState()
+  assert.equal(state.currentTrack?.id, 2)
+  assert.equal(state.currentIndex, 1)
+  assert.equal(state.status, 'paused')
+  assert.equal(state.progress, 42000)
+  assert.equal(state.duration, 200000)
+  assert.equal(state.playbackMode, 'shuffle')
+  assert.equal(state.pendingRestoreProgress, 42000)
+  assert.equal(state.shouldAutoPlayOnLoad, false)
+  assert.equal(state.requestId, 1)
+})
