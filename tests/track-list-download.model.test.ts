@@ -117,6 +117,33 @@ test('handleTrackDownload stops when source resolution fails', async () => {
   assert.equal(toastMessage, TRACK_DOWNLOAD_TOASTS.sourceResolutionFailed)
 })
 
+test('handleTrackDownload stops when source resolution rejects', async () => {
+  let enqueued = false
+  let toastMessage = ''
+
+  const result = await handleTrackDownload({
+    item: {
+      id: 7,
+      name: 'No Download',
+      duration: 0,
+    },
+    downloadEnabled: true,
+    resolveDownloadSource: async () => {
+      throw new Error('resolver failed')
+    },
+    enqueueSongDownload: async () => {
+      enqueued = true
+    },
+    toastError: message => {
+      toastMessage = message
+    },
+  })
+
+  assert.equal(result, false)
+  assert.equal(enqueued, false)
+  assert.equal(toastMessage, TRACK_DOWNLOAD_TOASTS.sourceResolutionFailed)
+})
+
 test('handleTrackDownload stops when download is disabled', async () => {
   let enqueued = false
   let toastMessage = ''

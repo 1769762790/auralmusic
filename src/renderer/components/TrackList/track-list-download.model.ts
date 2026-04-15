@@ -109,11 +109,18 @@ export async function handleTrackDownload(options: {
   const requestedQuality = options.requestedQuality || context.requestedQuality
   const resolveDownloadSource =
     options.resolveDownloadSource ?? defaultResolveDownloadSource
-  const resolvedSource = await resolveDownloadSource({
-    track: buildTrackDownloadSource(options.item, options.coverUrl),
-    requestedQuality,
-    policy: 'fallback',
-  })
+  let resolvedSource: ResolvedDownloadSource | null
+
+  try {
+    resolvedSource = await resolveDownloadSource({
+      track: buildTrackDownloadSource(options.item, options.coverUrl),
+      requestedQuality,
+      policy: 'fallback',
+    })
+  } catch {
+    options.toastError(TRACK_DOWNLOAD_TOASTS.sourceResolutionFailed)
+    return false
+  }
 
   if (!resolvedSource?.url) {
     options.toastError(TRACK_DOWNLOAD_TOASTS.sourceResolutionFailed)
