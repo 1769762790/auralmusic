@@ -1,10 +1,12 @@
 import type { SongDownloadPayload } from '../../../main/download/download-types'
+import type { ResolvedDownloadSource } from '../../services/download/download-source-resolver'
 
 export const TRACK_DOWNLOAD_TOASTS = {
   disabled: '下载功能未开启，请先在设置中打开',
   unavailable: '下载能力暂不可用，请稍后重试',
   enqueued: '已加入下载队列',
   enqueueFailed: '加入下载队列失败，请稍后重试',
+  sourceResolutionFailed: '无法解析下载源，歌曲未加入队列，请稍后重试',
 } as const
 
 export interface TrackListDownloadSong {
@@ -44,11 +46,16 @@ export function buildTrackDownloadContext(
   }
 }
 
+type ResolveDownloadSource = (
+  payload: SongDownloadPayload
+) => Promise<ResolvedDownloadSource | null>
+
 export async function handleTrackDownload(options: {
   item: TrackListDownloadSong
   coverUrl?: string
   requestedQuality?: SongDownloadPayload['requestedQuality']
   downloadEnabled: boolean
+  resolveDownloadSource?: ResolveDownloadSource
   enqueueSongDownload: (payload: SongDownloadPayload) => Promise<unknown>
   toastError: (message: string) => void
 }) {
@@ -62,10 +69,34 @@ export async function handleTrackDownload(options: {
     return false
   }
 
-  await options.enqueueSongDownload({
+  const requestedQuality = options.requestedQuality || context.requestedQuality
+  const resolvedSource = options.resolveDownloadSource
+    ? await options.resolveDownloadSource({
+        ...context,
+        requestedQuality,
+      })
+    : null
+
+  if (options.resolveDownloadSource && !resolvedSource?.url) {
+    options.toastError(TRACK_DOWNLOAD_TOASTS.sourceResolutionFailed)
+    return false
+  }
+
+  const enqueuePayload: SongDownloadPayload = {
     ...context,
-    requestedQuality: options.requestedQuality || context.requestedQuality,
-  })
+    requestedQuality,
+  }
+
+  if (resolvedSource?.url) {
+    enqueuePayload.sourceUrl = resolvedSource.url
+    enqueuePayload.resolvedQuality = resolvedSource.quality
+    enqueuePayload.sourceProvider = resolvedSource.provider
+    enqueuePayload.fileExtension = resolvedSource.fileExtension
+  } else if (context.sourceUrl) {
+    enqueuePayload.sourceUrl = context.sourceUrl
+  }
+
+  await options.enqueueSongDownload(enqueuePayload)
 
   return true
 }

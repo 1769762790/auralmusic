@@ -16,6 +16,11 @@ export const DOWNLOAD_QUALITY_FALLBACK_CHAIN = [
   'standard',
 ] as const satisfies readonly AudioQualityLevel[]
 
+export type DownloadSourceProvider =
+  | 'official-download'
+  | 'official-playback'
+  | 'lxMusic'
+
 export type DownloadTaskStatus =
   | 'queued'
   | 'downloading'
@@ -40,6 +45,9 @@ export type SongDownloadPayload = {
   fileName?: string
   requestedQuality: AudioQualityLevel
   sourceUrl?: string
+  resolvedQuality?: AudioQualityLevel | null
+  sourceProvider?: DownloadSourceProvider
+  fileExtension?: string | null
   metadata?: DownloadTaskMetadata
 }
 

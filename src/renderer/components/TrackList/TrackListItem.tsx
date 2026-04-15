@@ -14,6 +14,7 @@ import {
   handleTrackDownload,
   TRACK_DOWNLOAD_TOASTS,
 } from './track-list-download.model'
+import { createDownloadSourceResolver } from '../../services/download/download-source-resolver'
 
 export interface songProps {
   artists?: Artist[] | null
@@ -68,8 +69,9 @@ const TrackListItem = ({
   const openCollectToPlaylistDrawer = useCollectToPlaylistStore(
     state => state.openDrawer
   )
-  const downloadEnabled = useConfigStore(state => state.config.downloadEnabled)
-  const downloadQuality = useConfigStore(state => state.config.downloadQuality)
+  const downloadConfig = useConfigStore(state => state.config)
+  const downloadEnabled = downloadConfig.downloadEnabled
+  const downloadQuality = downloadConfig.downloadQuality
   const isLiked = useUserStore(state =>
     item.id ? state.likedSongIds.has(item.id) : false
   )
@@ -155,6 +157,22 @@ const TrackListItem = ({
         coverUrl,
         requestedQuality: downloadQuality,
         downloadEnabled,
+        resolveDownloadSource: async payload => {
+          const resolveDownloadSource = createDownloadSourceResolver()
+
+          return resolveDownloadSource({
+            track: {
+              id: item.id,
+              name: item.name,
+              artistNames: artistName,
+              albumName: item.albumName || '',
+              coverUrl: item.coverUrl || coverUrl || '',
+              duration: item.duration,
+            },
+            requestedQuality: payload.requestedQuality,
+            policy: 'fallback',
+          })
+        },
         enqueueSongDownload: payload =>
           electronDownload.enqueueSongDownload(payload),
         toastError: message => {

@@ -2,6 +2,7 @@ import type {
   AppConfig,
   AudioQualityLevel,
 } from '../../../main/config/types.ts'
+import type { DownloadSourceProvider } from '../../../main/download/download-types.ts'
 import { normalizeSongUrlV1Response } from '../../../shared/playback.ts'
 import { resolveTrackWithLxMusicSource } from '../music-source/lx-playback-resolver.ts'
 
@@ -10,7 +11,7 @@ export type DownloadResolutionPolicy = 'strict' | 'fallback'
 export type ResolvedDownloadSource = {
   url: string
   quality: AudioQualityLevel
-  provider: 'official-download' | 'official-playback' | 'lxMusic'
+  provider: DownloadSourceProvider
   fileExtension: string | null
 }
 
