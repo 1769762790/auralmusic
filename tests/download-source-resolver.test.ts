@@ -6,17 +6,17 @@ import {
   type DownloadSourceResolverDeps,
 } from '../src/renderer/services/download/download-source-resolver.ts'
 
-test('createDownloadSourceResolver falls back from official endpoints to LX and returns effective quality', async () => {
+test('createDownloadSourceResolver falls back from thrown official endpoints to LX under strict policy', async () => {
   const calls: string[] = []
 
   const deps: DownloadSourceResolverDeps = {
     getSongUrlV1: async params => {
       calls.push(`song-url:${params.level}:${params.unblock}`)
-      return { data: { data: [{ id: 1, url: '' }] } }
+      throw new Error('playback unavailable')
     },
     getSongDownloadUrlV1: async params => {
       calls.push(`song-download:${params.level}`)
-      return { data: { data: { url: '' } } }
+      throw new Error('download unavailable')
     },
     resolveTrackWithLxMusicSource: async () => {
       calls.push('lx')
@@ -48,7 +48,7 @@ test('createDownloadSourceResolver falls back from official endpoints to LX and 
       duration: 200000,
     },
     requestedQuality: 'lossless',
-    policy: 'fallback',
+    policy: 'strict',
   })
 
   assert.deepEqual(result, {

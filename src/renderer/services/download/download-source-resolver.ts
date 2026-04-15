@@ -179,42 +179,46 @@ export function createDownloadSourceResolver(
     const level = options.requestedQuality
     const getSongUrl = deps.getSongUrlV1 ?? (await getDefaultSongUrlV1())
 
-    const downloadResponse = await getSongDownloadUrl({
-      id: options.track.id,
-      level,
-    })
-    const officialDownload = readOfficialDownloadUrl(downloadResponse.data)
+    try {
+      const downloadResponse = await getSongDownloadUrl({
+        id: options.track.id,
+        level,
+      })
+      const officialDownload = readOfficialDownloadUrl(downloadResponse.data)
 
-    if (officialDownload) {
-      return {
-        url: officialDownload.url,
-        quality: level,
-        provider: 'official-download',
-        fileExtension: officialDownload.fileExtension,
+      if (officialDownload) {
+        return {
+          url: officialDownload.url,
+          quality: level,
+          provider: 'official-download',
+          fileExtension: officialDownload.fileExtension,
+        }
       }
+    } catch {
+      // Fall through to playback and LX resolution.
     }
 
     const unblockAttempts = config.musicSourceEnabled ? [false, true] : [false]
     for (const unblock of unblockAttempts) {
-      const playbackResponse = await getSongUrl({
-        id: options.track.id,
-        level,
-        unblock,
-      })
-      const playback = normalizeSongUrlV1Response(playbackResponse.data)
+      try {
+        const playbackResponse = await getSongUrl({
+          id: options.track.id,
+          level,
+          unblock,
+        })
+        const playback = normalizeSongUrlV1Response(playbackResponse.data)
 
-      if (playback?.url) {
-        return {
-          url: playback.url,
-          quality: level,
-          provider: 'official-playback',
-          fileExtension: inferFileExtensionFromUrl(playback.url),
+        if (playback?.url) {
+          return {
+            url: playback.url,
+            quality: level,
+            provider: 'official-playback',
+            fileExtension: inferFileExtensionFromUrl(playback.url),
+          }
         }
+      } catch {
+        // Fall through to the next unblock attempt or LX resolution.
       }
-    }
-
-    if (options.policy === 'strict') {
-      return null
     }
 
     const lxResult = await resolveTrackWithLxMusicSourceFn({
