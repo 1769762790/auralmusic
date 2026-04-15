@@ -92,6 +92,7 @@ export async function handleTrackDownload(options: {
   coverUrl?: string
   requestedQuality?: SongDownloadPayload['requestedQuality']
   downloadEnabled: boolean
+  downloadQualityPolicy?: DownloadResolutionPolicy
   resolveDownloadSource?: ResolveDownloadSource
   enqueueSongDownload: (payload: SongDownloadPayload) => Promise<unknown>
   toastError: (message: string) => void
@@ -107,6 +108,7 @@ export async function handleTrackDownload(options: {
   }
 
   const requestedQuality = options.requestedQuality || context.requestedQuality
+  const downloadQualityPolicy = options.downloadQualityPolicy ?? 'fallback'
   const resolveDownloadSource =
     options.resolveDownloadSource ?? defaultResolveDownloadSource
   let resolvedSource: ResolvedDownloadSource | null
@@ -115,7 +117,7 @@ export async function handleTrackDownload(options: {
     resolvedSource = await resolveDownloadSource({
       track: buildTrackDownloadSource(options.item, options.coverUrl),
       requestedQuality,
-      policy: 'fallback',
+      policy: downloadQualityPolicy,
     })
   } catch {
     options.toastError(TRACK_DOWNLOAD_TOASTS.sourceResolutionFailed)
@@ -130,6 +132,7 @@ export async function handleTrackDownload(options: {
   const enqueuePayload: SongDownloadPayload = {
     ...context,
     requestedQuality,
+    downloadQualityPolicy,
     sourceUrl: resolvedSource.url,
     resolvedQuality: resolvedSource.quality,
     sourceProvider: resolvedSource.provider,

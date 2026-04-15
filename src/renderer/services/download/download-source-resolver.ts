@@ -2,7 +2,10 @@ import type {
   AppConfig,
   AudioQualityLevel,
 } from '../../../main/config/types.ts'
-import type { DownloadSourceProvider } from '../../../main/download/download-types.ts'
+import {
+  createDownloadQualityFallbackChain,
+  type DownloadSourceProvider,
+} from '../../../main/download/download-types.ts'
 import { normalizeSongUrlV1Response } from '../../../shared/playback.ts'
 import { resolveTrackWithLxMusicSource } from '../music-source/lx-playback-resolver.ts'
 
@@ -185,7 +188,6 @@ export function createDownloadSourceResolver(
     options: ResolveDownloadSourceOptions
   ): Promise<ResolvedDownloadSource | null> {
     const config = await getConfig()
-    const level = options.requestedQuality
     const getSongUrl =
       deps.getSongUrlV1 ?? (await getDefaultSongUrlV1(loadSongApiListModule))
     const getSongDownloadUrl =
@@ -196,60 +198,69 @@ export function createDownloadSourceResolver(
       return null
     }
 
-    try {
-      const downloadResponse = await getSongDownloadUrl({
-        id: options.track.id,
-        level,
-      })
-      const officialDownload = readOfficialDownloadUrl(downloadResponse.data)
+    const levels =
+      options.policy === 'strict'
+        ? [options.requestedQuality]
+        : createDownloadQualityFallbackChain(options.requestedQuality)
 
-      if (officialDownload) {
-        return {
-          url: officialDownload.url,
-          quality: level,
-          provider: 'official-download',
-          fileExtension: officialDownload.fileExtension,
-        }
-      }
-    } catch {
-      // Fall through to playback and LX resolution.
-    }
-
-    const unblockAttempts = config.musicSourceEnabled ? [false, true] : [false]
-    for (const unblock of unblockAttempts) {
+    for (const level of levels) {
       try {
-        const playbackResponse = await getSongUrl({
+        const downloadResponse = await getSongDownloadUrl({
           id: options.track.id,
           level,
-          unblock,
         })
-        const playback = normalizeSongUrlV1Response(playbackResponse.data)
+        const officialDownload = readOfficialDownloadUrl(downloadResponse.data)
 
-        if (playback?.url) {
+        if (officialDownload) {
           return {
-            url: playback.url,
+            url: officialDownload.url,
             quality: level,
-            provider: 'official-playback',
-            fileExtension: inferFileExtensionFromUrl(playback.url),
+            provider: 'official-download',
+            fileExtension: officialDownload.fileExtension,
           }
         }
       } catch {
-        // Fall through to the next unblock attempt or LX resolution.
+        // Fall through to playback and LX resolution.
       }
-    }
 
-    const lxResult = await resolveTrackWithLxMusicSourceFn({
-      track: options.track,
-      quality: level,
-      config,
-    })
+      const unblockAttempts = config.musicSourceEnabled
+        ? [false, true]
+        : [false]
+      for (const unblock of unblockAttempts) {
+        try {
+          const playbackResponse = await getSongUrl({
+            id: options.track.id,
+            level,
+            unblock,
+          })
+          const playback = normalizeSongUrlV1Response(playbackResponse.data)
 
-    if (lxResult?.url) {
-      return {
-        url: lxResult.url,
+          if (playback?.url) {
+            return {
+              url: playback.url,
+              quality: level,
+              provider: 'official-playback',
+              fileExtension: inferFileExtensionFromUrl(playback.url),
+            }
+          }
+        } catch {
+          // Fall through to the next unblock attempt or LX resolution.
+        }
+      }
+
+      const lxResult = await resolveTrackWithLxMusicSourceFn({
+        track: options.track,
         quality: level,
-        provider: 'lxMusic',
-        fileExtension: inferFileExtensionFromUrl(lxResult.url),
+        config,
+      })
+
+      if (lxResult?.url) {
+        return {
+          url: lxResult.url,
+          quality: level,
+          provider: 'lxMusic',
+          fileExtension: inferFileExtensionFromUrl(lxResult.url),
+        }
       }
     }
 

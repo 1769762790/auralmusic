@@ -1,0 +1,8 @@
+allowBuilds:
+  '@applemusic-like-lyrics/core': true
+  '@applemusic-like-lyrics/react': true
+  core-js: true
+  electron: true
+  electron-winstaller: true
+  esbuild: true
+  msw: true

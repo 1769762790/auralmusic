@@ -14,6 +14,7 @@ import {
   normalizeDownloadEnabled,
   normalizeDownloadFileNamePattern,
   normalizeDownloadQuality,
+  normalizeDownloadQualityPolicy,
   normalizeDownloadSkipExisting,
   normalizeDynamicCoverEnabled,
   normalizeLyricsKaraokeEnabled,
@@ -169,6 +170,9 @@ function normalizeConfig(config: AppConfig): AppConfig {
     diskCacheMaxBytes: normalizeDiskCacheMaxBytes(config.diskCacheMaxBytes),
     downloadEnabled: normalizeDownloadEnabled(config.downloadEnabled),
     downloadQuality: normalizeDownloadQuality(config.downloadQuality),
+    downloadQualityPolicy: normalizeDownloadQualityPolicy(
+      config.downloadQualityPolicy
+    ),
     downloadSkipExisting: normalizeDownloadSkipExisting(
       config.downloadSkipExisting
     ),

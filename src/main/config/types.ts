@@ -30,6 +30,10 @@ export const DOWNLOAD_FILE_NAME_PATTERNS = [
 export type DownloadFileNamePattern =
   (typeof DOWNLOAD_FILE_NAME_PATTERNS)[number]
 
+export const DOWNLOAD_QUALITY_POLICIES = ['strict', 'fallback'] as const
+
+export type DownloadQualityPolicy = (typeof DOWNLOAD_QUALITY_POLICIES)[number]
+
 export const MUSIC_SOURCE_PROVIDERS = [
   'migu',
   'kugou',
@@ -79,6 +83,7 @@ export interface AppConfig {
   diskCacheMaxBytes: number
   downloadEnabled: boolean
   downloadQuality: AudioQualityLevel
+  downloadQualityPolicy: DownloadQualityPolicy
   downloadSkipExisting: boolean
   downloadDir: string
   downloadConcurrency: number
@@ -121,6 +126,7 @@ export const defaultConfig: AppConfig = {
   diskCacheMaxBytes: DEFAULT_DISK_CACHE_MAX_BYTES,
   downloadEnabled: false,
   downloadQuality: 'higher',
+  downloadQualityPolicy: 'fallback',
   downloadSkipExisting: true,
   downloadDir: '',
   downloadConcurrency: 3,
@@ -191,6 +197,13 @@ export function normalizeDownloadQuality(value: unknown) {
     AUDIO_QUALITY_LEVELS.includes(value as AudioQualityLevel)
     ? (value as AudioQualityLevel)
     : defaultConfig.downloadQuality
+}
+
+export function normalizeDownloadQualityPolicy(value: unknown) {
+  return typeof value === 'string' &&
+    DOWNLOAD_QUALITY_POLICIES.includes(value as DownloadQualityPolicy)
+    ? (value as DownloadQualityPolicy)
+    : defaultConfig.downloadQualityPolicy
 }
 
 export function normalizeDownloadSkipExisting(value: unknown) {

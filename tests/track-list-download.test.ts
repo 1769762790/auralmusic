@@ -64,6 +64,7 @@ test('handleTrackDownload enqueues the song when download is enabled', async () 
         resolvedQuality?: string
         sourceProvider?: string
         fileExtension?: string | null
+        downloadQualityPolicy?: string
       }
     | undefined
 
@@ -76,6 +77,7 @@ test('handleTrackDownload enqueues the song when download is enabled', async () 
     },
     downloadEnabled: true,
     coverUrl: '',
+    downloadQualityPolicy: 'fallback',
     resolveDownloadSource: async input => {
       assert.deepEqual(input.track, {
         id: 8,
@@ -113,5 +115,6 @@ test('handleTrackDownload enqueues the song when download is enabled', async () 
     resolvedQuality: 'lossless',
     sourceProvider: 'official-download',
     fileExtension: '.flac',
+    downloadQualityPolicy: 'fallback',
   })
 })

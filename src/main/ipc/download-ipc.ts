@@ -50,6 +50,7 @@ function createDefaultDownloadService(
     readConfig: () => ({
       downloadDir: getConfig('downloadDir'),
       downloadQuality: getConfig('downloadQuality'),
+      downloadQualityPolicy: getConfig('downloadQualityPolicy'),
       downloadSkipExisting: getConfig('downloadSkipExisting'),
       downloadConcurrency: getConfig('downloadConcurrency'),
       downloadFileNamePattern: getConfig('downloadFileNamePattern'),

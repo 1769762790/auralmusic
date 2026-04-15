@@ -1,6 +1,7 @@
 import ElectronStore from 'electron-store'
 import {
   AUDIO_QUALITY_LEVELS,
+  DOWNLOAD_QUALITY_POLICIES,
   DOWNLOAD_FILE_NAME_PATTERNS,
   MUSIC_SOURCE_PROVIDERS,
   defaultConfig,
@@ -15,6 +16,7 @@ import {
   normalizeDownloadEnabled,
   normalizeDownloadFileNamePattern,
   normalizeDownloadQuality,
+  normalizeDownloadQualityPolicy,
   normalizeDownloadSkipExisting,
   normalizeDynamicCoverEnabled,
   normalizeLyricsKaraokeEnabled,
@@ -193,6 +195,10 @@ function createConfigStore() {
       diskCacheMaxBytes: { type: 'number', minimum: 1 },
       downloadEnabled: { type: 'boolean' },
       downloadQuality: { type: 'string', enum: AUDIO_QUALITY_LEVELS },
+      downloadQualityPolicy: {
+        type: 'string',
+        enum: DOWNLOAD_QUALITY_POLICIES,
+      },
       downloadSkipExisting: { type: 'boolean' },
       downloadDir: { type: 'string' },
       downloadConcurrency: { type: 'number', minimum: 1, maximum: 10 },
@@ -399,6 +405,19 @@ class ConfigStore {
         normalizeDownloadQuality(downloadQuality)
       if (downloadQuality !== normalizedDownloadQuality) {
         ConfigStore.instance.set('downloadQuality', normalizedDownloadQuality)
+      }
+
+      const downloadQualityPolicy = ConfigStore.instance.get(
+        'downloadQualityPolicy'
+      )
+      const normalizedDownloadQualityPolicy = normalizeDownloadQualityPolicy(
+        downloadQualityPolicy
+      )
+      if (downloadQualityPolicy !== normalizedDownloadQualityPolicy) {
+        ConfigStore.instance.set(
+          'downloadQualityPolicy',
+          normalizedDownloadQualityPolicy
+        )
       }
 
       const downloadSkipExisting = ConfigStore.instance.get(

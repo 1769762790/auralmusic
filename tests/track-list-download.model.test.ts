@@ -33,6 +33,7 @@ test('handleTrackDownload resolves source before enqueueing and forwards resolve
         resolvedQuality?: string
         sourceProvider?: string
         fileExtension?: string | null
+        downloadQualityPolicy?: string
       }
     | undefined
   let toastMessage = ''
@@ -47,6 +48,7 @@ test('handleTrackDownload resolves source before enqueueing and forwards resolve
     },
     coverUrl: 'fallback-cover.jpg',
     downloadEnabled: true,
+    downloadQualityPolicy: 'fallback',
     resolveDownloadSource: async input => {
       resolvedInput = input
       return {
@@ -88,8 +90,66 @@ test('handleTrackDownload resolves source before enqueueing and forwards resolve
     resolvedQuality: 'lossless',
     sourceProvider: 'official-download',
     fileExtension: '.flac',
+    downloadQualityPolicy: 'fallback',
   })
   assert.equal(toastMessage, '')
+})
+
+test('handleTrackDownload forwards the requested download quality policy', async () => {
+  let resolvedInput:
+    | {
+        requestedQuality: string
+        policy: string
+      }
+    | undefined
+  let enqueuedPayload:
+    | {
+        requestedQuality: string
+        downloadQualityPolicy?: string
+      }
+    | undefined
+
+  const result = await handleTrackDownload({
+    item: {
+      id: 18,
+      name: 'Strict Download',
+      artistNames: 'Singer B',
+      duration: 2_000,
+    },
+    requestedQuality: 'lossless',
+    downloadEnabled: true,
+    downloadQualityPolicy: 'strict',
+    resolveDownloadSource: async input => {
+      resolvedInput = {
+        requestedQuality: input.requestedQuality,
+        policy: input.policy,
+      }
+
+      return {
+        url: 'https://cdn.example.com/strict.flac',
+        quality: 'lossless',
+        provider: 'official-download',
+        fileExtension: '.flac',
+      }
+    },
+    enqueueSongDownload: async payload => {
+      enqueuedPayload = {
+        requestedQuality: payload.requestedQuality,
+        downloadQualityPolicy: payload.downloadQualityPolicy,
+      }
+    },
+    toastError: () => undefined,
+  })
+
+  assert.equal(result, true)
+  assert.deepEqual(resolvedInput, {
+    requestedQuality: 'lossless',
+    policy: 'strict',
+  })
+  assert.deepEqual(enqueuedPayload, {
+    requestedQuality: 'lossless',
+    downloadQualityPolicy: 'strict',
+  })
 })
 
 test('handleTrackDownload stops when source resolution fails', async () => {

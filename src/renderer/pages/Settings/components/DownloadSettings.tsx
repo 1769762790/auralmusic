@@ -18,6 +18,7 @@ import type { DownloadApi } from '@preload/api/download-api'
 import type {
   AudioQualityLevel,
   DownloadFileNamePattern,
+  DownloadQualityPolicy,
 } from '../../../../main/config/types'
 
 const AUDIO_QUALITY_OPTIONS: Array<{
@@ -48,6 +49,23 @@ const DOWNLOAD_CONCURRENCY_OPTIONS = Array.from({ length: 10 }, (_, index) => {
   const value = String(index + 1)
   return { label: value, value }
 })
+
+const DOWNLOAD_QUALITY_POLICY_OPTIONS: Array<{
+  value: DownloadQualityPolicy
+  label: string
+  description: string
+}> = [
+  {
+    value: 'fallback',
+    label: '自动降级',
+    description: '当前音质不可用时，继续尝试更低音质，提高下载成功率。',
+  },
+  {
+    value: 'strict',
+    label: '严格按所选音质',
+    description: '只尝试当前选中的音质，找不到下载源时直接失败。',
+  },
+]
 
 function getElectronDownloadApi() {
   return (window as Window & { electronDownload?: DownloadApi })
@@ -179,6 +197,9 @@ function SettingCheckboxRow({
 const DownloadSettings = () => {
   const downloadEnabled = useConfigStore(state => state.config.downloadEnabled)
   const downloadQuality = useConfigStore(state => state.config.downloadQuality)
+  const downloadQualityPolicy = useConfigStore(
+    state => state.config.downloadQualityPolicy
+  )
   const downloadSkipExisting = useConfigStore(
     state => state.config.downloadSkipExisting
   )
@@ -312,6 +333,47 @@ const DownloadSettings = () => {
           disabled={isConfigLoading}
           onToggle={() => void setConfig('downloadEnabled', !downloadEnabled)}
         />
+      </div>
+      <Separator />
+
+      <div className='grid grid-cols-[minmax(0,1fr)_minmax(240px,280px)] items-center gap-6 py-3'>
+        <div className='space-y-1'>
+          <div className='text-muted-foreground text-sm font-medium'>
+            音质不可用时
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            控制下载在当前音质不可用时，是自动降级继续尝试，还是直接失败。
+          </p>
+        </div>
+        <Select
+          value={downloadQualityPolicy}
+          disabled={isConfigLoading}
+          onValueChange={value =>
+            void setConfig(
+              'downloadQualityPolicy',
+              value as DownloadQualityPolicy
+            )
+          }
+        >
+          <SelectTrigger className='bg-muted/60 h-10 w-full rounded-2xl border-none px-4 shadow-none'>
+            <SelectValue placeholder='选择音质策略' />
+          </SelectTrigger>
+          <SelectContent align='end'>
+            {DOWNLOAD_QUALITY_POLICY_OPTIONS.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className='grid grid-cols-[minmax(0,1fr)_minmax(240px,280px)] gap-6 pb-3'>
+        <div />
+        <p className='text-muted-foreground text-xs'>
+          {DOWNLOAD_QUALITY_POLICY_OPTIONS.find(
+            option => option.value === downloadQualityPolicy
+          )?.description ?? ''}
+        </p>
       </div>
       <Separator />
 

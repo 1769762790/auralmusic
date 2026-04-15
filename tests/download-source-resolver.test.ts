@@ -229,3 +229,122 @@ test('createDownloadSourceResolver derives extension from official download payl
     fileExtension: '.aac',
   })
 })
+
+test('createDownloadSourceResolver stops after the requested quality when policy is strict', async () => {
+  const calls: string[] = []
+
+  const resolveDownloadSource = createDownloadSourceResolver({
+    getSongDownloadUrlV1: async params => {
+      calls.push(`song-download:${params.level}`)
+      return { data: { data: { url: '' } } }
+    },
+    getSongUrlV1: async params => {
+      calls.push(`song-url:${params.level}:${params.unblock}`)
+      return {
+        data: { data: [{ id: 1, url: '' }] },
+      }
+    },
+    resolveTrackWithLxMusicSource: async params => {
+      calls.push(`lx:${params.quality}`)
+      return null
+    },
+    getConfig: () => ({
+      quality: 'lossless',
+      musicSourceEnabled: true,
+      luoxueSourceEnabled: true,
+      musicSourceProviders: ['lxMusic'],
+      activeLuoxueMusicSourceScriptId: 'script-1',
+      luoxueMusicSourceScripts: [{ id: 'script-1' }] as never,
+    }),
+  })
+
+  const result = await resolveDownloadSource({
+    track: {
+      id: 1,
+      name: 'Strict Song',
+      artistNames: 'Artist',
+      albumName: 'Album',
+      coverUrl: '',
+      duration: 1_000,
+    },
+    requestedQuality: 'lossless',
+    policy: 'strict',
+  })
+
+  assert.equal(result, null)
+  assert.deepEqual(calls, [
+    'song-download:lossless',
+    'song-url:lossless:false',
+    'song-url:lossless:true',
+    'lx:lossless',
+  ])
+})
+
+test('createDownloadSourceResolver falls through lower qualities when policy is fallback', async () => {
+  const calls: string[] = []
+
+  const resolveDownloadSource = createDownloadSourceResolver({
+    getSongDownloadUrlV1: async params => {
+      calls.push(`song-download:${params.level}`)
+      return {
+        data: {
+          data: {
+            url:
+              params.level === 'higher'
+                ? 'https://cdn.example.com/fallback.mp3'
+                : '',
+          },
+        },
+      }
+    },
+    getSongUrlV1: async params => {
+      calls.push(`song-url:${params.level}:${params.unblock}`)
+      return {
+        data: { data: [{ id: 1, url: '' }] },
+      }
+    },
+    resolveTrackWithLxMusicSource: async params => {
+      calls.push(`lx:${params.quality}`)
+      return null
+    },
+    getConfig: () => ({
+      quality: 'lossless',
+      musicSourceEnabled: true,
+      luoxueSourceEnabled: true,
+      musicSourceProviders: ['lxMusic'],
+      activeLuoxueMusicSourceScriptId: 'script-1',
+      luoxueMusicSourceScripts: [{ id: 'script-1' }] as never,
+    }),
+  })
+
+  const result = await resolveDownloadSource({
+    track: {
+      id: 1,
+      name: 'Fallback Song',
+      artistNames: 'Artist',
+      albumName: 'Album',
+      coverUrl: '',
+      duration: 1_000,
+    },
+    requestedQuality: 'lossless',
+    policy: 'fallback',
+  })
+
+  assert.deepEqual(result, {
+    url: 'https://cdn.example.com/fallback.mp3',
+    quality: 'higher',
+    provider: 'official-download',
+    fileExtension: '.mp3',
+  })
+  assert.deepEqual(calls, [
+    'song-download:lossless',
+    'song-url:lossless:false',
+    'song-url:lossless:true',
+    'lx:lossless',
+    'song-download:exhigh',
+    'song-url:exhigh:false',
+    'song-url:exhigh:true',
+    'lx:exhigh',
+    'song-download:higher',
+  ])
+})

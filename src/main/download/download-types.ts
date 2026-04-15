@@ -1,6 +1,7 @@
 import type {
   AudioQualityLevel,
   DownloadFileNamePattern,
+  DownloadQualityPolicy,
 } from '../config/types.ts'
 export { DOWNLOAD_IPC_CHANNELS } from '../../shared/ipc/download.ts'
 
@@ -44,6 +45,7 @@ export type SongDownloadPayload = {
   directory?: string
   fileName?: string
   requestedQuality: AudioQualityLevel
+  downloadQualityPolicy?: DownloadQualityPolicy
   sourceUrl?: string
   resolvedQuality?: AudioQualityLevel | null
   sourceProvider?: DownloadSourceProvider
@@ -88,6 +90,7 @@ export type DownloadRuntimeConfig = {
   musicSourceEnabled: boolean
   downloadDir: string
   downloadQuality: AudioQualityLevel
+  downloadQualityPolicy: DownloadQualityPolicy
   downloadSkipExisting: boolean
   downloadConcurrency: number
   downloadFileNamePattern: DownloadFileNamePattern

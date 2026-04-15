@@ -496,6 +496,7 @@ export class DownloadService {
       musicSourceEnabled: config.musicSourceEnabled ?? false,
       downloadDir: config.downloadDir || '',
       downloadQuality: config.downloadQuality || 'higher',
+      downloadQualityPolicy: config.downloadQualityPolicy || 'fallback',
       downloadSkipExisting: config.downloadSkipExisting ?? true,
       downloadConcurrency:
         this.fixedConcurrency || config.downloadConcurrency || 3,
@@ -714,9 +715,15 @@ export class DownloadService {
       throw new Error(`Download task ${taskId} was not found.`)
     }
 
-    for (const quality of createDownloadQualityFallbackChain(
-      payload.requestedQuality
-    )) {
+    const runtimeConfig = this.getRuntimeConfig()
+    const downloadQualityPolicy =
+      payload.downloadQualityPolicy ?? runtimeConfig.downloadQualityPolicy
+    const qualityChain =
+      downloadQualityPolicy === 'strict'
+        ? [payload.requestedQuality]
+        : createDownloadQualityFallbackChain(payload.requestedQuality)
+
+    for (const quality of qualityChain) {
       const resolved = await this.resolveSongUrlForQuality(
         taskId,
         payload,

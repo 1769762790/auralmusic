@@ -18,7 +18,7 @@ import {
   registerLocalMediaProtocol,
   registerLocalMediaScheme,
 } from './protocol/local-media'
-import { startMusicApi } from './server'
+import { startMusicApi, type StartedMusicApiRuntime } from './server'
 import {
   clearConfiguredGlobalShortcuts,
   syncConfiguredGlobalShortcuts,
@@ -40,6 +40,7 @@ registerLocalMediaScheme()
 let mainWindow: BrowserWindow | null = null
 let tray: InstanceType<typeof Tray> | null = null
 let isQuitting = false
+let musicApiRuntime: StartedMusicApiRuntime | null = null
 
 type AudioPermissionDetails = {
   mediaType?: string
@@ -112,7 +113,7 @@ function getRendererUrl() {
 }
 
 function getPreloadPath() {
-  return path.join(__dirname, '../preload/index.js')
+  return path.join(__dirname, '../preload/index.cjs')
 }
 
 function getTrayIcon() {
@@ -303,8 +304,8 @@ app.whenReady().then(async () => {
   createTray()
 
   try {
-    const runtimeInfo = await startMusicApi()
-    applyMusicApiRuntimeEnv(runtimeInfo)
+    musicApiRuntime = await startMusicApi()
+    applyMusicApiRuntimeEnv(musicApiRuntime)
     registerAuthRequestHeaderHook()
     await bootstrapAuthSession()
     syncNativeThemeSource(getConfig('theme'))
@@ -349,6 +350,8 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   isQuitting = true
+  musicApiRuntime?.dispose()
+  musicApiRuntime = null
   tray?.destroy()
   tray = null
 })

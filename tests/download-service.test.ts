@@ -430,6 +430,51 @@ test('DownloadService falls back to request quality and response type when rende
   await rm(root, { recursive: true, force: true })
 })
 
+test('DownloadService honors strict download quality policy during legacy resolution', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-download-test-'))
+  const attemptedQualities: string[] = []
+  const service = new DownloadService({
+    defaultRootDir: root,
+    now: createNowSequence(),
+    createTaskId: () => 'task-strict-quality-policy',
+    readConfig: () => ({
+      downloadQualityPolicy: 'strict',
+    }),
+    resolveSongUrl: async ({ quality }) => {
+      attemptedQualities.push(quality)
+      if (quality === 'higher') {
+        return {
+          url: 'https://cdn.example.com/higher.mp3',
+        }
+      }
+
+      return null
+    },
+    downloadFetcher: async () => {
+      return new Response(Buffer.from('strict-audio'), {
+        status: 200,
+        headers: {
+          'content-type': 'audio/mpeg',
+        },
+      })
+    },
+  })
+
+  const task = await service.enqueueSongDownload({
+    songId: 'strict-song',
+    songName: 'Strict Song',
+    artistName: 'Strict Artist',
+    requestedQuality: 'lossless',
+  })
+
+  const failed = await waitForTaskStatus(service, task.id, 'failed')
+
+  assert.deepEqual(attemptedQualities, ['lossless'])
+  assert.match(failed.errorMessage ?? '', /可用音质|quality|source/i)
+
+  await rm(root, { recursive: true, force: true })
+})
+
 test('DownloadService skips same-name files that already exist', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-download-test-'))
   const existingPath = path.join(root, 'existing-track.mp3')

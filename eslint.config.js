@@ -57,7 +57,10 @@ export default defineConfig([
     },
     rules: {
       'no-var': 'error',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-console': 'off',
@@ -86,7 +89,10 @@ export default defineConfig([
     },
     rules: {
       'no-var': 'error',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
     },
@@ -133,10 +139,16 @@ export default defineConfig([
       'react-hooks/exhaustive-deps': 'warn',
 
       // React Refresh 规则
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
 
       // TypeScript 规则
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-unused-vars': 'off', // 由 TS 规则处理
@@ -145,7 +157,27 @@ export default defineConfig([
 
   // 配置文件配置
   {
-    files: ['*.config.{ts,js,mjs}', 'vite.config.*', 'electron.vite.config.*', 'eslint.config.*'],
+    files: ['scripts/**/*.cjs'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-console': 'off',
+    },
+  },
+
+  {
+    files: [
+      '*.config.{ts,js,mjs}',
+      'vite.config.*',
+      'electron.vite.config.*',
+      'eslint.config.*',
+    ],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     languageOptions: {
       ecmaVersion: 'latest',

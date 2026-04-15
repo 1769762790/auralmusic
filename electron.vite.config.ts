@@ -10,7 +10,8 @@ export default defineConfig({
       sourcemap: true,
       rollupOptions: {
         output: {
-          entryFileNames: '[name].js',
+          format: 'cjs',
+          entryFileNames: '[name].cjs',
         },
       },
     },
@@ -27,7 +28,7 @@ export default defineConfig({
       rollupOptions: {
         output: {
           format: 'cjs',
-          entryFileNames: '[name].js',
+          entryFileNames: '[name].cjs',
         },
       },
     },
