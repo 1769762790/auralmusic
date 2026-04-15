@@ -351,6 +351,53 @@ test('DownloadService preserves renderer pre-resolved source metadata when sourc
   await rm(root, { recursive: true, force: true })
 })
 
+test('DownloadService prefers renderer sourceUrl over an injected legacy resolver', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-download-test-'))
+  let legacyResolverCalls = 0
+  const attemptedRequests: string[] = []
+  const service = new DownloadService({
+    defaultRootDir: root,
+    now: createNowSequence(),
+    createTaskId: () => 'task-renderer-source-priority',
+    resolveSongUrl: async () => {
+      legacyResolverCalls += 1
+      throw new Error('legacy resolver should be skipped')
+    },
+    downloadFetcher: async input => {
+      const url = typeof input === 'string' ? input : input.toString()
+      attemptedRequests.push(url)
+
+      return new Response(Buffer.from('rendered-audio'), {
+        status: 200,
+        headers: {
+          'content-type': 'audio/flac',
+        },
+      })
+    },
+  })
+
+  const task = await service.enqueueSongDownload({
+    songId: '6',
+    songName: 'Renderer Source Song',
+    artistName: 'Renderer Artist',
+    requestedQuality: 'higher',
+    sourceUrl: 'https://cdn.example.com/renderer-source.flac',
+    resolvedQuality: 'lossless',
+    fileExtension: '.flac',
+  })
+
+  const completed = await waitForTaskStatus(service, task.id, 'completed')
+
+  assert.equal(legacyResolverCalls, 0)
+  assert.equal(completed.resolvedQuality, 'lossless')
+  assert.ok(completed.targetPath.endsWith('.flac'))
+  assert.deepEqual(attemptedRequests, [
+    'https://cdn.example.com/renderer-source.flac',
+  ])
+
+  await rm(root, { recursive: true, force: true })
+})
+
 test('DownloadService falls back to request quality and response type when renderer metadata is missing', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-download-test-'))
   const service = new DownloadService({

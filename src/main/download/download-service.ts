@@ -741,6 +741,14 @@ export class DownloadService {
     payload: SongDownloadPayload,
     quality: AudioQualityLevel
   ) {
+    if (payload.sourceUrl) {
+      return {
+        url: payload.sourceUrl,
+        quality: payload.resolvedQuality ?? quality,
+        fileExtension: payload.fileExtension ?? null,
+      } satisfies ResolvedSongDownload
+    }
+
     if (this.resolveSongUrl) {
       return this.resolveSongUrl({
         taskId,
@@ -748,14 +756,6 @@ export class DownloadService {
         quality,
         songId: payload.songId,
       })
-    }
-
-    if (payload.sourceUrl) {
-      return {
-        url: payload.sourceUrl,
-        quality: payload.resolvedQuality ?? quality,
-        fileExtension: payload.fileExtension ?? null,
-      } satisfies ResolvedSongDownload
     }
 
     const resolver = createDownloadSourceResolver({
