@@ -6,6 +6,7 @@ import { exposeMusicSourceApi } from './api/music-source-api'
 import { exposeRuntimeApi } from './api/runtime-api'
 import { exposeShortcutApi } from './api/shortcut-api'
 import { exposeSystemFontsApi } from './api/system-fonts-api'
+import { exposeTrayApi } from './api/tray-api'
 import { exposeWindowApi } from './api/window-api'
 
 exposeAuthApi()
@@ -16,4 +17,5 @@ exposeMusicSourceApi()
 exposeRuntimeApi()
 exposeShortcutApi()
 exposeSystemFontsApi()
+exposeTrayApi()
 exposeWindowApi()

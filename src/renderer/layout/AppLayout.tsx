@@ -4,6 +4,7 @@ import PlaybackControl from '@/components/PlaybackControl'
 import PlaybackEngine from '@/components/PlaybackControl/PlaybackEngine'
 import PlaybackSessionBridge from '@/components/PlaybackSessionBridge'
 import PlaybackShortcutBridge from '@/components/PlaybackShortcutBridge'
+import TrayCommandBridge from '@/components/TrayCommandBridge'
 import PlayerScene from '@/components/PlayerScene'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import KeepAliveRouteOutlet from 'keepalive-for-react-router'
@@ -30,6 +31,7 @@ const AppLayout = () => {
       <PlaybackEngine />
       <PlaybackSessionBridge />
       <PlaybackShortcutBridge />
+      <TrayCommandBridge />
       <PlaybackControl />
       <PlayerScene />
       <CollectToPlaylistDrawer />

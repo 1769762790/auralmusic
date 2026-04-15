@@ -13,6 +13,7 @@ import { registerConfigIpc } from './ipc/config-ipc'
 import { registerDownloadIpc } from './ipc/download-ipc'
 import { registerMusicSourceIpc } from './ipc/music-source-ipc'
 import { registerSystemFontsIpc } from './ipc/system-fonts-ipc'
+import { registerTrayIpc } from './ipc/tray-ipc'
 import { registerWindowIpc, bindWindowStateEvents } from './ipc/window-ipc'
 import { applyMusicApiRuntimeEnv } from './music-api-runtime'
 import {
@@ -24,22 +25,22 @@ import {
   clearConfiguredGlobalShortcuts,
   syncConfiguredGlobalShortcuts,
 } from './shortcuts/global-shortcuts'
+import { createTrayController } from './tray/tray-controller'
 import {
   applyWindowTitleBarTheme,
   syncNativeThemeSource,
 } from './window/titlebar-theme'
 import { resolveWindowCloseBehavior } from './window/close-behavior'
+import { TRAY_IPC_CHANNELS } from '../shared/ipc/tray.ts'
 import { WINDOW_IPC_CHANNELS } from './window/types'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const { app, globalShortcut, Menu, nativeImage, nativeTheme, session, Tray } =
-  electron
+const { app, globalShortcut, nativeTheme, session } = electron
 
 registerLocalMediaScheme()
 
 let mainWindow: BrowserWindow | null = null
-let tray: InstanceType<typeof Tray> | null = null
 let isQuitting = false
 let musicApiRuntime: StartedMusicApiRuntime | null = null
 
@@ -115,28 +116,6 @@ function getPreloadPath() {
   return path.join(__dirname, '../preload/index.cjs')
 }
 
-function getTrayIcon() {
-  const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-      <rect width="64" height="64" rx="16" fill="#111111"/>
-      <path d="M18 36c3.5-7 7.5-11 14-11s10.5 4 14 11" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
-      <circle cx="24" cy="40" r="4" fill="#ffffff"/>
-      <circle cx="32" cy="27" r="4" fill="#ffffff"/>
-      <circle cx="40" cy="40" r="4" fill="#ffffff"/>
-    </svg>
-  `
-
-  const image = nativeImage.createFromDataURL(
-    `data:image/svg+xml;base64,${Buffer.from(iconSvg).toString('base64')}`
-  )
-
-  if (process.platform === 'darwin') {
-    image.setTemplateImage(true)
-  }
-
-  return image
-}
-
 function showMainWindow() {
   if (!mainWindow) {
     return
@@ -154,57 +133,16 @@ function hideMainWindowToTray() {
   mainWindow?.hide()
 }
 
-function createTray(): InstanceType<typeof Tray> {
-  if (tray) {
-    return tray
-  }
-
-  tray = new Tray(getTrayIcon())
-  tray.setToolTip('AuralMusic')
-  tray.setContextMenu(
-    Menu.buildFromTemplate([
-      {
-        label: '显示主窗口',
-        click: () => {
-          showMainWindow()
-        },
-      },
-      {
-        label: '最小化到托盘',
-        click: () => {
-          hideMainWindowToTray()
-        },
-      },
-      { type: 'separator' },
-      {
-        label: '退出应用',
-        click: () => {
-          isQuitting = true
-          app.quit()
-        },
-      },
-    ])
-  )
-
-  tray.on('click', () => {
-    if (!mainWindow) {
-      return
-    }
-
-    if (mainWindow.isVisible()) {
-      mainWindow.focus()
-      return
-    }
-
-    showMainWindow()
-  })
-
-  tray.on('double-click', () => {
-    showMainWindow()
-  })
-
-  return tray
-}
+const trayController = createTrayController({
+  showMainWindow,
+  quitApp: () => {
+    isQuitting = true
+    app.quit()
+  },
+  sendCommand: command => {
+    mainWindow?.webContents.send(TRAY_IPC_CHANNELS.COMMAND, command)
+  },
+})
 
 function registerWindowCloseBehavior(window: BrowserWindow) {
   window.on('close', event => {
@@ -293,6 +231,9 @@ app.whenReady().then(async () => {
   registerDownloadIpc()
   registerMusicSourceIpc()
   registerSystemFontsIpc()
+  registerTrayIpc({
+    trayController,
+  })
   registerWindowIpc({
     onQuitRequested: () => {
       isQuitting = true
@@ -300,7 +241,7 @@ app.whenReady().then(async () => {
   })
   registerLocalMediaProtocol()
   registerPermissionHandlers()
-  createTray()
+  trayController.initialize()
 
   try {
     musicApiRuntime = await startMusicApi()
@@ -351,8 +292,7 @@ app.on('before-quit', () => {
   isQuitting = true
   musicApiRuntime?.dispose()
   musicApiRuntime = null
-  tray?.destroy()
-  tray = null
+  trayController.destroy()
 })
 
 app.on('will-quit', () => {

@@ -6,6 +6,7 @@ import { CACHE_IPC_CHANNELS } from '../src/shared/ipc/cache.ts'
 import { IPC_CHANNELS } from '../src/shared/ipc/config.ts'
 import { DOWNLOAD_IPC_CHANNELS } from '../src/shared/ipc/download.ts'
 import { SYSTEM_FONTS_IPC_CHANNELS } from '../src/shared/ipc/system-fonts.ts'
+import { TRAY_IPC_CHANNELS } from '../src/shared/ipc/tray.ts'
 import { WINDOW_IPC_CHANNELS } from '../src/shared/ipc/window.ts'
 
 test('shared ipc channel constants preserve the existing wire contract', () => {
@@ -55,6 +56,11 @@ test('shared ipc channel constants preserve the existing wire contract', () => {
 
   assert.deepEqual(SYSTEM_FONTS_IPC_CHANNELS, {
     GET_ALL: 'system-fonts:get-all',
+  })
+
+  assert.deepEqual(TRAY_IPC_CHANNELS, {
+    SYNC_STATE: 'tray:sync-state',
+    COMMAND: 'tray:command',
   })
 
   assert.deepEqual(WINDOW_IPC_CHANNELS, {
