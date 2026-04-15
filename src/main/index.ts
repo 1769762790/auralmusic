@@ -12,6 +12,7 @@ import { registerCacheIpc } from './ipc/cache-ipc'
 import { registerConfigIpc } from './ipc/config-ipc'
 import { registerDownloadIpc } from './ipc/download-ipc'
 import { registerMusicSourceIpc } from './ipc/music-source-ipc'
+import { registerSystemFontsIpc } from './ipc/system-fonts-ipc'
 import { registerWindowIpc, bindWindowStateEvents } from './ipc/window-ipc'
 import { applyMusicApiRuntimeEnv } from './music-api-runtime'
 import {
@@ -79,11 +80,10 @@ function registerPermissionHandlers() {
 
       return (
         isMainWindowRequest(webContents) &&
-        (permissionName === 'local-fonts' ||
-          isAllowedAudioPermission(
-            permissionName,
-            details as AudioPermissionDetails
-          ))
+        isAllowedAudioPermission(
+          permissionName,
+          details as AudioPermissionDetails
+        )
       )
     }
   )
@@ -94,11 +94,10 @@ function registerPermissionHandlers() {
 
       callback(
         isMainWindowRequest(webContents) &&
-          (permissionName === 'local-fonts' ||
-            isAllowedAudioPermission(
-              permissionName,
-              details as AudioPermissionDetails
-            ))
+          isAllowedAudioPermission(
+            permissionName,
+            details as AudioPermissionDetails
+          )
       )
     }
   )
@@ -245,7 +244,6 @@ function createWindow() {
     webPreferences: {
       preload: getPreloadPath(),
       contextIsolation: true,
-      enableBlinkFeatures: 'LocalFontAccess',
       nodeIntegration: false,
     },
   })
@@ -294,6 +292,7 @@ app.whenReady().then(async () => {
   registerCacheIpc()
   registerDownloadIpc()
   registerMusicSourceIpc()
+  registerSystemFontsIpc()
   registerWindowIpc({
     onQuitRequested: () => {
       isQuitting = true

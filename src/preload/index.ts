@@ -5,6 +5,7 @@ import { exposeDownloadApi } from './api/download-api'
 import { exposeMusicSourceApi } from './api/music-source-api'
 import { exposeRuntimeApi } from './api/runtime-api'
 import { exposeShortcutApi } from './api/shortcut-api'
+import { exposeSystemFontsApi } from './api/system-fonts-api'
 import { exposeWindowApi } from './api/window-api'
 
 exposeAuthApi()
@@ -14,4 +15,5 @@ exposeDownloadApi()
 exposeMusicSourceApi()
 exposeRuntimeApi()
 exposeShortcutApi()
+exposeSystemFontsApi()
 exposeWindowApi()
