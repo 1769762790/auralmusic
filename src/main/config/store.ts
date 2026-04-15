@@ -1,3 +1,4 @@
+import path from 'node:path'
 import ElectronStore from 'electron-store'
 import {
   AUDIO_QUALITY_LEVELS,
@@ -48,6 +49,18 @@ const Store =
       default?: typeof ElectronStore
     }
   ).default ?? ElectronStore
+
+function isLegacyProjectDownloadsDir(value: string) {
+  const normalizedValue = value.trim()
+  if (!normalizedValue) {
+    return false
+  }
+
+  const legacyProjectDownloadsDir = path.join(process.cwd(), 'downloads')
+  return (
+    path.resolve(normalizedValue) === path.resolve(legacyProjectDownloadsDir)
+  )
+}
 
 function normalizeQuality(value: unknown): AudioQualityLevel {
   if (value === 'high') {
@@ -433,7 +446,9 @@ class ConfigStore {
       }
 
       const downloadDir = ConfigStore.instance.get('downloadDir')
-      const normalizedDownloadDir = normalizeDownloadDir(downloadDir)
+      const normalizedDownloadDir = isLegacyProjectDownloadsDir(downloadDir)
+        ? defaultConfig.downloadDir
+        : normalizeDownloadDir(downloadDir)
       if (downloadDir !== normalizedDownloadDir) {
         ConfigStore.instance.set('downloadDir', normalizedDownloadDir)
       }

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { InternalAxiosRequestConfig } from 'axios'
-import { resolveRequestBaseUrl } from './request-base-url'
+import { resolveRequestBaseUrl } from './request-base-url.ts'
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   retryCount?: number
@@ -11,10 +11,12 @@ const runtimeBaseUrl =
   typeof window !== 'undefined'
     ? window.appRuntime?.getMusicApiBaseUrl()
     : undefined
+const viteEnv = (import.meta as ImportMeta & { env?: Record<string, string> })
+  .env
 
 const baseURL = resolveRequestBaseUrl({
   runtimeBaseUrl,
-  viteApiBaseUrl: import.meta.env.VITE_API,
+  viteApiBaseUrl: viteEnv?.VITE_API,
 })
 
 const request = axios.create({

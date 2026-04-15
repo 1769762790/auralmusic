@@ -7,6 +7,11 @@ import {
   type DownloadSourceProvider,
 } from '../../../main/download/download-types.ts'
 import { normalizeSongUrlV1Response } from '../../../shared/playback.ts'
+import {
+  getSongDownloadUrlV1 as defaultGetSongDownloadUrlV1,
+  getSongUrlV1 as defaultGetSongUrlV1,
+} from '../../api/list.ts'
+import { useConfigStore } from '../../stores/config-store.ts'
 import { resolveTrackWithLxMusicSource } from '../music-source/lx-playback-resolver.ts'
 
 export type DownloadResolutionPolicy = 'strict' | 'fallback'
@@ -58,18 +63,11 @@ type GetSongDownloadUrlV1 = (params: {
   level: AudioQualityLevel
 }) => Promise<{ data: unknown }>
 
-let configStoreModulePromise: Promise<
-  typeof import('../../stores/config-store.ts')
-> | null = null
-
-let apiListModulePromise: Promise<DownloadSourceApiListModule> | null = null
-
 async function loadDefaultSongApiListModule(): Promise<DownloadSourceApiListModule> {
-  if (!apiListModulePromise) {
-    apiListModulePromise = import('../../api/list.ts')
+  return {
+    getSongUrlV1: defaultGetSongUrlV1,
+    getSongDownloadUrlV1: defaultGetSongDownloadUrlV1,
   }
-
-  return apiListModulePromise
 }
 
 async function getDefaultSongUrlV1(
@@ -124,12 +122,7 @@ function normalizeFileExtension(value: string | null | undefined) {
 }
 
 async function getDefaultConfig(): Promise<AppConfig> {
-  if (!configStoreModulePromise) {
-    configStoreModulePromise = import('../../stores/config-store.ts')
-  }
-
-  const module = await configStoreModulePromise
-  return module.useConfigStore.getState().config
+  return useConfigStore.getState().config
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

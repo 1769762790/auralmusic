@@ -1,5 +1,3 @@
-import path from 'node:path'
-
 import { IPC_CHANNELS } from '../../shared/ipc/config.ts'
 import type { ImportedLxMusicSource } from '../../shared/lx-music-source.ts'
 import type { PlaybackMode } from '../../shared/playback.ts'
@@ -217,13 +215,6 @@ export function normalizeDownloadDir(value: unknown) {
 
   const normalizedValue = value.trim()
   if (!normalizedValue) {
-    return defaultConfig.downloadDir
-  }
-
-  const legacyProjectDownloadsDir = path.join(process.cwd(), 'downloads')
-  if (
-    path.resolve(normalizedValue) === path.resolve(legacyProjectDownloadsDir)
-  ) {
     return defaultConfig.downloadDir
   }
 

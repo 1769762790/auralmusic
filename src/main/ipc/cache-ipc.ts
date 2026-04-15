@@ -27,7 +27,7 @@ type CacheIpcRegistrationOptions = {
     }>
   }
   browserWindowFromWebContents?: (webContents: unknown) => unknown
-  appGetPath?: (name: 'cache' | 'sessionData') => string
+  appGetPath?: (name: 'appData' | 'sessionData') => string
   getConfigValue?: <K extends keyof AppConfig>(key: K) => AppConfig[K]
   cacheService?: Pick<
     CacheService,
@@ -42,17 +42,17 @@ type CacheIpcRegistrationOptions = {
 }
 
 function resolveDefaultCacheRoot(
-  appGetPath: (name: 'cache' | 'sessionData') => string
+  appGetPath: (name: 'appData' | 'sessionData') => string
 ) {
   try {
-    return path.join(appGetPath('cache'), 'AuralMusic')
+    return path.join(appGetPath('appData'), 'AuralMusic')
   } catch {
     return path.join(appGetPath('sessionData'), 'AuralMusic')
   }
 }
 
 function createDefaultCacheService(
-  appGetPath: (name: 'cache' | 'sessionData') => string
+  appGetPath: (name: 'appData' | 'sessionData') => string
 ) {
   return new CacheService({
     defaultRootDir: resolveDefaultCacheRoot(appGetPath),
@@ -70,7 +70,7 @@ export function createCacheIpc(options: CacheIpcRegistrationOptions = {}) {
       ))
   const appGetPath =
     options.appGetPath ??
-    ((name: 'cache' | 'sessionData') => electron.app.getPath(name))
+    ((name: 'appData' | 'sessionData') => electron.app.getPath(name))
   const getConfigValue = options.getConfigValue ?? getConfig
   const cacheService =
     options.cacheService ?? createDefaultCacheService(appGetPath)

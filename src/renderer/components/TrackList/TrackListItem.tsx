@@ -8,7 +8,6 @@ import { useAuthStore } from '@/stores/auth-store'
 import { useCollectToPlaylistStore } from '@/stores/collect-to-playlist-store'
 import { useConfigStore } from '@/stores/config-store'
 import { useUserStore } from '@/stores/user'
-import type { DownloadQualityPolicy } from '../../../../main/config/types'
 import AvatarCover from '../AvatarCover'
 import MusicContextMenu from '../MusicContextMenu'
 import {
@@ -72,8 +71,7 @@ const TrackListItem = ({
   const downloadConfig = useConfigStore(state => state.config)
   const downloadEnabled = downloadConfig.downloadEnabled
   const downloadQuality = downloadConfig.downloadQuality
-  const downloadQualityPolicy =
-    downloadConfig.downloadQualityPolicy as DownloadQualityPolicy
+  const downloadQualityPolicy = downloadConfig.downloadQualityPolicy
   const isLiked = useUserStore(state =>
     item.id ? state.likedSongIds.has(item.id) : false
   )

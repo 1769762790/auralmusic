@@ -1,5 +1,5 @@
-import request from '@/lib/request'
-import type { AudioQualityLevel } from '../../main/config/types'
+import request from '../lib/request.ts'
+import type { AudioQualityLevel } from '../../main/config/types.ts'
 
 // 获取排行榜列表
 export function getTopList() {
