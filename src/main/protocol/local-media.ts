@@ -1,6 +1,6 @@
 import electron from 'electron'
 import { createReadStream } from 'node:fs'
-import { stat } from 'node:fs/promises'
+import { open, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { Readable } from 'node:stream'
 
@@ -22,6 +22,7 @@ type LocalMediaRange = {
 type ResolveLocalMediaHeadersOptions = {
   fileSize: number
   fileExtension: string
+  fileHeader?: Uint8Array
   range?: LocalMediaRange
 }
 
@@ -36,6 +37,75 @@ const LOCAL_MEDIA_MIME_TYPES: Record<string, string> = {
 
 function normalizeLocalMediaExtension(fileExtension: string) {
   return fileExtension.trim().toLowerCase()
+}
+
+function matchesBytes(bytes: Uint8Array, offset: number, signature: number[]) {
+  return signature.every((value, index) => bytes[offset + index] === value)
+}
+
+function inferLocalMediaContentTypeFromHeader(fileHeader?: Uint8Array) {
+  if (!fileHeader?.length) {
+    return null
+  }
+
+  if (matchesBytes(fileHeader, 0, [0x49, 0x44, 0x33])) {
+    return 'audio/mpeg'
+  }
+
+  if (matchesBytes(fileHeader, 0, [0x66, 0x4c, 0x61, 0x43])) {
+    return 'audio/flac'
+  }
+
+  if (matchesBytes(fileHeader, 0, [0x4f, 0x67, 0x67, 0x53])) {
+    return 'audio/ogg'
+  }
+
+  if (
+    matchesBytes(fileHeader, 0, [0x52, 0x49, 0x46, 0x46]) &&
+    matchesBytes(fileHeader, 8, [0x57, 0x41, 0x56, 0x45])
+  ) {
+    return 'audio/wav'
+  }
+
+  if (
+    matchesBytes(fileHeader, 4, [0x66, 0x74, 0x79, 0x70]) ||
+    matchesBytes(fileHeader, 0, [0x66, 0x74, 0x79, 0x70])
+  ) {
+    return 'audio/mp4'
+  }
+
+  if (fileHeader[0] === 0xff && (fileHeader[1] & 0xf6) === 0xf0) {
+    return 'audio/aac'
+  }
+
+  if (fileHeader[0] === 0xff && (fileHeader[1] & 0xe0) === 0xe0) {
+    return 'audio/mpeg'
+  }
+
+  return null
+}
+
+export function inferLocalMediaContentType(
+  fileExtension: string,
+  fileHeader?: Uint8Array
+) {
+  return (
+    LOCAL_MEDIA_MIME_TYPES[normalizeLocalMediaExtension(fileExtension)] ||
+    inferLocalMediaContentTypeFromHeader(fileHeader) ||
+    'application/octet-stream'
+  )
+}
+
+async function readLocalMediaHeader(targetPath: string, maxBytes = 32) {
+  const handle = await open(targetPath, 'r')
+
+  try {
+    const buffer = Buffer.allocUnsafe(maxBytes)
+    const { bytesRead } = await handle.read(buffer, 0, maxBytes, 0)
+    return new Uint8Array(buffer.subarray(0, bytesRead))
+  } finally {
+    await handle.close()
+  }
 }
 
 function createUnsatisfiedRangeHeaders(fileSize: number) {
@@ -115,10 +185,10 @@ export function resolveLocalMediaResponseHeaders(
     'content-length': String(
       options.range?.contentLength ?? Math.max(0, Math.floor(options.fileSize))
     ),
-    'content-type':
-      LOCAL_MEDIA_MIME_TYPES[
-        normalizeLocalMediaExtension(options.fileExtension)
-      ] || 'application/octet-stream',
+    'content-type': inferLocalMediaContentType(
+      options.fileExtension,
+      options.fileHeader
+    ),
   }
 
   if (options.range) {
@@ -164,6 +234,7 @@ export function registerLocalMediaProtocol() {
     try {
       const fileStats = await stat(targetPath)
       const fileSize = fileStats.size
+      const fileHeader = await readLocalMediaHeader(targetPath)
       const rangeHeader = request.headers.get('range')
       const wantsByteRange = rangeHeader?.trim().startsWith('bytes=') ?? false
       const range = resolveLocalMediaRangeRequest(rangeHeader, fileSize)
@@ -178,6 +249,7 @@ export function registerLocalMediaProtocol() {
       const headers = resolveLocalMediaResponseHeaders({
         fileSize,
         fileExtension: path.extname(targetPath),
+        fileHeader,
         range: range ?? undefined,
       })
 
@@ -197,8 +269,9 @@ export function registerLocalMediaProtocol() {
             }
           : undefined
       )
+      const body = Readable.toWeb(stream) as ReadableStream
 
-      return new Response(Readable.toWeb(stream) as BodyInit, {
+      return new Response(body, {
         status: range ? 206 : 200,
         headers,
       })

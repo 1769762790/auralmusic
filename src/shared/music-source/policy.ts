@@ -30,7 +30,7 @@ export function buildResolverPolicy(context: ResolveContext): ResolverPolicy {
   const customApiEnabled =
     context.config.customMusicApiEnabled &&
     context.config.customMusicApiUrl.trim().length > 0
-  const resolverOrder = context.config.musicSourceEnabled
+  const resolverOrder: MusicResolverId[] = context.config.musicSourceEnabled
     ? compactResolvers(
         context.isAuthenticated
           ? [

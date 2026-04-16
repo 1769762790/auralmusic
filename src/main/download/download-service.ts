@@ -114,6 +114,10 @@ function normalizeExtension(extension: string | null | undefined) {
     : `.${extension.toLowerCase()}`
 }
 
+function hasExplicitFileExtension(fileName: string) {
+  return /^\.[a-z0-9]{1,8}$/i.test(path.extname(fileName))
+}
+
 function isLowerQuality(
   candidate: AudioQualityLevel,
   requested: AudioQualityLevel
@@ -154,7 +158,7 @@ function buildFileName(
       : `${payload.songName} - ${payload.artistName}`)
 
   const sanitized = sanitizeFileName(baseName)
-  if (path.extname(sanitized)) {
+  if (hasExplicitFileExtension(sanitized)) {
     return sanitized
   }
 
@@ -642,7 +646,7 @@ export class DownloadService {
       const responseExtension =
         initialExtension ||
         inferExtensionFromContentType(response.headers.get('content-type'))
-      if (responseExtension && !path.extname(targetPath)) {
+      if (responseExtension && !hasExplicitFileExtension(targetPath)) {
         targetPath = path.join(
           targetDirectory,
           buildFileName(

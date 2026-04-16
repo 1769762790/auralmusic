@@ -7,6 +7,7 @@ import {
   parseLocalMediaUrl,
 } from '../src/shared/local-media.ts'
 import {
+  inferLocalMediaContentType,
   resolveLocalMediaRangeRequest,
   resolveLocalMediaResponseHeaders,
 } from '../src/main/protocol/local-media.ts'
@@ -82,5 +83,23 @@ test('resolveLocalMediaResponseHeaders returns range-friendly headers for full a
       'content-range': 'bytes 512-1023/2048',
       'content-type': 'audio/flac',
     }
+  )
+})
+
+test('inferLocalMediaContentType falls back to file signatures when the path has no extension', () => {
+  assert.equal(
+    inferLocalMediaContentType(
+      '',
+      new Uint8Array([0x49, 0x44, 0x33, 0x04, 0x00, 0x00])
+    ),
+    'audio/mpeg'
+  )
+
+  assert.equal(
+    inferLocalMediaContentType(
+      '',
+      new Uint8Array([0x66, 0x4c, 0x61, 0x43, 0x00, 0x00])
+    ),
+    'audio/flac'
   )
 })

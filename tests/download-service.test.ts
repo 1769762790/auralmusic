@@ -427,6 +427,37 @@ test('DownloadService falls back to request quality and response type when rende
   await rm(root, { recursive: true, force: true })
 })
 
+test('DownloadService appends the resolved extension when the song name contains dots', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-download-test-'))
+  const service = new DownloadService({
+    defaultRootDir: root,
+    now: createNowSequence(),
+    createTaskId: () => 'task-dotted-song-name',
+    downloadFetcher: async () => {
+      return new Response(Buffer.from('dotted-song-audio'), {
+        status: 200,
+        headers: {
+          'content-type': 'audio/mpeg',
+        },
+      })
+    },
+  })
+
+  const task = await service.enqueueSongDownload({
+    songId: '7',
+    songName: 'P.Y.T',
+    artistName: 'Test Artist',
+    requestedQuality: 'higher',
+    sourceUrl: 'https://cdn.example.com/dotted-song',
+  })
+
+  const completed = await waitForTaskStatus(service, task.id, 'completed')
+
+  assert.ok(completed.targetPath.endsWith('P.Y.T - Test Artist.mp3'))
+
+  await rm(root, { recursive: true, force: true })
+})
+
 test('DownloadService honors strict download quality policy during legacy resolution', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-download-test-'))
   const attemptedQualities: string[] = []

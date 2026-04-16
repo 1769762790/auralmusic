@@ -1,4 +1,7 @@
-import { resolveTrackWithLxMusicSource } from '../../music-source/lx-playback-resolver.ts'
+import {
+  resolveTrackWithLxMusicSource,
+  type LxPlaybackResolverConfig,
+} from '../../music-source/lx-playback-resolver.ts'
 import { inferFileExtensionFromUrl } from './shared.ts'
 import type {
   DownloadResolverConfig,
@@ -6,10 +9,7 @@ import type {
   DownloadSourceProviderOptions,
 } from './types.ts'
 
-type LxDownloadConfig = DownloadResolverConfig & {
-  activeLuoxueMusicSourceScriptId: string | null
-  luoxueMusicSourceScripts: Array<{ id: string }>
-}
+type LxDownloadConfig = DownloadResolverConfig & LxPlaybackResolverConfig
 
 function isValidLxDownloadConfig(
   config: DownloadResolverConfig

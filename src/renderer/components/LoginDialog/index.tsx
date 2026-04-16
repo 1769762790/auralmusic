@@ -1,7 +1,6 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useAuthStore } from '@/stores/auth-store'
 
-import LoginArtwork from './components/LoginArtwork'
 import LoginForm from './components/LoginForm'
 import LoginModeSwitcher from './components/LoginModeSwitcher'
 import { useMemo } from 'react'

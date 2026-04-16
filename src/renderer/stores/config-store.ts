@@ -25,6 +25,7 @@ import {
   normalizeShowLyricTranslation,
   type AppConfig,
   type AudioQualityLevel,
+  type MusicSourceProvider,
 } from '../../main/config/types.ts'
 import {
   normalizeImportedLxMusicSource,

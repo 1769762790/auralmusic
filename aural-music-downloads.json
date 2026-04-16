@@ -1,6 +1,25 @@
 {
   "tasks": [
     {
+      "id": "download-1776356193470-ffmlcq1o",
+      "songId": 1378372740,
+      "songName": "Never Grow Up",
+      "artistName": "ちゃんみな",
+      "coverUrl": "https://p4.music.126.net/aJ6uJtSsjpx_8q5XNGVQ5w==/109951164266290622.jpg",
+      "albumName": "Never Grow Up",
+      "requestedQuality": "jymaster",
+      "resolvedQuality": "jymaster",
+      "status": "completed",
+      "progress": 100,
+      "errorMessage": null,
+      "targetPath": "C:\\Users\\s1769\\Downloads\\Never Grow Up - ちゃんみな.mp3",
+      "note": "Embedded MP3 metadata.",
+      "warningMessage": null,
+      "createdAt": 1776356193470,
+      "updatedAt": 1776356209643,
+      "completedAt": 1776356209643
+    },
+    {
       "id": "download-1776347237500-5gcigyxx",
       "songId": 1846188607,
       "songName": "Distance",

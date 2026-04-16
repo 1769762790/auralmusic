@@ -14,6 +14,14 @@ import type {
 } from '../../../shared/playback.ts'
 import { getLxMusicRunner, initLxMusicRunner } from './LxMusicSourceRunner.ts'
 
+export type LxPlaybackResolverConfig = Pick<
+  AppConfig,
+  | 'musicSourceEnabled'
+  | 'luoxueSourceEnabled'
+  | 'activeLuoxueMusicSourceScriptId'
+  | 'luoxueMusicSourceScripts'
+>
+
 const AUDIO_QUALITY_TO_LX: Record<AudioQualityLevel, LxQuality> = {
   standard: '128k',
   higher: '320k',
@@ -72,7 +80,7 @@ function mapAudioQualityLevelToLxQuality(
 export async function resolveTrackWithLxMusicSource(options: {
   track: PlaybackTrack
   quality: AudioQualityLevel
-  config: AppConfig
+  config: LxPlaybackResolverConfig
 }): Promise<SongUrlV1Result | null> {
   const { track, quality, config } = options
 
