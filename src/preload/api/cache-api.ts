@@ -3,6 +3,7 @@ import { CACHE_IPC_CHANNELS } from '../../shared/ipc/cache.ts'
 import type {
   CacheStatus,
   ResolveAudioSourceResult,
+  ResolveImageSourceResult,
 } from '../../main/cache/cache-types'
 
 export type CacheApi = {
@@ -14,6 +15,10 @@ export type CacheApi = {
     cacheKey: string,
     sourceUrl: string
   ) => Promise<ResolveAudioSourceResult>
+  resolveImageSource: (
+    cacheKey: string,
+    sourceUrl: string
+  ) => Promise<ResolveImageSourceResult>
   readLyricsPayload: (cacheKey: string) => Promise<string | null>
   writeLyricsPayload: (cacheKey: string, payload: unknown) => Promise<void>
 }
@@ -34,6 +39,13 @@ const cacheApi: CacheApi = {
   resolveAudioSource: async (cacheKey, sourceUrl) => {
     return ipcRenderer.invoke(
       CACHE_IPC_CHANNELS.RESOLVE_AUDIO_SOURCE,
+      cacheKey,
+      sourceUrl
+    )
+  },
+  resolveImageSource: async (cacheKey, sourceUrl) => {
+    return ipcRenderer.invoke(
+      CACHE_IPC_CHANNELS.RESOLVE_IMAGE_SOURCE,
       cacheKey,
       sourceUrl
     )

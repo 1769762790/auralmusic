@@ -24,6 +24,10 @@ test('createCacheIpc registers handlers and resolves the system cache directory 
       url: 'https://cdn.example.com/song.mp3',
       fromCache: false,
     }),
+    resolveImageSource: async () => ({
+      url: 'file:///C:/cache/image.webp',
+      fromCache: true,
+    }),
     readLyricsPayload: async () => null,
     writeLyricsPayload: async () => undefined,
   }
@@ -79,5 +83,16 @@ test('createCacheIpc registers handlers and resolves the system cache directory 
       sender: {},
     }),
     'D:\\cache'
+  )
+  assert.deepEqual(
+    await handlers.get(CACHE_IPC_CHANNELS.RESOLVE_IMAGE_SOURCE)?.(
+      {},
+      'artist:detail:hero:7',
+      'https://img.example.com/7.jpg'
+    ),
+    {
+      url: 'file:///C:/cache/image.webp',
+      fromCache: true,
+    }
   )
 })

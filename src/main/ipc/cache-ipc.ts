@@ -36,6 +36,7 @@ type CacheIpcRegistrationOptions = {
     | 'getStatus'
     | 'clear'
     | 'resolveAudioSource'
+    | 'resolveImageSource'
     | 'readLyricsPayload'
     | 'writeLyricsPayload'
   >
@@ -117,6 +118,19 @@ export function createCacheIpc(options: CacheIpcRegistrationOptions = {}) {
         CACHE_IPC_CHANNELS.RESOLVE_AUDIO_SOURCE,
         async (_event, cacheKey: string, sourceUrl: string) => {
           return cacheService.resolveAudioSource({
+            cacheKey,
+            sourceUrl,
+            enabled: getConfigValue('diskCacheEnabled'),
+            cacheDir: getConfigValue('diskCacheDir'),
+            maxBytes: getConfigValue('diskCacheMaxBytes'),
+          })
+        }
+      )
+
+      ipcMain.handle(
+        CACHE_IPC_CHANNELS.RESOLVE_IMAGE_SOURCE,
+        async (_event, cacheKey: string, sourceUrl: string) => {
+          return cacheService.resolveImageSource({
             cacheKey,
             sourceUrl,
             enabled: getConfigValue('diskCacheEnabled'),
