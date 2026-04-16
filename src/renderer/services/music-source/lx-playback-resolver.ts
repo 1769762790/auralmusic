@@ -76,11 +76,7 @@ export async function resolveTrackWithLxMusicSource(options: {
 }): Promise<SongUrlV1Result | null> {
   const { track, quality, config } = options
 
-  if (
-    !config.musicSourceEnabled ||
-    !config.luoxueSourceEnabled ||
-    !config.musicSourceProviders.includes('lxMusic')
-  ) {
+  if (!config.musicSourceEnabled || !config.luoxueSourceEnabled) {
     return null
   }
 

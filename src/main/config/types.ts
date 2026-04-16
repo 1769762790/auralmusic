@@ -40,7 +40,19 @@ export const MUSIC_SOURCE_PROVIDERS = [
   'lxMusic',
 ] as const
 
+// Deprecated compatibility field for legacy settings UI/state.
 export type MusicSourceProvider = (typeof MUSIC_SOURCE_PROVIDERS)[number]
+
+export const ENHANCED_SOURCE_MODULES = [
+  'unm',
+  'bikonoo',
+  'gdmusic',
+  'msls',
+  'qijieya',
+  'baka',
+] as const
+
+export type EnhancedSourceModule = (typeof ENHANCED_SOURCE_MODULES)[number]
 
 export type CloseBehavior = 'ask' | 'minimize' | 'quit'
 export type PlayerBackgroundMode = 'off' | 'static' | 'dynamic'
@@ -62,6 +74,7 @@ export interface AppConfig {
   lyricsKaraokeEnabled: boolean
   musicSourceEnabled: boolean
   musicSourceProviders: MusicSourceProvider[]
+  enhancedSourceModules: EnhancedSourceModule[]
   luoxueSourceEnabled: boolean
   luoxueSourceUrl: string
   luoxueMusicSourceScript: ImportedLxMusicSource | null
@@ -104,7 +117,8 @@ export const defaultConfig: AppConfig = {
   showLyricTranslation: false,
   lyricsKaraokeEnabled: true,
   musicSourceEnabled: false,
-  musicSourceProviders: ['migu', 'kugou', 'pyncmd', 'bilibili'],
+  musicSourceProviders: [],
+  enhancedSourceModules: ['unm', 'bikonoo', 'gdmusic', 'msls', 'qijieya'],
   luoxueSourceEnabled: false,
   luoxueSourceUrl: '',
   luoxueMusicSourceScript: null,
@@ -227,6 +241,25 @@ export function normalizeDownloadConcurrency(value: unknown) {
   }
 
   return Math.min(10, Math.max(1, Math.floor(value)))
+}
+
+export function normalizeEnhancedSourceModules(
+  value: unknown
+): EnhancedSourceModule[] {
+  if (!Array.isArray(value)) {
+    return defaultConfig.enhancedSourceModules
+  }
+
+  const modules = value.filter((item): item is EnhancedSourceModule => {
+    return (
+      typeof item === 'string' &&
+      ENHANCED_SOURCE_MODULES.includes(item as EnhancedSourceModule)
+    )
+  })
+
+  return modules.length
+    ? [...new Set(modules)]
+    : defaultConfig.enhancedSourceModules
 }
 
 export function normalizeDownloadFileNamePattern(value: unknown) {

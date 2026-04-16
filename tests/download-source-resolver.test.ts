@@ -71,6 +71,7 @@ test('createDownloadSourceResolver falls back from official family to LX and ret
   assert.deepEqual(calls, [
     'song-download:lossless',
     'song-url:lossless:false',
+    'song-url:lossless:true',
     'lx:lossless',
   ])
 })
@@ -249,6 +250,7 @@ test('createDownloadSourceResolver stops after the requested quality when policy
   assert.deepEqual(calls, [
     'song-download:lossless',
     'song-url:lossless:false',
+    'song-url:lossless:true',
     'lx:lossless',
   ])
 })
@@ -303,9 +305,11 @@ test('createDownloadSourceResolver falls through lower qualities when policy is 
   assert.deepEqual(calls, [
     'song-download:lossless',
     'song-url:lossless:false',
+    'song-url:lossless:true',
     'lx:lossless',
     'song-download:exhigh',
     'song-url:exhigh:false',
+    'song-url:exhigh:true',
     'lx:exhigh',
     'song-download:higher',
   ])
@@ -318,6 +322,51 @@ test('createDownloadSourceResolver prefers builtin unblock before official when 
     getConfig: () =>
       createConfig({
         musicSourceProviders: ['migu'],
+        luoxueSourceEnabled: false,
+      }),
+    getIsAuthenticated: () => false,
+    getSongDownloadUrlV1: async () => {
+      calls.push('official-download')
+      return {
+        data: { data: { url: 'https://cdn.example.com/official.flac' } },
+      }
+    },
+    getSongUrlV1: async params => {
+      calls.push(`song-url:${params.unblock}`)
+      return {
+        data: {
+          data: [
+            {
+              id: 1,
+              url: params.unblock ? 'https://cdn.example.com/unblock.mp3' : '',
+            },
+          ],
+        },
+      }
+    },
+    resolveTrackWithLxMusicSource: async () => {
+      calls.push('lx')
+      return null
+    },
+  })
+
+  const result = await resolveDownloadSource({
+    track: createTrack(),
+    requestedQuality: 'higher',
+    policy: 'strict',
+  })
+
+  assert.equal(result?.provider, 'builtin-unblock')
+  assert.deepEqual(calls, ['song-url:true'])
+})
+
+test('createDownloadSourceResolver still tries builtin unblock when legacy builtin providers are empty', async () => {
+  const calls: string[] = []
+
+  const resolveDownloadSource = createDownloadSourceResolver({
+    getConfig: () =>
+      createConfig({
+        musicSourceProviders: ['lxMusic'],
         luoxueSourceEnabled: false,
       }),
     getIsAuthenticated: () => false,

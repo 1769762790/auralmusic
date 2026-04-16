@@ -15,7 +15,6 @@ function isValidLxDownloadConfig(
   config: DownloadResolverConfig
 ): config is LxDownloadConfig {
   return (
-    Array.isArray(config.musicSourceProviders) &&
     Array.isArray(config.luoxueMusicSourceScripts) &&
     (typeof config.activeLuoxueMusicSourceScriptId === 'string' ||
       config.activeLuoxueMusicSourceScriptId === null)

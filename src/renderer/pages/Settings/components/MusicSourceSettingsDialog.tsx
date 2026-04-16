@@ -15,28 +15,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/stores/config-store'
 import { validateLxMusicSourceScript } from '@/services/music-source/LxMusicSourceRunner'
+import {
+  createMusicSourceSettingsDraft,
+  createMusicSourceSettingsSaveEntries,
+} from './music-source-settings.model'
 import type {
   ImportedLxMusicSource,
   LxMusicSourceScriptDraft,
 } from '../../../../shared/lx-music-source'
 import {
-  MUSIC_SOURCE_PROVIDERS,
-  type MusicSourceProvider,
+  ENHANCED_SOURCE_MODULES,
+  type EnhancedSourceModule,
 } from '../../../../main/config/types'
 
-type MusicSourceTab = 'providers' | 'luoxue' | 'custom-api'
-
-const MUSIC_SOURCE_PROVIDER_LABELS: Record<MusicSourceProvider, string> = {
-  migu: '咪咕音乐',
-  kugou: '酷狗音乐',
-  pyncmd: 'pyncmd',
-  bilibili: '哔哩哔哩',
-  lxMusic: '落雪音源',
-}
+type MusicSourceTab = 'enhanced-unblock' | 'luoxue' | 'custom-api'
 
 interface MusicSourceSettingsDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+}
+
+const ENHANCED_SOURCE_MODULE_LABELS: Record<EnhancedSourceModule, string> = {
+  unm: 'UNM',
+  bikonoo: 'Bikonoo',
+  gdmusic: 'GDMusic',
+  msls: 'MSLS',
+  qijieya: 'Qijieya',
+  baka: 'Baka',
 }
 
 const SourceToggle = ({
@@ -57,7 +62,7 @@ const SourceToggle = ({
       className={cn(
         'bg-muted/60 relative h-8 w-24 rounded-full px-1 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
         checked
-          ? 'text-primary-foreground bg-primary/90'
+          ? 'bg-primary/90 text-primary-foreground'
           : 'text-muted-foreground'
       )}
     >
@@ -149,20 +154,19 @@ const ScriptInfoCard = ({
   )
 }
 
-function uniqueProviders(providers: MusicSourceProvider[]) {
-  return [...new Set(providers)]
-}
-
 const MusicSourceSettingsDialog = ({
   open,
   onOpenChange,
 }: MusicSourceSettingsDialogProps) => {
   const config = useConfigStore(state => state.config)
   const setConfig = useConfigStore(state => state.setConfig)
-  const [activeTab, setActiveTab] = useState<MusicSourceTab>('providers')
-  const [providers, setProviders] = useState<MusicSourceProvider[]>([])
+  const [activeTab, setActiveTab] = useState<MusicSourceTab>('enhanced-unblock')
+  const [enhancedModules, setEnhancedModules] = useState<
+    EnhancedSourceModule[]
+  >([])
   const [lxScripts, setLxScripts] = useState<ImportedLxMusicSource[]>([])
   const [activeLxScriptId, setActiveLxScriptId] = useState<string | null>(null)
+  const [hasLegacyProviders, setHasLegacyProviders] = useState(false)
   const [customApiEnabled, setCustomApiEnabled] = useState(false)
   const [customApiUrl, setCustomApiUrl] = useState('')
   const [onlineScriptUrl, setOnlineScriptUrl] = useState('')
@@ -170,7 +174,6 @@ const MusicSourceSettingsDialog = ({
   const [importingOnline, setImportingOnline] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  const canSave = providers.length > 0
   const importing = importingLocal || importingOnline
 
   useEffect(() => {
@@ -178,38 +181,46 @@ const MusicSourceSettingsDialog = ({
       return
     }
 
-    setActiveTab('providers')
-    setProviders(config.musicSourceProviders)
+    const draft = createMusicSourceSettingsDraft(config)
+
+    setActiveTab('enhanced-unblock')
+    setEnhancedModules(draft.enhancedSourceModules)
     setLxScripts(config.luoxueMusicSourceScripts)
     setActiveLxScriptId(config.activeLuoxueMusicSourceScriptId)
-    setCustomApiEnabled(config.customMusicApiEnabled)
-    setCustomApiUrl(config.customMusicApiUrl)
+    setHasLegacyProviders(draft.hasLegacyProviders)
+    setCustomApiEnabled(draft.customMusicApiEnabled)
+    setCustomApiUrl(draft.customMusicApiUrl)
     setOnlineScriptUrl('')
-    // 只在打开弹框时同步一次，避免导入脚本写入配置后把当前 Tab 重置。
+    // Only sync once when opening so script import does not reset the active tab.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
+  const toggleEnhancedModule = (
+    module: EnhancedSourceModule,
+    checked: boolean
+  ) => {
+    setEnhancedModules(current => {
+      if (checked) {
+        return current.includes(module) ? current : [...current, module]
+      }
+
+      return current.filter(item => item !== module)
+    })
+  }
+
   const persistLxScripts = async (
     scripts: ImportedLxMusicSource[],
-    activeId: string | null,
-    nextProviders = providers
+    activeId: string | null
   ) => {
     const nextActiveId = scripts.some(script => script.id === activeId)
       ? activeId
       : scripts[0]?.id || null
-    const nextSourceEnabled = Boolean(nextActiveId)
-    const nextMusicSourceProviders = nextSourceEnabled
-      ? uniqueProviders([...nextProviders, 'lxMusic'])
-      : nextProviders.filter(provider => provider !== 'lxMusic')
 
     setLxScripts(scripts)
     setActiveLxScriptId(nextActiveId)
-    setProviders(nextMusicSourceProviders)
 
     await setConfig('luoxueMusicSourceScripts', scripts)
     await setConfig('activeLuoxueMusicSourceScriptId', nextActiveId)
-    await setConfig('luoxueSourceEnabled', nextSourceEnabled)
-    await setConfig('musicSourceProviders', nextMusicSourceProviders)
   }
 
   const validateAndSaveLxScript = async (draft: LxMusicSourceScriptDraft) => {
@@ -225,33 +236,6 @@ const MusicSourceSettingsDialog = ({
 
     await persistLxScripts(nextScripts, savedScript.id)
     toast.success(`已导入落雪音源：${savedScript.name}`)
-  }
-
-  const handleProviderChange = (
-    provider: MusicSourceProvider,
-    checked: boolean
-  ) => {
-    if (provider === 'lxMusic' && checked && !activeLxScriptId) {
-      toast.warning('请先导入并选择落雪音源脚本')
-      setActiveTab('luoxue')
-      return
-    }
-
-    if (checked) {
-      setProviders(current =>
-        current.includes(provider) ? current : [...current, provider]
-      )
-      return
-    }
-
-    setProviders(current => {
-      if (current.length <= 1) {
-        toast.warning('至少保留一个音源')
-        return current
-      }
-
-      return current.filter(item => item !== provider)
-    })
   }
 
   const handleImportLocalLxScript = async () => {
@@ -344,21 +328,25 @@ const MusicSourceSettingsDialog = ({
   }
 
   const handleSave = async () => {
-    if (!canSave || saving) {
+    if (saving) {
       return
     }
-
-    const nextProviders = activeLxScriptId
-      ? providers
-      : providers.filter(provider => provider !== 'lxMusic')
 
     setSaving(true)
 
     try {
-      await setConfig('musicSourceProviders', nextProviders)
-      await setConfig('luoxueSourceEnabled', Boolean(activeLxScriptId))
-      await setConfig('customMusicApiEnabled', customApiEnabled)
-      await setConfig('customMusicApiUrl', customApiUrl.trim())
+      const saveEntries = createMusicSourceSettingsSaveEntries({
+        enhancedSourceModules: enhancedModules,
+        luoxueSourceEnabled: Boolean(activeLxScriptId),
+        customMusicApiEnabled: customApiEnabled,
+        customMusicApiUrl: customApiUrl,
+      })
+
+      for (const [key, value] of saveEntries) {
+        await setConfig(key, value)
+      }
+
+      setHasLegacyProviders(false)
       onOpenChange(false)
     } catch (error) {
       toast.error(
@@ -385,8 +373,8 @@ const MusicSourceSettingsDialog = ({
             className='gap-4'
           >
             <TabsList className='bg-muted/60 grid h-10 w-full grid-cols-3 rounded-2xl p-1'>
-              <TabsTrigger value='providers' className='rounded-xl'>
-                音源选择
+              <TabsTrigger value='enhanced-unblock' className='rounded-xl'>
+                增强模块
               </TabsTrigger>
               <TabsTrigger value='luoxue' className='rounded-xl'>
                 落雪音源
@@ -396,46 +384,52 @@ const MusicSourceSettingsDialog = ({
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value='providers' className='min-h-[320px] space-y-4'>
+            <TabsContent
+              value='enhanced-unblock'
+              className='min-h-[320px] space-y-4'
+            >
               <div>
                 <h3 className='text-foreground text-sm font-semibold'>
-                  音源选择
+                  增强模块顺序
                 </h3>
-                <p className='text-muted-foreground mt-1 text-xs'>
-                  至少保留一个音源。落雪音源需要先导入脚本并选择当前脚本。
+                <p className='text-muted-foreground mt-1 text-xs leading-5'>
+                  这些模块会按勾选顺序依次调用
+                  `/song/url/match?source=...`。未勾选的模块不会参与播放解锁。
                 </p>
               </div>
+
+              {hasLegacyProviders ? (
+                <div className='rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-900 dark:text-amber-100'>
+                  检测到旧版“咪咕 / 酷狗 / pyncmd /
+                  哔哩哔哩”配置。这些旧配置已失效，保存时会自动清理。
+                </div>
+              ) : null}
+
               <div className='grid grid-cols-2 gap-3'>
-                {MUSIC_SOURCE_PROVIDERS.map(provider => (
+                {ENHANCED_SOURCE_MODULES.map(module => (
                   <label
-                    key={provider}
-                    className={cn(
-                      'border-border/70 bg-muted/30 hover:bg-muted/60 flex cursor-pointer items-center gap-3 rounded-2xl border p-3 transition-colors',
-                      provider === 'lxMusic' &&
-                        !activeLxScriptId &&
-                        'opacity-70'
-                    )}
+                    key={module}
+                    className='border-border/70 bg-muted/30 hover:bg-muted/60 flex cursor-pointer items-center gap-3 rounded-2xl border p-3 transition-colors'
                   >
                     <Checkbox
-                      checked={providers.includes(provider)}
+                      checked={enhancedModules.includes(module)}
                       onCheckedChange={checked =>
-                        handleProviderChange(provider, checked === true)
+                        toggleEnhancedModule(module, checked === true)
                       }
                     />
                     <span className='min-w-0 flex-1 text-sm font-medium'>
-                      {MUSIC_SOURCE_PROVIDER_LABELS[provider]}
-                      {provider === 'lxMusic' ? (
-                        <span className='text-muted-foreground block truncate text-[11px] font-normal'>
-                          {activeLxScriptId
-                            ? lxScripts.find(
-                                script => script.id === activeLxScriptId
-                              )?.name
-                            : '未配置'}
-                        </span>
-                      ) : null}
+                      {ENHANCED_SOURCE_MODULE_LABELS[module]}
+                      <span className='text-muted-foreground block text-[11px] font-normal'>
+                        {module}
+                      </span>
                     </span>
                   </label>
                 ))}
+              </div>
+
+              <div className='border-border/70 bg-muted/20 text-muted-foreground rounded-2xl border px-4 py-3 text-xs leading-5'>
+                `baka`
+                当前默认不建议启用。如果它恢复可用，你可以手动勾上并调整到靠后顺序作为备用模块。
               </div>
             </TabsContent>
 
@@ -446,7 +440,8 @@ const MusicSourceSettingsDialog = ({
                     落雪音源
                   </h3>
                   <p className='text-muted-foreground mt-1 text-xs'>
-                    支持本地导入和在线 URL 导入 LX Music 自定义源脚本。
+                    支持本地导入和在线 URL 导入 LX Music
+                    自定义源脚本。保存时会根据是否有可用脚本决定是否参与解析。
                   </p>
                 </div>
               </div>
@@ -543,7 +538,7 @@ const MusicSourceSettingsDialog = ({
           </Button>
           <Button
             type='button'
-            disabled={!canSave || saving}
+            disabled={saving}
             onClick={() => void handleSave()}
           >
             {saving ? '保存中...' : '保存'}

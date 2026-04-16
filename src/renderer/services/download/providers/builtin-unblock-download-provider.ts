@@ -12,10 +12,6 @@ import type {
 export function createBuiltinUnblockDownloadProvider(): DownloadResolverProvider {
   return {
     resolve: async (options: DownloadSourceProviderOptions) => {
-      if (!options.policy.builtinPlatforms.length) {
-        return null
-      }
-
       const loadSongApiListModule =
         options.deps.loadSongApiListModule ?? loadDefaultSongApiListModule
       const getSongUrl =

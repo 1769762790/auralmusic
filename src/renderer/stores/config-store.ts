@@ -17,6 +17,7 @@ import {
   normalizeDownloadQualityPolicy,
   normalizeDownloadSkipExisting,
   normalizeDynamicCoverEnabled,
+  normalizeEnhancedSourceModules,
   normalizeLyricsKaraokeEnabled,
   normalizePlaybackSpeed,
   normalizePlayerBackgroundMode,
@@ -24,7 +25,6 @@ import {
   normalizeShowLyricTranslation,
   type AppConfig,
   type AudioQualityLevel,
-  type MusicSourceProvider,
 } from '../../main/config/types.ts'
 import {
   normalizeImportedLxMusicSource,
@@ -53,36 +53,21 @@ function normalizeQuality(value: unknown): AudioQualityLevel {
   return defaultConfig.quality
 }
 
-function normalizeMusicSourceProviders(value: unknown): MusicSourceProvider[] {
+function normalizeMusicSourceProviders(value: unknown) {
   if (!Array.isArray(value)) {
     return defaultConfig.musicSourceProviders
   }
 
-  const providers = value.filter((item): item is MusicSourceProvider => {
-    return (
-      typeof item === 'string' &&
-      MUSIC_SOURCE_PROVIDERS.includes(item as MusicSourceProvider)
-    )
-  })
-
-  return providers.length ? providers : defaultConfig.musicSourceProviders
-}
-
-function normalizeProvidersForLxState(
-  providers: MusicSourceProvider[],
-  activeLxScriptId: string | null
-) {
-  if (activeLxScriptId) {
-    return providers
-  }
-
-  const normalizedProviders = providers.filter(
-    provider => provider !== 'lxMusic'
-  )
-
-  return normalizedProviders.length
-    ? normalizedProviders
-    : defaultConfig.musicSourceProviders
+  return [
+    ...new Set(
+      value.filter((item): item is MusicSourceProvider => {
+        return (
+          typeof item === 'string' &&
+          MUSIC_SOURCE_PROVIDERS.includes(item as MusicSourceProvider)
+        )
+      })
+    ),
+  ]
 }
 
 function normalizeConfig(config: AppConfig): AppConfig {
@@ -97,9 +82,11 @@ function normalizeConfig(config: AppConfig): AppConfig {
     config.activeLuoxueMusicSourceScriptId,
     luoxueMusicSourceScripts
   )
-  const musicSourceProviders = normalizeProvidersForLxState(
-    normalizeMusicSourceProviders(config.musicSourceProviders),
-    activeLuoxueMusicSourceScriptId
+  const musicSourceProviders = normalizeMusicSourceProviders(
+    config.musicSourceProviders
+  )
+  const enhancedSourceModules = normalizeEnhancedSourceModules(
+    config.enhancedSourceModules
   )
 
   return {
@@ -127,6 +114,7 @@ function normalizeConfig(config: AppConfig): AppConfig {
         ? config.musicSourceEnabled
         : defaultConfig.musicSourceEnabled,
     musicSourceProviders,
+    enhancedSourceModules,
     luoxueSourceEnabled:
       typeof config.luoxueSourceEnabled === 'boolean'
         ? config.luoxueSourceEnabled

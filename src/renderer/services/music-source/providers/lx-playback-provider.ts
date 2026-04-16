@@ -1,7 +1,4 @@
-import type {
-  AudioQualityLevel,
-  MusicSourceProvider,
-} from '../../../../main/config/types.ts'
+import type { AudioQualityLevel } from '../../../../main/config/types.ts'
 import { resolveTrackWithLxMusicSource } from '../lx-playback-resolver.ts'
 import type {
   PlaybackResolverConfig,
@@ -14,7 +11,6 @@ function getQuality(options: PlaybackSourceProviderOptions): AudioQualityLevel {
 }
 
 type LxPlaybackConfig = PlaybackResolverConfig & {
-  musicSourceProviders: MusicSourceProvider[]
   activeLuoxueMusicSourceScriptId: string | null
   luoxueMusicSourceScripts: Array<{ id: string }>
 }
@@ -23,7 +19,6 @@ function isValidLxPlaybackConfig(
   config: PlaybackResolverConfig
 ): config is LxPlaybackConfig {
   return (
-    Array.isArray(config.musicSourceProviders) &&
     Array.isArray(config.luoxueMusicSourceScripts) &&
     (typeof config.activeLuoxueMusicSourceScriptId === 'string' ||
       config.activeLuoxueMusicSourceScriptId === null)

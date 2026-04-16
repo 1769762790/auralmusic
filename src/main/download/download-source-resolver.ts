@@ -131,10 +131,6 @@ export function createDownloadSourceResolver(
 
     for (const resolverId of resolverPolicy.resolverOrder) {
       if (resolverId === 'builtinUnblock') {
-        if (!resolverPolicy.builtinPlatforms.length) {
-          continue
-        }
-
         const playbackUrl = new URL('/song/url/v1', `${baseURL}/`)
         playbackUrl.searchParams.set('id', String(payload.songId))
         playbackUrl.searchParams.set('level', quality)

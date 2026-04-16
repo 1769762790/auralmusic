@@ -1,6 +1,25 @@
 {
   "tasks": [
     {
+      "id": "download-1776344565854-nm631unz",
+      "songId": 35447132,
+      "songName": "勋章",
+      "artistName": "鹿晗",
+      "coverUrl": "http://p3.music.126.net/CxEaq_e_T_mhX0MOPwz1yg==/109951166672944844.jpg",
+      "albumName": "勋章",
+      "requestedQuality": "jymaster",
+      "resolvedQuality": "jymaster",
+      "status": "completed",
+      "progress": 100,
+      "errorMessage": null,
+      "targetPath": "C:\\Users\\s1769\\Downloads\\勋章 - 鹿晗.flac",
+      "note": null,
+      "warningMessage": "Metadata embedding skipped because this file format is not supported.",
+      "createdAt": 1776344565854,
+      "updatedAt": 1776344571154,
+      "completedAt": 1776344571154
+    },
+    {
       "id": "download-1776320927994-ss7yhhab",
       "songId": 1892938288,
       "songName": "爱止痛（Prod.JpBeatz）",

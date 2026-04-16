@@ -59,3 +59,54 @@ test('main download fallback tries builtin-unblock before official when unauthen
     'https://music.example.com/song/url/v1?id=1&level=higher&unblock=true',
   ])
 })
+
+test('main download fallback still tries builtin-unblock when legacy builtin providers are empty', async () => {
+  const attemptedUrls: string[] = []
+  const resolveDownloadSource = createDownloadSourceResolver({
+    readBaseUrl: () => 'https://music.example.com',
+    getAuthSession: () => null,
+    fetcher: async input => {
+      const url = typeof input === 'string' ? input : input.toString()
+      attemptedUrls.push(url)
+
+      if (url.includes('/song/url/v1') && url.includes('unblock=true')) {
+        return Response.json({
+          data: [{ id: 1, url: 'https://cdn.example.com/unblock.mp3' }],
+        })
+      }
+
+      return Response.json({ data: [{ id: 1, url: '' }] })
+    },
+  })
+
+  const result = await resolveDownloadSource({
+    payload: {
+      songId: '1',
+      songName: 'Song',
+      artistName: 'Artist',
+      requestedQuality: 'higher',
+    },
+    quality: 'higher',
+    runtimeConfig: {
+      musicSourceEnabled: true,
+      musicSourceProviders: ['lxMusic'],
+      luoxueSourceEnabled: false,
+      customMusicApiEnabled: false,
+      customMusicApiUrl: '',
+      downloadDir: '',
+      downloadQuality: 'higher',
+      downloadQualityPolicy: 'fallback',
+      downloadSkipExisting: true,
+      downloadConcurrency: 3,
+      downloadFileNamePattern: 'song-artist',
+      downloadEmbedCover: true,
+      downloadEmbedLyrics: true,
+      downloadEmbedTranslatedLyrics: false,
+    },
+  })
+
+  assert.equal(result?.url, 'https://cdn.example.com/unblock.mp3')
+  assert.deepEqual(attemptedUrls, [
+    'https://music.example.com/song/url/v1?id=1&level=higher&unblock=true',
+  ])
+})

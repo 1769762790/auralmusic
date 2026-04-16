@@ -154,7 +154,7 @@ test('authenticated playback stops after official succeeds', async () => {
   assert.deepEqual(calls, ['official:true'])
 })
 
-test('unauthenticated playback falls through when builtin platforms normalize to empty', async () => {
+test('unauthenticated playback still tries builtin unblock when legacy builtin platforms normalize to empty', async () => {
   const calls: string[] = []
   const track = createTrack()
 
@@ -176,7 +176,12 @@ test('unauthenticated playback falls through when builtin platforms normalize to
       builtinUnblock: {
         resolve: async options => {
           calls.push(`builtin:${options.policy.builtinPlatforms.length}`)
-          return null
+          return {
+            id: options.track.id,
+            url: 'https://cdn.example.com/builtin-unblock.mp3',
+            time: options.track.duration,
+            br: 320000,
+          }
         },
       },
       official: {
@@ -209,11 +214,11 @@ test('unauthenticated playback falls through when builtin platforms normalize to
 
   assert.deepEqual(result, {
     id: track.id,
-    url: 'https://cdn.example.com/fallback-official.mp3',
+    url: 'https://cdn.example.com/builtin-unblock.mp3',
     time: track.duration,
     br: 320000,
   })
-  assert.deepEqual(calls, ['builtin:0', 'official:false'])
+  assert.deepEqual(calls, ['builtin:0'])
 })
 
 test('musicSourceEnabled false tries official directly', async () => {

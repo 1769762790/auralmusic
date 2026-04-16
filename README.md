@@ -169,9 +169,10 @@ If you want, I can also add a short `CONTRIBUTING.md` for team collaboration rul
 - If `musicSourceEnabled = true`, resolver order is decided by login state:
   - Authenticated: `official -> builtinUnblock -> lxMusic -> customApi`
   - Unauthenticated: `builtinUnblock -> lxMusic -> customApi -> official`
+- `builtinUnblock` is the enhanced API auto-unlock family. It participates whenever `musicSourceEnabled = true`.
 - `lxMusic` only participates when `luoxueSourceEnabled = true`.
 - `customApi` only enters the order when `customMusicApiEnabled = true` and `customMusicApiUrl` is non-empty.
-- `musicSourceProviders` currently affects the `builtinUnblock` family by normalizing the builtin platform list (`migu / kugou / pyncmd / bilibili`), but it does not yet dispatch each builtin source independently.
+- `musicSourceProviders` is now a deprecated compatibility field. It no longer controls resolver behavior and is cleared when source settings are saved.
 
 ### Playback / Download Comparison
 
@@ -204,7 +205,7 @@ If you want, I can also add a short `CONTRIBUTING.md` for team collaboration rul
   - Download: `/song/download/url/v1`, then `/song/url/v1?unblock=false`
 - `builtinUnblock`
   - Playback and download both use `/song/url/v1?unblock=true`
-  - Current builtin source configuration affects family eligibility and platform ordering metadata only
+  - This family is backed by the enhanced API auto-unlock flow rather than per-provider selection
 - `lxMusic`
   - Separate resolver family
   - Internal source selection is still handled by the LX script runtime

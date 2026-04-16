@@ -4,6 +4,7 @@ import {
   AUDIO_QUALITY_LEVELS,
   DOWNLOAD_QUALITY_POLICIES,
   DOWNLOAD_FILE_NAME_PATTERNS,
+  ENHANCED_SOURCE_MODULES,
   MUSIC_SOURCE_PROVIDERS,
   defaultConfig,
   normalizeDiskCacheDir,
@@ -20,6 +21,7 @@ import {
   normalizeDownloadQualityPolicy,
   normalizeDownloadSkipExisting,
   normalizeDynamicCoverEnabled,
+  normalizeEnhancedSourceModules,
   normalizeLyricsKaraokeEnabled,
   normalizePlaybackSpeed,
   normalizePlayerBackgroundMode,
@@ -82,14 +84,16 @@ function normalizeMusicSourceProviders(value: unknown): MusicSourceProvider[] {
     return defaultConfig.musicSourceProviders
   }
 
-  const providers = value.filter((item): item is MusicSourceProvider => {
-    return (
-      typeof item === 'string' &&
-      MUSIC_SOURCE_PROVIDERS.includes(item as MusicSourceProvider)
-    )
-  })
-
-  return providers.length ? providers : defaultConfig.musicSourceProviders
+  return [
+    ...new Set(
+      value.filter((item): item is MusicSourceProvider => {
+        return (
+          typeof item === 'string' &&
+          MUSIC_SOURCE_PROVIDERS.includes(item as MusicSourceProvider)
+        )
+      })
+    ),
+  ]
 }
 
 function areProvidersEqual(
@@ -101,23 +105,6 @@ function areProvidersEqual(
     left.length === right.length &&
     left.every((item, index) => item === right[index])
   )
-}
-
-function normalizeProvidersForLxState(
-  providers: MusicSourceProvider[],
-  activeLxScriptId: string | null
-) {
-  if (activeLxScriptId) {
-    return providers
-  }
-
-  const normalizedProviders = providers.filter(
-    provider => provider !== 'lxMusic'
-  )
-
-  return normalizedProviders.length
-    ? normalizedProviders
-    : defaultConfig.musicSourceProviders
 }
 
 function createConfigStore() {
@@ -143,6 +130,10 @@ function createConfigStore() {
       musicSourceProviders: {
         type: 'array',
         items: { type: 'string', enum: MUSIC_SOURCE_PROVIDERS },
+      },
+      enhancedSourceModules: {
+        type: 'array',
+        items: { type: 'string', enum: ENHANCED_SOURCE_MODULES },
       },
       luoxueSourceEnabled: { type: 'boolean' },
       luoxueSourceUrl: { type: 'string' },
@@ -331,6 +322,22 @@ class ConfigStore {
         ConfigStore.instance.set('musicSourceProviders', normalizedProviders)
       }
 
+      const enhancedSourceModules = ConfigStore.instance.get(
+        'enhancedSourceModules'
+      )
+      const normalizedEnhancedSourceModules = normalizeEnhancedSourceModules(
+        enhancedSourceModules
+      )
+      if (
+        JSON.stringify(enhancedSourceModules) !==
+        JSON.stringify(normalizedEnhancedSourceModules)
+      ) {
+        ConfigStore.instance.set(
+          'enhancedSourceModules',
+          normalizedEnhancedSourceModules
+        )
+      }
+
       const lxScript = ConfigStore.instance.get('luoxueMusicSourceScript')
       const normalizedLxScript = normalizeImportedLxMusicSource(lxScript)
       if (lxScript !== normalizedLxScript) {
@@ -355,17 +362,6 @@ class ConfigStore {
         ConfigStore.instance.set(
           'activeLuoxueMusicSourceScriptId',
           normalizedActiveLxScriptId
-        )
-      }
-
-      const normalizedLxAwareProviders = normalizeProvidersForLxState(
-        normalizedProviders,
-        normalizedActiveLxScriptId
-      )
-      if (!areProvidersEqual(providers, normalizedLxAwareProviders)) {
-        ConfigStore.instance.set(
-          'musicSourceProviders',
-          normalizedLxAwareProviders
         )
       }
 

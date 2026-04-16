@@ -92,6 +92,34 @@ export function normalizeSongUrlV1Response(
   }
 }
 
+export function normalizeSongUrlMatchResponse(
+  payload: unknown,
+  fallback: Pick<SongUrlV1Result, 'id' | 'time' | 'br'>
+): SongUrlV1Result | null {
+  if (!isRecord(payload)) {
+    return null
+  }
+
+  const root = isRecord(payload.data) ? payload.data : payload
+  const url =
+    typeof root.data === 'string' && root.data.trim()
+      ? root.data.trim()
+      : typeof root.url === 'string' && root.url.trim()
+        ? root.url.trim()
+        : ''
+
+  if (!url) {
+    return null
+  }
+
+  return {
+    id: fallback.id,
+    url,
+    time: fallback.time,
+    br: fallback.br,
+  }
+}
+
 export function createSongUrlRequestAttempts(unblockEnabled: boolean) {
   return unblockEnabled ? [false, true] : [false]
 }

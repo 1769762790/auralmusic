@@ -12,6 +12,7 @@
   "lyricsKaraokeEnabled": true,
   "musicSourceEnabled": true,
   "musicSourceProviders": ["migu", "kugou", "pyncmd", "bilibili", "lxMusic"],
+  "enhancedSourceModules": ["unm", "bikonoo", "gdmusic", "msls", "qijieya"],
   "luoxueSourceEnabled": true,
   "luoxueSourceUrl": "",
   "luoxueMusicSourceScript": null,
@@ -76,12 +77,12 @@
   "diskCacheMaxBytes": 1073741824,
   "downloadEnabled": true,
   "downloadQuality": "jymaster",
+  "downloadQualityPolicy": "fallback",
   "downloadSkipExisting": true,
   "downloadDir": "",
   "downloadConcurrency": 3,
   "downloadFileNamePattern": "song-artist",
   "downloadEmbedCover": true,
   "downloadEmbedLyrics": true,
-  "downloadEmbedTranslatedLyrics": false,
-  "downloadQualityPolicy": "fallback"
+  "downloadEmbedTranslatedLyrics": false
 }

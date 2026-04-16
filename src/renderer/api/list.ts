@@ -223,6 +223,17 @@ export function getSongUrlV1(params: SongUrlV1Params) {
   })
 }
 
+export interface SongUrlMatchParams {
+  id: number | string
+  source: string
+}
+
+export function getSongUrlMatch(params: SongUrlMatchParams) {
+  return request.get('/song/url/match', {
+    params,
+  })
+}
+
 export interface SongDownloadUrlV1Params {
   id: number | string
   level: AudioQualityLevel

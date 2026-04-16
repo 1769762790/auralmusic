@@ -1,37 +1,59 @@
-import type { AudioQualityLevel } from '../../../../main/config/types.ts'
-import { normalizeSongUrlV1Response } from '../../../../shared/playback.ts'
-import { getSongUrlV1 as defaultGetSongUrlV1 } from '../../../api/list.ts'
-import type {
-  PlaybackSourceProvider,
-  PlaybackSourceProviderOptions,
-} from '../playback-source-resolver.ts'
+import { normalizeSongUrlMatchResponse } from '../../../../shared/playback.ts'
+import { getSongUrlMatch as defaultGetSongUrlMatch } from '../../../api/list.ts'
+import type { PlaybackSourceProvider } from '../playback-source-resolver.ts'
+import type { AppConfig } from '../../../../main/config/types.ts'
 
-type GetSongUrlV1 = typeof defaultGetSongUrlV1
+type GetSongUrlMatch = typeof defaultGetSongUrlMatch
 
-function getQuality(options: PlaybackSourceProviderOptions): AudioQualityLevel {
-  return options.context.config.quality ?? 'higher'
-}
+export const DEFAULT_BUILTIN_UNBLOCK_MATCH_SOURCES = [
+  'unm',
+  'bikonoo',
+  'gdmusic',
+  'msls',
+  'qijieya',
+] as const
 
 export function createBuiltinUnblockPlaybackProvider(
-  getSongUrlV1: GetSongUrlV1 = defaultGetSongUrlV1
+  deps: {
+    getSongUrlMatch?: GetSongUrlMatch
+    matchSources?: readonly string[]
+  } = {}
 ): PlaybackSourceProvider {
+  const getSongUrlMatch = deps.getSongUrlMatch ?? defaultGetSongUrlMatch
+  const matchSources =
+    deps.matchSources ?? DEFAULT_BUILTIN_UNBLOCK_MATCH_SOURCES
+
   return {
     resolve: async options => {
-      if (!options.policy.builtinPlatforms.length) {
-        return null
+      const configuredMatchSources =
+        Array.isArray(
+          (options.config as Partial<AppConfig>).enhancedSourceModules
+        ) &&
+        (options.config as Partial<AppConfig>).enhancedSourceModules!.length
+          ? (options.config as Partial<AppConfig>).enhancedSourceModules!
+          : matchSources
+
+      for (const source of configuredMatchSources) {
+        try {
+          const response = await getSongUrlMatch({
+            id: options.track.id,
+            source,
+          })
+          const matched = normalizeSongUrlMatchResponse(response.data, {
+            id: options.track.id,
+            time: options.track.duration,
+            br: 0,
+          })
+
+          if (matched?.url) {
+            return matched
+          }
+        } catch {
+          continue
+        }
       }
 
-      try {
-        const response = await getSongUrlV1({
-          id: options.track.id,
-          level: getQuality(options),
-          unblock: true,
-        })
-
-        return normalizeSongUrlV1Response(response.data)
-      } catch {
-        return null
-      }
+      return null
     },
   }
 }
