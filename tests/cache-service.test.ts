@@ -168,7 +168,19 @@ test('CacheService removes stale image entries and falls back to the remote imag
   assert.equal(resolved.fromCache, false)
   assert.equal(resolved.url, 'https://img.example.com/albums/88')
 
-  await new Promise(resolve => setTimeout(resolve, 0))
+  await waitFor(async () => {
+    const retried = await service.resolveImageSource({
+      cacheKey: 'artist:detail:album:88',
+      sourceUrl: 'https://img.example.com/albums/88',
+      enabled: true,
+      cacheDir: '',
+      maxBytes: MB,
+    })
+
+    assert.equal(retried.fromCache, true)
+    assert.ok(retried.url.startsWith('file:///'))
+  })
+
   await rm(root, { recursive: true, force: true })
 })
 
