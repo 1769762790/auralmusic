@@ -1,9 +1,10 @@
 import electron from 'electron'
 import ElectronStore from 'electron-store'
-import { AUTH_STORE_NAME } from './types'
-import { readMusicApiBaseUrlFromEnv } from '../music-api-runtime'
-import { parseCookiePairs, type AuthSession } from '../../shared/auth'
-import { resolveAuthRequestHeaders } from './request-header'
+import { AUTH_STORE_NAME } from './types.ts'
+import { readMusicApiBaseUrlFromEnv } from '../music-api-runtime.ts'
+import { resolveAppStoreDirectory } from '../storage/store-path.ts'
+import { parseCookiePairs, type AuthSession } from '../../shared/auth.ts'
+import { resolveAuthRequestHeaders } from './request-header.ts'
 
 interface AuthStoreSchema {
   session: AuthSession | null
@@ -21,12 +22,18 @@ const DEFAULT_AUTH_STATE: AuthStoreSchema = {
   session: null,
 }
 
-function createAuthStore() {
-  return new Store<AuthStoreSchema>({
-    cwd: process.cwd(),
+export function buildAuthStoreOptions(
+  resolveStoreDirectory: () => string = resolveAppStoreDirectory
+) {
+  return {
+    cwd: resolveStoreDirectory(),
     name: AUTH_STORE_NAME,
     defaults: DEFAULT_AUTH_STATE,
-  })
+  }
+}
+
+function createAuthStore() {
+  return new Store<AuthStoreSchema>(buildAuthStoreOptions())
 }
 
 class AuthStore {
@@ -43,8 +50,11 @@ class AuthStore {
   }
 }
 
-const authStore = AuthStore.getInstance()
 let authRequestHookRegistered = false
+
+function getAuthStore() {
+  return AuthStore.getInstance()
+}
 
 function resolveAuthOrigin() {
   const baseURL = readMusicApiBaseUrlFromEnv()
@@ -103,23 +113,23 @@ async function clearAuthCookies(authSession?: AuthSession | null) {
 }
 
 export function getAuthSession() {
-  return authStore.get('session')
+  return getAuthStore().get('session')
 }
 
 export async function setAuthSession(authSession: AuthSession) {
-  authStore.set('session', authSession)
+  getAuthStore().set('session', authSession)
   await applyAuthCookies(authSession)
   return authSession
 }
 
 export async function clearAuthSession() {
-  const currentSession = authStore.get('session')
+  const currentSession = getAuthStore().get('session')
   await clearAuthCookies(currentSession)
-  authStore.set('session', null)
+  getAuthStore().set('session', null)
 }
 
 export async function bootstrapAuthSession() {
-  const currentSession = authStore.get('session')
+  const currentSession = getAuthStore().get('session')
   if (!currentSession) {
     return null
   }

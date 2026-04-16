@@ -1,5 +1,6 @@
 import path from 'node:path'
 import ElectronStore from 'electron-store'
+import { resolveAppStoreDirectory } from '../storage/store-path.ts'
 import {
   AUDIO_QUALITY_LEVELS,
   DOWNLOAD_QUALITY_POLICIES,
@@ -107,114 +108,122 @@ function areProvidersEqual(
   )
 }
 
-function createConfigStore() {
-  return new Store<AppConfig>({
-    cwd: process.cwd(),
+const CONFIG_STORE_SCHEMA = {
+  theme: { type: 'string', enum: ['light', 'dark', 'system'] },
+  themeColor: {
+    anyOf: [{ type: 'string' }, { type: 'null' }],
+  },
+  fontFamily: { type: 'string' },
+  audioOutputDeviceId: { type: 'string' },
+  playbackVolume: { type: 'number', minimum: 0, maximum: 100 },
+  playbackMode: { type: 'string', enum: PLAYBACK_MODE_SEQUENCE },
+  playbackSpeed: { type: 'number', minimum: 0.5, maximum: 2 },
+  rememberPlaybackSession: { type: 'boolean' },
+  dynamicCoverEnabled: { type: 'boolean' },
+  showLyricTranslation: { type: 'boolean' },
+  lyricsKaraokeEnabled: { type: 'boolean' },
+  musicSourceEnabled: { type: 'boolean' },
+  musicSourceProviders: {
+    type: 'array',
+    items: { type: 'string', enum: MUSIC_SOURCE_PROVIDERS },
+  },
+  enhancedSourceModules: {
+    type: 'array',
+    items: { type: 'string', enum: ENHANCED_SOURCE_MODULES },
+  },
+  luoxueSourceEnabled: { type: 'boolean' },
+  luoxueSourceUrl: { type: 'string' },
+  luoxueMusicSourceScript: {
+    anyOf: [
+      { type: 'null' },
+      {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string' },
+          fileName: { type: 'string' },
+          description: { type: 'string' },
+          version: { type: 'string' },
+          author: { type: 'string' },
+          homepage: { type: 'string' },
+          createdAt: { type: 'number' },
+          updatedAt: { type: 'number' },
+        },
+        required: ['id', 'name', 'fileName', 'createdAt', 'updatedAt'],
+      },
+    ],
+  },
+  luoxueMusicSourceScripts: {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        name: { type: 'string' },
+        fileName: { type: 'string' },
+        sources: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        description: { type: 'string' },
+        version: { type: 'string' },
+        author: { type: 'string' },
+        homepage: { type: 'string' },
+        createdAt: { type: 'number' },
+        updatedAt: { type: 'number' },
+      },
+      required: ['id', 'name', 'fileName', 'createdAt', 'updatedAt'],
+    },
+  },
+  activeLuoxueMusicSourceScriptId: {
+    anyOf: [{ type: 'string' }, { type: 'null' }],
+  },
+  customMusicApiEnabled: { type: 'boolean' },
+  customMusicApiUrl: { type: 'string' },
+  quality: { type: 'string', enum: AUDIO_QUALITY_LEVELS },
+  globalShortcutEnabled: { type: 'boolean' },
+  shortcutBindings: { type: 'object' },
+  autoStartEnabled: { type: 'boolean' },
+  closeBehavior: { type: 'string', enum: ['ask', 'minimize', 'quit'] },
+  rememberCloseChoice: { type: 'boolean' },
+  playerBackgroundMode: {
+    type: 'string',
+    enum: ['off', 'static', 'dynamic'],
+  },
+  diskCacheEnabled: { type: 'boolean' },
+  diskCacheDir: { type: 'string' },
+  diskCacheMaxBytes: { type: 'number', minimum: 1 },
+  downloadEnabled: { type: 'boolean' },
+  downloadQuality: { type: 'string', enum: AUDIO_QUALITY_LEVELS },
+  downloadQualityPolicy: {
+    type: 'string',
+    enum: DOWNLOAD_QUALITY_POLICIES,
+  },
+  downloadSkipExisting: { type: 'boolean' },
+  downloadDir: { type: 'string' },
+  downloadConcurrency: { type: 'number', minimum: 1, maximum: 10 },
+  downloadFileNamePattern: {
+    type: 'string',
+    enum: DOWNLOAD_FILE_NAME_PATTERNS,
+  },
+  downloadEmbedCover: { type: 'boolean' },
+  downloadEmbedLyrics: { type: 'boolean' },
+  downloadEmbedTranslatedLyrics: { type: 'boolean' },
+} satisfies ConstructorParameters<typeof Store<AppConfig>>[0]['schema']
+
+export function buildConfigStoreOptions(
+  resolveStoreDirectory: () => string = resolveAppStoreDirectory
+) {
+  return {
+    cwd: resolveStoreDirectory(),
     name: 'aural-music-config',
     defaults: defaultConfig,
-    schema: {
-      theme: { type: 'string', enum: ['light', 'dark', 'system'] },
-      themeColor: {
-        anyOf: [{ type: 'string' }, { type: 'null' }],
-      },
-      fontFamily: { type: 'string' },
-      audioOutputDeviceId: { type: 'string' },
-      playbackVolume: { type: 'number', minimum: 0, maximum: 100 },
-      playbackMode: { type: 'string', enum: PLAYBACK_MODE_SEQUENCE },
-      playbackSpeed: { type: 'number', minimum: 0.5, maximum: 2 },
-      rememberPlaybackSession: { type: 'boolean' },
-      dynamicCoverEnabled: { type: 'boolean' },
-      showLyricTranslation: { type: 'boolean' },
-      lyricsKaraokeEnabled: { type: 'boolean' },
-      musicSourceEnabled: { type: 'boolean' },
-      musicSourceProviders: {
-        type: 'array',
-        items: { type: 'string', enum: MUSIC_SOURCE_PROVIDERS },
-      },
-      enhancedSourceModules: {
-        type: 'array',
-        items: { type: 'string', enum: ENHANCED_SOURCE_MODULES },
-      },
-      luoxueSourceEnabled: { type: 'boolean' },
-      luoxueSourceUrl: { type: 'string' },
-      luoxueMusicSourceScript: {
-        anyOf: [
-          { type: 'null' },
-          {
-            type: 'object',
-            properties: {
-              id: { type: 'string' },
-              name: { type: 'string' },
-              fileName: { type: 'string' },
-              description: { type: 'string' },
-              version: { type: 'string' },
-              author: { type: 'string' },
-              homepage: { type: 'string' },
-              createdAt: { type: 'number' },
-              updatedAt: { type: 'number' },
-            },
-            required: ['id', 'name', 'fileName', 'createdAt', 'updatedAt'],
-          },
-        ],
-      },
-      luoxueMusicSourceScripts: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            name: { type: 'string' },
-            fileName: { type: 'string' },
-            sources: {
-              type: 'array',
-              items: { type: 'string' },
-            },
-            description: { type: 'string' },
-            version: { type: 'string' },
-            author: { type: 'string' },
-            homepage: { type: 'string' },
-            createdAt: { type: 'number' },
-            updatedAt: { type: 'number' },
-          },
-          required: ['id', 'name', 'fileName', 'createdAt', 'updatedAt'],
-        },
-      },
-      activeLuoxueMusicSourceScriptId: {
-        anyOf: [{ type: 'string' }, { type: 'null' }],
-      },
-      customMusicApiEnabled: { type: 'boolean' },
-      customMusicApiUrl: { type: 'string' },
-      quality: { type: 'string', enum: AUDIO_QUALITY_LEVELS },
-      globalShortcutEnabled: { type: 'boolean' },
-      shortcutBindings: { type: 'object' },
-      autoStartEnabled: { type: 'boolean' },
-      closeBehavior: { type: 'string', enum: ['ask', 'minimize', 'quit'] },
-      rememberCloseChoice: { type: 'boolean' },
-      playerBackgroundMode: {
-        type: 'string',
-        enum: ['off', 'static', 'dynamic'],
-      },
-      diskCacheEnabled: { type: 'boolean' },
-      diskCacheDir: { type: 'string' },
-      diskCacheMaxBytes: { type: 'number', minimum: 1 },
-      downloadEnabled: { type: 'boolean' },
-      downloadQuality: { type: 'string', enum: AUDIO_QUALITY_LEVELS },
-      downloadQualityPolicy: {
-        type: 'string',
-        enum: DOWNLOAD_QUALITY_POLICIES,
-      },
-      downloadSkipExisting: { type: 'boolean' },
-      downloadDir: { type: 'string' },
-      downloadConcurrency: { type: 'number', minimum: 1, maximum: 10 },
-      downloadFileNamePattern: {
-        type: 'string',
-        enum: DOWNLOAD_FILE_NAME_PATTERNS,
-      },
-      downloadEmbedCover: { type: 'boolean' },
-      downloadEmbedLyrics: { type: 'boolean' },
-      downloadEmbedTranslatedLyrics: { type: 'boolean' },
-    },
-  })
+    schema: CONFIG_STORE_SCHEMA,
+  }
+}
+
+function createConfigStore() {
+  return new Store<AppConfig>(buildConfigStoreOptions())
 }
 
 class ConfigStore {
@@ -518,19 +527,21 @@ class ConfigStore {
   }
 }
 
-export const configStore = ConfigStore.getInstance()
+function getConfigStore() {
+  return ConfigStore.getInstance()
+}
 
 export const getConfig = <K extends keyof AppConfig>(key: K): AppConfig[K] => {
-  return configStore.get(key)
+  return getConfigStore().get(key)
 }
 
 export const setConfig = <K extends keyof AppConfig>(
   key: K,
   value: AppConfig[K]
 ): void => {
-  configStore.set(key, value)
+  getConfigStore().set(key, value)
 }
 
 export const resetConfig = (): void => {
-  configStore.reset()
+  getConfigStore().reset()
 }
