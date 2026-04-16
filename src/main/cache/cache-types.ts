@@ -1,6 +1,6 @@
 export { CACHE_IPC_CHANNELS } from '../../shared/ipc/cache.ts'
 
-export type CacheEntryType = 'audio' | 'lyrics'
+export type CacheEntryType = 'audio' | 'lyrics' | 'image'
 
 export type CacheRuntimeConfig = {
   enabled: boolean
@@ -35,6 +35,16 @@ export type ResolveAudioSourceParams = CacheRuntimeConfig & {
 }
 
 export type ResolveAudioSourceResult = {
+  url: string
+  fromCache: boolean
+}
+
+export type ResolveImageSourceParams = CacheRuntimeConfig & {
+  cacheKey: string
+  sourceUrl: string
+}
+
+export type ResolveImageSourceResult = {
   url: string
   fromCache: boolean
 }

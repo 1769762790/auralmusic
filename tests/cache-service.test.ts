@@ -16,6 +16,22 @@ function createNowSequence(start = 1_000) {
   }
 }
 
+async function waitFor(assertion: () => Promise<void>, attempts = 10) {
+  let lastError: unknown
+
+  for (let index = 0; index < attempts; index += 1) {
+    try {
+      await assertion()
+      return
+    } catch (error) {
+      lastError = error
+      await new Promise(resolve => setTimeout(resolve, 0))
+    }
+  }
+
+  throw lastError
+}
+
 test('CacheService resolves default cache directory when config dir is empty', async () => {
   const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-cache-test-'))
   const service = new CacheService({
@@ -70,6 +86,89 @@ test('CacheService returns the original audio url on first fetch and reuses loca
   assert.ok(second.url.startsWith('file:///'))
   assert.equal(fetchCount, 1)
 
+  await rm(root, { recursive: true, force: true })
+})
+
+test('CacheService returns the remote image url immediately and reuses a local file after background persistence', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-cache-test-'))
+  let fetchCount = 0
+  const service = new CacheService({
+    defaultRootDir: root,
+    now: createNowSequence(),
+    fetcher: async () => {
+      fetchCount += 1
+      return new Response(Buffer.from('image-binary'), {
+        status: 200,
+        headers: { 'content-type': 'image/jpeg' },
+      })
+    },
+  })
+
+  const first = await service.resolveImageSource({
+    cacheKey: 'artist:detail:hero:12',
+    sourceUrl: 'https://img.example.com/artist-12.jpg',
+    enabled: true,
+    cacheDir: '',
+    maxBytes: MB,
+  })
+
+  assert.equal(first.fromCache, false)
+  assert.equal(first.url, 'https://img.example.com/artist-12.jpg')
+  assert.equal(fetchCount, 1)
+
+  await waitFor(async () => {
+    const second = await service.resolveImageSource({
+      cacheKey: 'artist:detail:hero:12',
+      sourceUrl: 'https://img.example.com/artist-12.jpg',
+      enabled: true,
+      cacheDir: '',
+      maxBytes: MB,
+    })
+
+    assert.equal(second.fromCache, true)
+    assert.ok(second.url.startsWith('file:///'))
+  })
+
+  assert.equal(fetchCount, 1)
+
+  await rm(root, { recursive: true, force: true })
+})
+
+test('CacheService removes stale image entries and falls back to the remote image url', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'auralmusic-cache-test-'))
+  const service = new CacheService({
+    defaultRootDir: root,
+    now: createNowSequence(),
+    fetcher: async () =>
+      new Response(Buffer.from('fresh-image'), {
+        status: 200,
+        headers: { 'content-type': 'image/webp' },
+      }),
+  })
+
+  await service.resolveImageSource({
+    cacheKey: 'artist:detail:album:88',
+    sourceUrl: 'https://img.example.com/albums/88',
+    enabled: true,
+    cacheDir: '',
+    maxBytes: MB,
+  })
+
+  await new Promise(resolve => setTimeout(resolve, 0))
+  await rm(path.join(root, 'images'), { recursive: true, force: true })
+
+  const resolved = await service.resolveImageSource({
+    cacheKey: 'artist:detail:album:88',
+    sourceUrl: 'https://img.example.com/albums/88',
+    enabled: true,
+    cacheDir: '',
+    maxBytes: MB,
+  })
+
+  assert.equal(resolved.fromCache, false)
+  assert.equal(resolved.url, 'https://img.example.com/albums/88')
+
+  await new Promise(resolve => setTimeout(resolve, 0))
   await rm(root, { recursive: true, force: true })
 })
 

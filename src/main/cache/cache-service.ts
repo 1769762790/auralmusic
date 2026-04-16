@@ -10,11 +10,14 @@ import type {
   ReadLyricsPayloadParams,
   ResolveAudioSourceParams,
   ResolveAudioSourceResult,
+  ResolveImageSourceParams,
+  ResolveImageSourceResult,
   WriteLyricsPayloadParams,
 } from './cache-types'
 
 const CACHE_INDEX_VERSION = 1 as const
 const AUDIO_DIR_NAME = 'audio'
+const IMAGE_DIR_NAME = 'images'
 const LYRICS_DIR_NAME = 'lyrics'
 const INDEX_FILE_NAME = 'index.json'
 
@@ -27,6 +30,7 @@ type CacheServiceOptions = {
 type CacheLayout = {
   rootDir: string
   audioDir: string
+  imageDir: string
   lyricsDir: string
   indexFilePath: string
 }
@@ -40,7 +44,7 @@ function isNonEmptyString(value: unknown): value is string {
 }
 
 function isKnownEntryType(value: unknown): value is CacheEntryType {
-  return value === 'audio' || value === 'lyrics'
+  return value === 'audio' || value === 'lyrics' || value === 'image'
 }
 
 function normalizeRelativePath(value: unknown) {
@@ -169,6 +173,30 @@ function getContentTypeExtension(contentType: string | null) {
   return '.bin'
 }
 
+function getImageContentTypeExtension(contentType: string | null) {
+  if (!contentType) {
+    return '.bin'
+  }
+
+  if (contentType.includes('image/jpeg')) {
+    return '.jpg'
+  }
+  if (contentType.includes('image/png')) {
+    return '.png'
+  }
+  if (contentType.includes('image/webp')) {
+    return '.webp'
+  }
+  if (contentType.includes('image/avif')) {
+    return '.avif'
+  }
+  if (contentType.includes('image/gif')) {
+    return '.gif'
+  }
+
+  return '.bin'
+}
+
 async function fileExists(filePath: string) {
   try {
     await fs.access(filePath)
@@ -181,6 +209,7 @@ async function fileExists(filePath: string) {
 export class CacheService {
   private readonly defaultRootDir: string
   private readonly fetcher: typeof fetch
+  private readonly inFlightImageWrites = new Map<string, Promise<void>>()
   private readonly now: () => number
 
   constructor(options: CacheServiceOptions) {
@@ -265,6 +294,38 @@ export class CacheService {
     }
   }
 
+  async resolveImageSource(
+    params: ResolveImageSourceParams
+  ): Promise<ResolveImageSourceResult> {
+    if (!params.enabled) {
+      return { url: params.sourceUrl, fromCache: false }
+    }
+
+    const layout = await this.ensureLayout(params.cacheDir)
+    const state = await this.loadIndex(layout)
+    const id = buildCacheId('image', params.cacheKey)
+    const cachedEntry = state.entries.get(id)
+
+    if (cachedEntry) {
+      const absolutePath = this.toAbsolutePath(
+        layout.rootDir,
+        cachedEntry.relativePath
+      )
+      if (await fileExists(absolutePath)) {
+        cachedEntry.lastAccessed = this.now()
+        await this.saveIndex(layout, state)
+
+        return { url: pathToFileURL(absolutePath).href, fromCache: true }
+      }
+
+      state.entries.delete(id)
+      await this.saveIndex(layout, state)
+    }
+
+    this.queueImagePersistence(layout, state, id, params)
+    return { url: params.sourceUrl, fromCache: false }
+  }
+
   async readLyricsPayload(
     params: ReadLyricsPayloadParams
   ): Promise<string | null> {
@@ -327,11 +388,13 @@ export class CacheService {
     const layout = await this.ensureLayout(options.cacheDir)
     await Promise.all([
       fs.rm(layout.audioDir, { recursive: true, force: true }),
+      fs.rm(layout.imageDir, { recursive: true, force: true }),
       fs.rm(layout.lyricsDir, { recursive: true, force: true }),
       fs.rm(layout.indexFilePath, { force: true }),
     ])
     await Promise.all([
       fs.mkdir(layout.audioDir, { recursive: true }),
+      fs.mkdir(layout.imageDir, { recursive: true }),
       fs.mkdir(layout.lyricsDir, { recursive: true }),
     ])
   }
@@ -377,20 +440,42 @@ export class CacheService {
   private async ensureLayout(configCacheDir: string): Promise<CacheLayout> {
     const rootDir = this.resolveCacheRoot(configCacheDir)
     const audioDir = path.join(rootDir, AUDIO_DIR_NAME)
+    const imageDir = path.join(rootDir, IMAGE_DIR_NAME)
     const lyricsDir = path.join(rootDir, LYRICS_DIR_NAME)
     const indexFilePath = path.join(rootDir, INDEX_FILE_NAME)
 
     await Promise.all([
       fs.mkdir(audioDir, { recursive: true }),
+      fs.mkdir(imageDir, { recursive: true }),
       fs.mkdir(lyricsDir, { recursive: true }),
     ])
 
     return {
       rootDir,
       audioDir,
+      imageDir,
       lyricsDir,
       indexFilePath,
     }
+  }
+
+  private queueImagePersistence(
+    layout: CacheLayout,
+    state: CacheIndexState,
+    id: string,
+    params: ResolveImageSourceParams
+  ) {
+    if (this.inFlightImageWrites.has(id)) {
+      return
+    }
+
+    const writePromise = this.persistImageEntry(layout, state, id, params)
+      .catch(() => undefined)
+      .finally(() => {
+        this.inFlightImageWrites.delete(id)
+      })
+
+    this.inFlightImageWrites.set(id, writePromise)
   }
 
   private toAbsolutePath(rootDir: string, relativePath: string) {
@@ -413,6 +498,44 @@ export class CacheService {
       JSON.stringify(serializeIndex(state), null, 2),
       'utf8'
     )
+  }
+
+  private async persistImageEntry(
+    layout: CacheLayout,
+    state: CacheIndexState,
+    id: string,
+    params: ResolveImageSourceParams
+  ) {
+    const response = await this.fetcher(params.sourceUrl)
+    if (!response.ok) {
+      return
+    }
+
+    const bytes = Buffer.from(await response.arrayBuffer())
+    const urlExt = getUrlExtension(params.sourceUrl)
+    const contentExt = getImageContentTypeExtension(
+      response.headers.get('content-type')
+    )
+    const extension = urlExt !== '.bin' ? urlExt : contentExt
+    const relativePath = `${IMAGE_DIR_NAME}/${id}${extension}`
+    const absolutePath = this.toAbsolutePath(layout.rootDir, relativePath)
+
+    await fs.mkdir(path.dirname(absolutePath), { recursive: true })
+    await fs.writeFile(absolutePath, bytes)
+
+    const timestamp = this.now()
+    state.entries.set(id, {
+      id,
+      key: params.cacheKey,
+      type: 'image',
+      relativePath,
+      size: bytes.byteLength,
+      createdAt: timestamp,
+      lastAccessed: timestamp,
+    })
+
+    await this.evictIfNeeded(layout, state, params.maxBytes)
+    await this.saveIndex(layout, state)
   }
 
   private async evictIfNeeded(
