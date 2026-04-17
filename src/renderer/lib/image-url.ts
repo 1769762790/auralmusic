@@ -31,6 +31,11 @@ export function resizeImageUrl(
     return ''
   }
 
+  // 有些接口会返回直接返回预览，再拼接尺寸会报错
+  if (imageUrl.includes('thumbnail')) {
+    return imageUrl
+  }
+
   const normalizedWidth = normalizeDimension(width)
   const normalizedHeight = normalizeDimension(height ?? width)
 

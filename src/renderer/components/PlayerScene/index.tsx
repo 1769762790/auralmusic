@@ -162,7 +162,10 @@ const PlayerScene = () => {
 
   return (
     <Drawer open={isOpen} onOpenChange={handleOpenChange} direction='bottom'>
-      <DrawerContent className='h-[100dvh] max-h-[100dvh] overflow-hidden rounded-none border-0 bg-[var(--background)] p-0 text-[var(--player-foreground)] outline-none data-[vaul-drawer-direction=bottom]:h-[100dvh] data-[vaul-drawer-direction=bottom]:max-h-[100dvh] data-[vaul-drawer-direction=bottom]:rounded-none data-[vaul-drawer-direction=bottom]:border-0 [&>div:first-child]:hidden'>
+      <DrawerContent
+        className='h-[100dvh] max-h-[100dvh] overflow-hidden rounded-none border-0 bg-[var(--background)] p-0 text-[var(--player-foreground)] outline-none data-[vaul-drawer-direction=bottom]:h-[100dvh] data-[vaul-drawer-direction=bottom]:max-h-[100dvh] data-[vaul-drawer-direction=bottom]:rounded-none data-[vaul-drawer-direction=bottom]:border-0 [&>div:first-child]:hidden'
+        data-vaul-no-drag
+      >
         <DrawerTitle className='sr-only'>播放器主界面</DrawerTitle>
         <DrawerDescription className='sr-only'>
           当前播放歌曲、播放控制、进度条和歌词

@@ -32,21 +32,21 @@ const LibraryHero = ({
             }
           }}
         >
-          {/* {heroCoverUrl ? (
+          {_coverImgUrl ? (
             <>
               <div
-                className='absolute inset-0 scale-110 bg-cover bg-center opacity-80 blur-3xl'
+                className='absolute inset-0 scale-110 bg-cover bg-center opacity-50 blur-md'
                 style={{
-                  backgroundImage: `url("${heroCoverUrl}")`,
+                  backgroundImage: `url("${_coverImgUrl}")`,
                 }}
               />
-              <div className='absolute inset-0 bg-[linear-gradient(135deg,rgba(232,240,255,0.78)_0%,rgba(214,226,255,0.72)_55%,rgba(192,210,255,0.82)_100%)]' />
+              {/* <div className='absolute inset-0 bg-[linear-gradient(135deg,rgba(232,240,255,0.78)_0%,rgba(214,226,255,0.72)_55%,rgba(192,210,255,0.82)_100%)]' /> */}
             </>
           ) : (
             <div className='absolute inset-0 bg-[linear-gradient(135deg,#e8f0ff_0%,#d6e2ff_55%,#c0d2ff_100%)]' />
-          )} */}
+          )}
 
-          <div className='absolute inset-0 bg-white/60 backdrop-blur-[4px]' />
+          {/* <div className='absolute inset-0 bg-white/60 backdrop-blur-[4px]' /> */}
 
           <div className='relative z-10 flex h-full flex-col justify-between'>
             <div className='space-y-2'>

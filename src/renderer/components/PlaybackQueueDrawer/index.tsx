@@ -33,6 +33,7 @@ const PlaybackQueueDrawer = ({
     <Drawer open={open} onOpenChange={onOpenChange} direction='right'>
       <DrawerContent
         data-vaul-custom-container='true'
+        data-vaul-no-drag
         className='border-border/70 bg-background/92 !top-[15vh] !right-4 !bottom-auto h-[70vh] w-[calc(100vw-32px)] max-w-none rounded-[28px] border p-0 shadow-[0_28px_90px_rgba(15,23,42,0.18)] backdrop-blur-2xl data-[vaul-drawer-direction=right]:!top-[15vh] data-[vaul-drawer-direction=right]:!right-4 data-[vaul-drawer-direction=right]:!bottom-auto data-[vaul-drawer-direction=right]:!h-[70vh] data-[vaul-drawer-direction=right]:!w-[calc(100vw-32px)] data-[vaul-drawer-direction=right]:!max-w-none data-[vaul-drawer-direction=right]:!rounded-[28px] data-[vaul-drawer-direction=right]:!border data-[vaul-drawer-direction=right]:sm:!w-[420px] data-[vaul-drawer-direction=right]:sm:!max-w-[420px]'
       >
         <DrawerHeader className='border-border/60 border-b px-5 py-4'>
