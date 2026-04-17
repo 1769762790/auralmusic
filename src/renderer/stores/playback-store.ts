@@ -120,6 +120,7 @@ export const usePlaybackStore = create<PlaybackStoreState>((set, get) => ({
           : [],
       shuffleCursor: 0,
       status: snapshot.currentTrack ? 'loading' : 'idle',
+      shouldAutoPlayOnLoad: Boolean(snapshot.currentTrack),
       progress: 0,
       duration: snapshot.currentTrack?.duration || 0,
       error: '',

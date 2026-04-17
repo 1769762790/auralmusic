@@ -94,6 +94,24 @@ test('playQueueFromIndex preserves local source urls on playback tracks', () => 
   )
 })
 
+test('playQueueFromIndex re-enables autoplay after restoring a paused session', () => {
+  usePlaybackStore.getState().resetPlayback()
+  usePlaybackStore.getState().restoreSession({
+    queue: tracks,
+    currentIndex: 1,
+    progress: 42000,
+    duration: 200000,
+    playbackMode: 'repeat-all',
+  })
+
+  usePlaybackStore.getState().playQueueFromIndex(tracks, 0)
+
+  const state = usePlaybackStore.getState()
+  assert.equal(state.currentTrack?.id, 1)
+  assert.equal(state.status, 'loading')
+  assert.equal(state.shouldAutoPlayOnLoad, true)
+})
+
 test('appendToQueue seeds the queue without auto-playing when idle', () => {
   usePlaybackStore.getState().resetPlayback()
 
