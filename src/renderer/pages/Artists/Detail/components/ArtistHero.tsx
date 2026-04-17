@@ -25,8 +25,6 @@ const ArtistHero = ({
   followLoading,
   onToggleFollowedArtist,
 }: ArtistHeroProps) => {
-  console.log(profile)
-
   return (
     <section className='grid items-center gap-8 lg:grid-cols-[320px_minmax(0,1fr)]'>
       <AvatarCover

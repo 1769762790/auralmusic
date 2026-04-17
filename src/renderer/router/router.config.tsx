@@ -1,19 +1,22 @@
 import type { RouteMenuConfig } from './router.type'
-import AlbumDetail from '@/pages/Albums/Detail'
-import Albums from '@/pages/Albums'
-import ArtistDetail from '@/pages/Artists/Detail'
-import Artists from '@/pages/Artists'
-import Charts from '@/pages/Charts'
-import DailySongs from '@/pages/DailySongs'
-import Downloads from '@/pages/Downloads'
-import Home from '@/pages/Home'
-import Library from '@/pages/Library'
-import LikedSongs from '@/pages/LikedSongs'
-import PlayList from '@/pages/PlayList'
-import PlaylistDetail from '@/pages/PlayList/Detail'
-import Settings from '@/pages/Settings'
-import MvDetail from '@/pages/Mv/Detail'
-import AppLayout from '../layout/AppLayout'
+import AppLayout from '@/layout/AppLayout'
+
+import {
+  Home,
+  DailySongs,
+  Library,
+  LikedSongs,
+  Settings,
+  Downloads,
+  Charts,
+  PlayList,
+  PlaylistDetail,
+  MvDetail,
+  Artists,
+  ArtistDetail,
+  Albums,
+  AlbumDetail,
+} from './routeComponents'
 
 export const routeMenuConfig: RouteMenuConfig[] = [
   {

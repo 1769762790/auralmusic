@@ -31,6 +31,7 @@ import {
   syncNativeThemeSource,
 } from './window/titlebar-theme'
 import { resolveWindowCloseBehavior } from './window/close-behavior'
+import { toggleDetachedDevTools } from './window/devtools'
 import { TRAY_IPC_CHANNELS } from '../shared/ipc/tray.ts'
 import { WINDOW_IPC_CHANNELS } from './window/types'
 
@@ -184,6 +185,7 @@ function createWindow() {
       preload: getPreloadPath(),
       contextIsolation: true,
       nodeIntegration: false,
+      devTools: true,
     },
   })
 
@@ -200,7 +202,12 @@ function createWindow() {
 
   if (process.env.NODE_ENV_ELECTRON_VITE === 'development') {
     globalShortcut.register('Control+Shift+I', () => {
-      mainWindow?.webContents.toggleDevTools()
+      const webContents = mainWindow?.webContents
+      if (!webContents) {
+        return
+      }
+
+      toggleDetachedDevTools(webContents)
     })
   }
 

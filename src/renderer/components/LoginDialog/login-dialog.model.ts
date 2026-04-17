@@ -1,7 +1,7 @@
 import type { FormEventHandler } from 'react'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 import type { LucideIcon } from 'lucide-react'
-import { QrCode, ShieldCheck } from 'lucide-react'
+import { QrCode } from 'lucide-react'
 
 import type { LoginMode } from '@/api/auth'
 import {
