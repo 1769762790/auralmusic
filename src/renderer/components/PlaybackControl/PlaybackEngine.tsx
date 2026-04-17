@@ -9,7 +9,8 @@ import {
   normalizePlaybackSpeedValue,
 } from '@/pages/Settings/components/playback-speed.model'
 
-const PLAYBACK_UNAVAILABLE_MESSAGE = '鏆傛椂鏃犳硶鎾斁'
+const PLAYBACK_UNAVAILABLE_MESSAGE = '暂时无法播放'
+const OUTPUT_DEVICE_UNAVAILABLE_MESSAGE = '音频输出设备切换失败'
 
 const STALE_PLAYBACK_REQUEST = Symbol('STALE_PLAYBACK_REQUEST')
 
@@ -150,7 +151,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
         return
       }
 
-      toast.error('闊抽杈撳嚭璁惧鍒囨崲澶辫触')
+      toast.error(OUTPUT_DEVICE_UNAVAILABLE_MESSAGE)
     })
   }, [audioOutputDeviceId])
 
@@ -370,18 +371,14 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
             cancelled
           )
           if (!outputApplied) {
-            toast.error(
-              '闊抽杈撳嚭璁惧鍒囨崲澶辫触锛屽皢浣跨敤榛樿杈撳嚭璁惧鎾斁'
-            )
+            toast.error(OUTPUT_DEVICE_UNAVAILABLE_MESSAGE)
           }
         } catch (error) {
           if (error === STALE_PLAYBACK_REQUEST) {
             throw error
           }
           console.error('apply audio output device failed', error)
-          toast.error(
-            '闊抽杈撳嚭璁惧鍒囨崲澶辫触锛屽皢浣跨敤榛樿杈撳嚭璁惧鎾斁'
-          )
+          toast.error(OUTPUT_DEVICE_UNAVAILABLE_MESSAGE)
         }
 
         const currentPlaybackState = usePlaybackStore.getState()

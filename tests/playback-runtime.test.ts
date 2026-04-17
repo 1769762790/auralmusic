@@ -106,3 +106,49 @@ test('playback runtime creates equalizer graph once and reuses it', async () => 
 
   assert.equal(createCount, 1)
 })
+
+test('playback runtime falls back to the audio element when graph output switching fails', async () => {
+  const audio = new FakeAudio() as HTMLAudioElement & {
+    setSinkId?: (deviceId: string) => Promise<void>
+  }
+  const sinkIds: string[] = []
+  audio.setSinkId = async deviceId => {
+    sinkIds.push(deviceId)
+  }
+
+  const runtime = createPlaybackRuntime({
+    createAudioElement: () => audio,
+    createEqualizerGraph: () => ({
+      update() {},
+      async resume() {},
+      async setOutputDevice() {
+        throw new Error('graph sink failed')
+      },
+      dispose() {},
+    }),
+  })
+
+  runtime.applyEqualizer({ ...DEFAULT_EQUALIZER_CONFIG, enabled: true })
+  const success = await runtime.setOutputDevice('speaker-2')
+
+  assert.equal(success, true)
+  assert.deepEqual(sinkIds, ['speaker-2'])
+})
+
+test('default device id stays stable during runtime output switching', async () => {
+  const audio = new FakeAudio() as HTMLAudioElement & {
+    setSinkId?: (deviceId: string) => Promise<void>
+  }
+  const sinkIds: string[] = []
+  audio.setSinkId = async deviceId => {
+    sinkIds.push(deviceId)
+  }
+
+  const runtime = createPlaybackRuntime({
+    createAudioElement: () => audio,
+  })
+
+  await runtime.setOutputDevice('default')
+
+  assert.deepEqual(sinkIds, ['default'])
+})

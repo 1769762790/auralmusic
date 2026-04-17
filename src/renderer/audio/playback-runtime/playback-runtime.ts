@@ -125,11 +125,15 @@ export function createPlaybackRuntime(options?: {
       const normalizedDeviceId = normalizePlaybackOutputDeviceId(deviceId)
 
       if (equalizerConfig.enabled) {
-        const applied =
-          await ensureEqualizerGraph().setOutputDevice(normalizedDeviceId)
+        try {
+          const applied =
+            await ensureEqualizerGraph().setOutputDevice(normalizedDeviceId)
 
-        if (applied) {
-          return true
+          if (applied) {
+            return true
+          }
+        } catch {
+          // Fall through to the audio element output path.
         }
       }
 
