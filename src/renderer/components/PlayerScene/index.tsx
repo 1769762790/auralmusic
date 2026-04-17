@@ -247,6 +247,7 @@ const PlayerScene = () => {
               playing={isPlaying}
               loading={lyricsLoading}
               error={lyricsError}
+              onSeek={seekTo}
             />
           </div>
         </div>

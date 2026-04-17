@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
-import { adaptLyricsToAmll } from '../src/renderer/components/PlayerScene/player-lyrics-amll.adapter.ts'
+import {
+  adaptLyricsToAmll,
+  resolveAmllLyricClickSeekTime,
+} from '../src/renderer/components/PlayerScene/player-lyrics-amll.adapter.ts'
 
 test('adaptLyricsToAmll maps karaoke segments into AMLL word timing', () => {
   const result = adaptLyricsToAmll(
@@ -83,4 +88,64 @@ test('adaptLyricsToAmll can disable translation and karaoke word splitting', () 
       isDuet: false,
     },
   ])
+})
+
+test('resolveAmllLyricClickSeekTime returns the clicked lyric line start time', () => {
+  assert.equal(
+    resolveAmllLyricClickSeekTime({
+      lineIndex: 1,
+      line: {
+        getLine: () => ({
+          startTime: 3210.6,
+        }),
+      },
+    }),
+    3211
+  )
+})
+
+test('resolveAmllLyricClickSeekTime ignores invalid click events', () => {
+  assert.equal(
+    resolveAmllLyricClickSeekTime({
+      lineIndex: -1,
+      line: {
+        getLine: () => ({
+          startTime: Number.NaN,
+        }),
+      },
+    }),
+    null
+  )
+})
+
+test('PlayerSceneAmllLyrics wires lyric line clicks to the playback seek callback', async () => {
+  const playerSceneLyricsSource = await readFile(
+    fileURLToPath(
+      new URL(
+        '../src/renderer/components/PlayerScene/PlayerSceneAmllLyrics.tsx',
+        import.meta.url
+      )
+    ),
+    'utf8'
+  )
+  const playerSceneSource = await readFile(
+    fileURLToPath(
+      new URL(
+        '../src/renderer/components/PlayerScene/index.tsx',
+        import.meta.url
+      )
+    ),
+    'utf8'
+  )
+
+  assert.match(
+    playerSceneLyricsSource,
+    /onSeek: \(positionMs: number\) => void/
+  )
+  assert.match(playerSceneLyricsSource, /resolveAmllLyricClickSeekTime/)
+  assert.match(
+    playerSceneLyricsSource,
+    /onLyricLineClick=\{handleLyricLineClick\}/
+  )
+  assert.match(playerSceneSource, /onSeek=\{seekTo\}/)
 })

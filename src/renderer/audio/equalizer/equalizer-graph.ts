@@ -11,30 +11,17 @@ type ConnectableAudioNode = {
   disconnect: () => void
 }
 
-type EqualizerAudioParam = {
-  value: number
-}
-
-type EqualizerGainNode = ConnectableAudioNode & {
-  gain: EqualizerAudioParam
-}
-
-type EqualizerBiquadFilterNode = ConnectableAudioNode & {
-  type: BiquadFilterType | string
-  frequency: EqualizerAudioParam
-  Q: EqualizerAudioParam
-  gain: EqualizerAudioParam
-}
-
-type EqualizerAudioContext = {
-  destination: unknown
-  state: string
-  createMediaElementSource: (audioElement: unknown) => ConnectableAudioNode
-  createGain: () => EqualizerGainNode
-  createBiquadFilter: () => EqualizerBiquadFilterNode
+type EqualizerAudioContext = Pick<
+  AudioContext,
+  | 'destination'
+  | 'state'
+  | 'createMediaElementSource'
+  | 'createGain'
+  | 'createBiquadFilter'
+  | 'resume'
+  | 'close'
+> & {
   setSinkId?: (sinkId: string) => Promise<void>
-  resume: () => Promise<void>
-  close: () => Promise<void>
 }
 
 export interface EqualizerGraph {
@@ -72,7 +59,7 @@ function createDefaultAudioContext(): EqualizerAudioContext {
 }
 
 export function createEqualizerGraph(options: {
-  audioElement: unknown
+  audioElement: HTMLMediaElement
   createAudioContext?: () => EqualizerAudioContext
 }): EqualizerGraph {
   const audioContext =

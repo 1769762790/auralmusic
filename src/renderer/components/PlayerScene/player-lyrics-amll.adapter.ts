@@ -12,6 +12,15 @@ type AdaptLyricsToAmllOptions = {
   karaokeEnabled: boolean
 }
 
+type AmllLyricLineClickEvent = {
+  lineIndex?: number
+  line?: {
+    getLine: () => {
+      startTime?: number | null
+    }
+  } | null
+}
+
 function resolveLineEndTime(
   line: PlayerLyricLine,
   nextLine?: PlayerLyricLine
@@ -66,4 +75,16 @@ export function adaptLyricsToAmll(
       isDuet: false,
     }
   })
+}
+
+export function resolveAmllLyricClickSeekTime(
+  event: AmllLyricLineClickEvent
+): number | null {
+  const startTime = event.line?.getLine().startTime
+
+  if (typeof startTime !== 'number' || !Number.isFinite(startTime)) {
+    return null
+  }
+
+  return Math.max(0, Math.round(startTime))
 }

@@ -1,9 +1,15 @@
-import { LyricPlayer } from '@applemusic-like-lyrics/react'
-import { useMemo, type CSSProperties } from 'react'
+import {
+  LyricPlayer,
+  type LyricPlayerProps,
+} from '@applemusic-like-lyrics/react'
+import { useCallback, useMemo, type CSSProperties } from 'react'
 
 import { cn } from '@/lib/utils'
 import type { LyricLine } from './player-lyrics.model'
-import { adaptLyricsToAmll } from './player-lyrics-amll.adapter'
+import {
+  adaptLyricsToAmll,
+  resolveAmllLyricClickSeekTime,
+} from './player-lyrics-amll.adapter'
 
 type PlayerSceneAmllLyricsProps = {
   lines: LyricLine[]
@@ -13,7 +19,10 @@ type PlayerSceneAmllLyricsProps = {
   playing: boolean
   loading: boolean
   error: string
+  onSeek: (positionMs: number) => void
 }
+
+type LyricLineClickHandler = NonNullable<LyricPlayerProps['onLyricLineClick']>
 
 const AMLL_PLAYER_STYLE = {
   '--amll-lp-color': 'var(--player-foreground)',
@@ -31,6 +40,7 @@ const PlayerSceneAmllLyrics = ({
   playing,
   loading,
   error,
+  onSeek,
 }: PlayerSceneAmllLyricsProps) => {
   const lyricLines = useMemo(
     () =>
@@ -39,6 +49,19 @@ const PlayerSceneAmllLyrics = ({
         karaokeEnabled,
       }),
     [karaokeEnabled, lines, showTranslation]
+  )
+
+  const handleLyricLineClick = useCallback<LyricLineClickHandler>(
+    event => {
+      const seekTime = resolveAmllLyricClickSeekTime(event)
+
+      if (seekTime === null) {
+        return
+      }
+
+      onSeek(seekTime)
+    },
+    [onSeek]
   )
 
   if (loading) {
@@ -76,6 +99,7 @@ const PlayerSceneAmllLyrics = ({
           enableScale={true}
           wordFadeWidth={0.5}
           className='h-full w-full'
+          onLyricLineClick={handleLyricLineClick}
         />
       </div>
     </section>

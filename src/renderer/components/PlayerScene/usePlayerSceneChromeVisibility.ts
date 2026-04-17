@@ -21,7 +21,7 @@ export function usePlayerSceneChromeVisibility({
 }: UsePlayerSceneChromeVisibilityOptions) {
   const [chromeState, setChromeState] = useState(INITIAL_CHROME_STATE)
   const chromeStateRef = useRef(INITIAL_CHROME_STATE)
-  const hideTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
+  const hideTimerRef = useRef<number | null>(null)
 
   const clearHideTimer = useCallback(() => {
     if (hideTimerRef.current) {
