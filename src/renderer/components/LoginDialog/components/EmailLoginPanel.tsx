@@ -1,15 +1,15 @@
 import { Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Field, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 import type { CredentialLoginPanelProps } from '../login-dialog.model'
 
 const EmailLoginPanel = ({
-  form,
+  errors,
   isLoading,
-  onFieldChange,
+  register,
   onSubmit,
 }: CredentialLoginPanelProps) => {
   return (
@@ -23,11 +23,12 @@ const EmailLoginPanel = ({
         </FieldLabel>
         <Input
           autoComplete='email'
+          aria-invalid={!!errors.email}
           className='h-10 bg-neutral-50 px-4 text-[15px]'
           placeholder='m@example.com'
-          value={form.email}
-          onChange={event => onFieldChange('email', event.target.value)}
+          {...register('email')}
         />
+        <FieldError errors={[errors.email]} />
       </Field>
 
       <Field className='gap-2'>
@@ -36,12 +37,13 @@ const EmailLoginPanel = ({
         </FieldLabel>
         <Input
           autoComplete='current-password'
+          aria-invalid={!!errors.password}
           className='h-10 bg-neutral-50 px-4 text-[15px]'
           placeholder='请输入密码'
           type='password'
-          value={form.password}
-          onChange={event => onFieldChange('password', event.target.value)}
+          {...register('password')}
         />
+        <FieldError errors={[errors.password]} />
       </Field>
 
       <Button

@@ -35,7 +35,7 @@ async function toggleCurrentTrackLike() {
   const authState = useAuthStore.getState()
 
   if (!authState.hasHydrated || !authState.user?.userId) {
-    authState.openLoginDialog('email')
+    authState.openLoginDialog()
     return
   }
 

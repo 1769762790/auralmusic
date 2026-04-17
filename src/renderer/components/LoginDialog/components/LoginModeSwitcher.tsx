@@ -7,7 +7,7 @@ const LoginModeSwitcher = () => {
   const setLoginMode = useAuthStore(state => state.setLoginMode)
 
   return (
-    <div className='bg-primary/4 grid grid-cols-4 gap-1 rounded-[18px] p-1'>
+    <div className='bg-primary/4 grid grid-cols-1 gap-5 rounded-[18px] p-1'>
       {LOGIN_MODE_OPTIONS.map(option => {
         const Icon = option.icon
         const active = currentMode === option.value

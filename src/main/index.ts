@@ -176,6 +176,7 @@ function createWindow() {
     minWidth: 1280,
     minHeight: 760,
     frame: !isWindows,
+    maximizable: false, // 禁止双击标题栏放大
     titleBarStyle: isMac ? 'hiddenInset' : isWindows ? undefined : 'hidden',
     titleBarOverlay: isMac ? false : isWindows ? false : true,
     autoHideMenuBar: true,

@@ -68,7 +68,7 @@ const AccountControl = ({
 
   const handleOpenLogin = () => {
     setMenuOpen(false)
-    openLoginDialog('email')
+    openLoginDialog()
   }
 
   const handleLogout = async () => {

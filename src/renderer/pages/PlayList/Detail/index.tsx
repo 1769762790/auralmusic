@@ -167,7 +167,7 @@ const PlaylistDetail = () => {
 
   const handleTogglePlaylistFavorite = async () => {
     if (!hasHydrated || !currentUserId) {
-      openLoginDialog('email')
+      openLoginDialog()
       return
     }
 
@@ -215,7 +215,7 @@ const PlaylistDetail = () => {
     desc: string
   }) => {
     if (!hasHydrated || !currentUserId) {
-      openLoginDialog('email')
+      openLoginDialog()
       return
     }
 
@@ -245,7 +245,7 @@ const PlaylistDetail = () => {
 
   const handleDeletePlaylist = async (targetPlaylistId: number) => {
     if (!hasHydrated || !currentUserId) {
-      openLoginDialog('email')
+      openLoginDialog()
       return
     }
 

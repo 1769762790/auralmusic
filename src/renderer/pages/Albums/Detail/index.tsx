@@ -99,7 +99,7 @@ const AlbumDetail = () => {
 
   const handleToggleLikedAlbum = async () => {
     if (!hasHydrated || !userId) {
-      openLoginDialog('email')
+      openLoginDialog()
       return
     }
 

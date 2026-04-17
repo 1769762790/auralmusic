@@ -28,14 +28,14 @@ const LoginDialog = () => {
         showCloseButton
       >
         <div className='min-h-[560px]'>
-          <div className='border-border/60 bg-[#f9f7f2] p-6 sm:p-8 lg:border-r lg:p-10'>
+          <div className='border-border/60 flex min-h-[560px] flex-col bg-[#f9f7f2] p-6 sm:p-8 lg:border-r lg:p-10'>
             <div className='space-y-2'>
               <h1 className='text-center text-3xl font-black tracking-[-0.05em] text-neutral-950 sm:text-3xl'>
                 {currentLabel}登录
               </h1>
             </div>
 
-            <div className='mt-6 space-y-6'>
+            <div className='mt-6 flex flex-1 flex-col gap-6'>
               <LoginModeSwitcher />
               <LoginForm />
             </div>

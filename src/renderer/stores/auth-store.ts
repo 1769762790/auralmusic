@@ -19,6 +19,8 @@ import { useUserStore } from './user'
 
 type LoginStatus = 'anonymous' | 'authenticated' | 'expired'
 
+const DEFAULT_LOGIN_MODE: LoginMode = 'qr'
+
 interface AuthStoreState {
   user: AuthUser | null
   session: AuthSession | null
@@ -158,7 +160,7 @@ export const useAuthStore = create<AuthStoreState>(set => ({
   session: null,
   isLoading: false,
   dialogOpen: false,
-  loginMode: 'email',
+  loginMode: DEFAULT_LOGIN_MODE,
   loginStatus: 'anonymous',
   errorMessage: null,
   hasHydrated: false,
@@ -217,7 +219,7 @@ export const useAuthStore = create<AuthStoreState>(set => ({
     }
   },
 
-  openLoginDialog: (mode = 'email') => {
+  openLoginDialog: (mode = DEFAULT_LOGIN_MODE) => {
     set({ dialogOpen: true, loginMode: mode, errorMessage: null })
   },
 

@@ -1,21 +1,24 @@
 import { Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Field, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
+import { PHONE_CAPTCHA_LOGIN_FIELD_NAMES } from '../login-form.schema'
 import type { PhoneCaptchaLoginPanelProps } from '../login-dialog.model'
 
+const [phoneField, captchaField] = PHONE_CAPTCHA_LOGIN_FIELD_NAMES
+
 const PhoneCaptchaLoginPanel = ({
-  form,
+  errors,
   isLoading,
-  onFieldChange,
+  register,
   onSendCaptcha,
   onSubmit,
 }: PhoneCaptchaLoginPanelProps) => {
   return (
     <form
-      className='space-y-4 rounded-[28px] border border-neutral-200 bg-white p-5 shadow-[0_18px_70px_rgba(15,23,42,0.05)]'
+      className='flex flex-1 flex-col gap-4 rounded-[28px] border border-neutral-200 bg-white p-5 shadow-[0_18px_70px_rgba(15,23,42,0.05)]'
       onSubmit={onSubmit}
     >
       <Field className='gap-2'>
@@ -26,9 +29,10 @@ const PhoneCaptchaLoginPanel = ({
           autoComplete='tel'
           className='h-10 bg-neutral-50 px-4 text-[15px]'
           placeholder='请输入手机号'
-          value={form.phone}
-          onChange={event => onFieldChange('phone', event.target.value)}
+          aria-invalid={!!errors[phoneField]}
+          {...register(phoneField)}
         />
+        <FieldError errors={[errors[phoneField]]} />
       </Field>
 
       <Field className='gap-2'>
@@ -40,8 +44,8 @@ const PhoneCaptchaLoginPanel = ({
             autoComplete='one-time-code'
             className='h-10 bg-neutral-50 px-4 text-[15px]'
             placeholder='请输入验证码'
-            value={form.captcha}
-            onChange={event => onFieldChange('captcha', event.target.value)}
+            aria-invalid={!!errors[captchaField]}
+            {...register(captchaField)}
           />
           <Button
             className='bg-primary/5 text-primary hover:bg-primary/10 h-10 px-4'
@@ -52,22 +56,11 @@ const PhoneCaptchaLoginPanel = ({
             获取验证码
           </Button>
         </div>
-      </Field>
-
-      <Field className='gap-2'>
-        <FieldLabel className='text-xs font-semibold tracking-[0.18em] text-neutral-500 uppercase'>
-          国家区号
-        </FieldLabel>
-        <Input
-          className='h-10 bg-neutral-50 px-4 text-[15px]'
-          placeholder='86'
-          value={form.countrycode}
-          onChange={event => onFieldChange('countrycode', event.target.value)}
-        />
+        <FieldError errors={[errors[captchaField]]} />
       </Field>
 
       <Button
-        className='h-10 w-full bg-neutral-950 text-base font-semibold text-white hover:bg-neutral-800'
+        className='mt-auto h-10 w-full bg-neutral-950 text-base font-semibold text-white hover:bg-neutral-800'
         disabled={isLoading}
         type='submit'
       >

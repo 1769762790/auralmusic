@@ -461,7 +461,7 @@ const ArtistDetail = () => {
 
   const handleToggleFollowedArtist = async () => {
     if (!hasHydrated || !userId) {
-      openLoginDialog('email')
+      openLoginDialog()
       return
     }
 

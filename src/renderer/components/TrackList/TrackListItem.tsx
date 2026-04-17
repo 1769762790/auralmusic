@@ -93,7 +93,7 @@ const TrackListItem = ({
     }
 
     if (!hasHydrated || !userId) {
-      openLoginDialog('email')
+      openLoginDialog()
       return
     }
 
@@ -132,7 +132,7 @@ const TrackListItem = ({
     }
 
     if (!hasHydrated || !userId) {
-      openLoginDialog('email')
+      openLoginDialog()
       return
     }
 

@@ -1,12 +1,16 @@
-import { useState } from 'react'
-import type { FormEvent } from 'react'
+import { useEffect, useMemo } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 
 import { useAuthStore } from '@/stores/auth-store'
 
 import {
-  LOGIN_FORM_INITIAL_STATE,
-  type LoginFormState,
-} from '../login-dialog.model'
+  LOGIN_FORM_DEFAULT_VALUES,
+  buildLoginPayload,
+  getCaptchaRequestPayload,
+  getLoginFormSchema,
+  type LoginFormValues,
+} from '../login-form.schema'
 import EmailLoginPanel from './EmailLoginPanel'
 import PhoneCaptchaLoginPanel from './PhoneCaptchaLoginPanel'
 import PhonePasswordLoginPanel from './PhonePasswordLoginPanel'
@@ -20,89 +24,43 @@ const LoginForm = () => {
   const sendCaptchaCode = useAuthStore(state => state.sendCaptchaCode)
   const clearError = useAuthStore(state => state.clearError)
 
-  const [form, setForm] = useState<LoginFormState>(LOGIN_FORM_INITIAL_STATE)
-  const [localError, setLocalError] = useState('')
+  const schema = useMemo(() => getLoginFormSchema(loginMode), [loginMode])
+  const {
+    clearErrors,
+    formState: { errors },
+    getValues,
+    handleSubmit,
+    register,
+    setError,
+  } = useForm<LoginFormValues>({
+    defaultValues: LOGIN_FORM_DEFAULT_VALUES,
+    resolver: zodResolver(schema),
+  })
 
-  const combinedError = localError || errorMessage || ''
-
-  const updateForm = (field: keyof LoginFormState, value: string) => {
+  useEffect(() => {
+    clearErrors()
     clearError()
-    setLocalError('')
-    setForm(current => ({
-      ...current,
-      [field]: value,
-    }))
-  }
+  }, [clearError, clearErrors, loginMode])
 
-  const validate = () => {
-    if (loginMode === 'email') {
-      if (!form.email.trim()) return '请输入邮箱'
-      if (!form.password.trim()) return '请输入密码'
-    }
-
-    if (loginMode === 'phone-password') {
-      if (!form.phone.trim()) return '请输入手机号'
-      if (!form.password.trim()) return '请输入密码'
-    }
-
-    if (loginMode === 'phone-captcha') {
-      if (!form.phone.trim()) return '请输入手机号'
-      if (!form.captcha.trim()) return '请输入验证码'
-    }
-
-    return ''
-  }
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const message = validate()
-    if (message) {
-      setLocalError(message)
+  const onSubmit = handleSubmit(async values => {
+    if (loginMode === 'qr') {
       return
     }
 
-    setLocalError('')
     clearError()
-
-    if (loginMode === 'email') {
-      await loginWithCurrentMode({
-        mode: 'email',
-        email: form.email.trim(),
-        password: form.password,
-      })
-      return
-    }
-
-    if (loginMode === 'phone-password') {
-      await loginWithCurrentMode({
-        mode: 'phone-password',
-        phone: form.phone.trim(),
-        password: form.password,
-        countrycode: form.countrycode || '86',
-      })
-      return
-    }
-
-    if (loginMode === 'phone-captcha') {
-      await loginWithCurrentMode({
-        mode: 'phone-captcha',
-        phone: form.phone.trim(),
-        captcha: form.captcha.trim(),
-        countrycode: form.countrycode || '86',
-      })
-    }
-  }
+    await loginWithCurrentMode(buildLoginPayload(loginMode, values))
+  })
 
   const handleSendCaptcha = async () => {
-    if (!form.phone.trim()) {
-      setLocalError('请先输入手机号')
-      return
-    }
-
-    setLocalError('')
     clearError()
-    await sendCaptchaCode(form.phone.trim(), form.countrycode || '86')
+    try {
+      const payload = getCaptchaRequestPayload(getValues())
+      await sendCaptchaCode(payload.phone, payload.countrycode)
+    } catch (error) {
+      setError('phone', {
+        message: error instanceof Error ? error.message : '请先输入手机号',
+      })
+    }
   }
 
   const renderPanel = () => {
@@ -110,29 +68,29 @@ const LoginForm = () => {
       case 'email':
         return (
           <EmailLoginPanel
-            form={form}
+            errors={errors}
             isLoading={isLoading}
-            onFieldChange={updateForm}
-            onSubmit={handleSubmit}
+            register={register}
+            onSubmit={onSubmit}
           />
         )
       case 'phone-password':
         return (
           <PhonePasswordLoginPanel
-            form={form}
+            errors={errors}
             isLoading={isLoading}
-            onFieldChange={updateForm}
-            onSubmit={handleSubmit}
+            register={register}
+            onSubmit={onSubmit}
           />
         )
       case 'phone-captcha':
         return (
           <PhoneCaptchaLoginPanel
-            form={form}
+            errors={errors}
             isLoading={isLoading}
-            onFieldChange={updateForm}
+            register={register}
             onSendCaptcha={handleSendCaptcha}
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
           />
         )
       case 'qr':
@@ -143,10 +101,10 @@ const LoginForm = () => {
   }
 
   return (
-    <div className='space-y-4'>
-      {combinedError ? (
+    <div className='flex flex-1 flex-col gap-4'>
+      {errorMessage ? (
         <div className='border-destructive/20 bg-destructive/5 text-destructive rounded-[18px] border px-4 py-3 text-sm'>
-          {combinedError}
+          {errorMessage}
         </div>
       ) : null}
 

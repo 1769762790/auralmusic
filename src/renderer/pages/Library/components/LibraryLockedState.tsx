@@ -22,7 +22,7 @@ const LibraryLockedState = () => {
 
           <Button
             className='mt-8 h-11 rounded-full px-6 text-base font-semibold'
-            onClick={() => openLoginDialog('email')}
+            onClick={() => openLoginDialog()}
           >
             <LogIn className='mr-2 size-4' />
             去登录
