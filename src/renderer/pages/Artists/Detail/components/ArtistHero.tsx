@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/tooltip'
 import AvatarCover from '@/components/AvatarCover'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
+import { ARTIST_DETAIL_HERO_LAYOUT } from '../artist-detail-layout.model'
 
 interface ArtistHeroProps {
   profile: ArtistDetailProfile
@@ -26,10 +27,10 @@ const ArtistHero = ({
   onToggleFollowedArtist,
 }: ArtistHeroProps) => {
   return (
-    <section className='grid items-center gap-8 lg:grid-cols-[320px_minmax(0,1fr)]'>
+    <section className={ARTIST_DETAIL_HERO_LAYOUT.grid}>
       <AvatarCover
-        className='w-62.5'
-        shadowClassName='w-62.5'
+        className={ARTIST_DETAIL_HERO_LAYOUT.avatar}
+        shadowClassName={ARTIST_DETAIL_HERO_LAYOUT.avatar}
         rounded='full'
         isAutoHovered
         url={resizeImageUrl(
@@ -39,7 +40,7 @@ const ArtistHero = ({
         )}
       />
 
-      <div className='mt-2 flex min-w-0 flex-col justify-center gap-5 py-4'>
+      <div className={ARTIST_DETAIL_HERO_LAYOUT.content}>
         <div className='space-y-2'>
           <h1 className='text-foreground text-5xl font-black tracking-tight'>
             {profile.name}
@@ -91,7 +92,7 @@ const ArtistHero = ({
             type='button'
             size='icon-lg'
             variant='secondary'
-            className='w-[100px] rounded-full py-7'
+            className={ARTIST_DETAIL_HERO_LAYOUT.moreButton}
           >
             <MoreHorizontal className='size-5' />
           </Button>

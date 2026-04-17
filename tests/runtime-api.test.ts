@@ -10,10 +10,12 @@ test('createRuntimeApi reads the music api base url from the provided env bag', 
       [MUSIC_API_BASE_URL_ENV_KEY]: 'http://127.0.0.1:7705',
     },
     platform: 'win32',
+    appVersion: '1.2.3',
   })
 
   assert.equal(runtimeApi.getMusicApiBaseUrl(), 'http://127.0.0.1:7705')
   assert.equal(runtimeApi.getPlatform(), 'win32')
+  assert.equal(runtimeApi.getAppVersion(), '1.2.3')
 })
 
 test('createRuntimeApi trims empty env values to undefined', () => {

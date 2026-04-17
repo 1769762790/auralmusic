@@ -1,4 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  ARTIST_DETAIL_HERO_LAYOUT,
+  ARTIST_DETAIL_HERO_SKELETON_LAYOUT,
+} from '../artist-detail-layout.model'
 
 const SONG_SKELETONS = Array.from({ length: 6 })
 const GRID_SKELETONS = Array.from({ length: 4 })
@@ -6,17 +10,20 @@ const GRID_SKELETONS = Array.from({ length: 4 })
 const ArtistDetailSkeleton = () => {
   return (
     <section className='space-y-10 pb-8'>
-      <div className='grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]'>
-        <Skeleton className='aspect-[4/4.4] rounded-[36px]' />
-        <div className='space-y-5'>
-          <Skeleton className='h-4 w-28 rounded-full' />
-          <Skeleton className='h-16 w-64 rounded-full' />
-          <Skeleton className='h-6 w-56 rounded-full' />
-          <Skeleton className='h-24 w-full rounded-[28px]' />
+      <div className={ARTIST_DETAIL_HERO_LAYOUT.grid}>
+        <Skeleton className={ARTIST_DETAIL_HERO_SKELETON_LAYOUT.avatar} />
+        <div className={ARTIST_DETAIL_HERO_LAYOUT.content}>
+          <div className='space-y-2'>
+            <Skeleton className={ARTIST_DETAIL_HERO_SKELETON_LAYOUT.title} />
+            <Skeleton className={ARTIST_DETAIL_HERO_SKELETON_LAYOUT.meta} />
+          </div>
+          <Skeleton className={ARTIST_DETAIL_HERO_SKELETON_LAYOUT.summary} />
           <div className='flex gap-4'>
             <Skeleton className='h-14 w-40 rounded-full' />
             <Skeleton className='h-14 w-36 rounded-full' />
-            <Skeleton className='h-14 w-14 rounded-full' />
+            <Skeleton
+              className={ARTIST_DETAIL_HERO_SKELETON_LAYOUT.moreButton}
+            />
           </div>
         </div>
       </div>

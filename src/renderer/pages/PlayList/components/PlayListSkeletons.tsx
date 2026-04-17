@@ -25,7 +25,7 @@ export const OnlinePlaylistFeatureSkeleton = () => {
 
 export const AllPlayListSkeleton = () => {
   return (
-    <div className='grid grid-cols-4 gap-6 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-6'>
+    <div className='3xl:grid-cols-6 4xl:grid-cols-7 grid grid-cols-4 gap-6 md:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5'>
       {Array.from({ length: 12 }).map((_, index) => (
         <div key={index} className='flex flex-col gap-4'>
           <div className='aspect-square animate-pulse rounded-[15px] bg-slate-700' />

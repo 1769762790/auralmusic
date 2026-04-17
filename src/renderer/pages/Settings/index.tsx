@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
+import AboutSettings from './components/AboutSettings'
 import BasicSettings from './components/BasicSettings'
 import DownloadSettings from './components/DownloadSettings'
 import PlaySettings from './components/PlaySettings'
@@ -13,6 +14,7 @@ const SETTINGS_TABS = [
   { label: '下载设置', value: 'download' },
   { label: '系统设置', value: 'system' },
   { label: '快捷键', value: 'shortcutKeys' },
+  { label: '关于', value: 'about' },
 ] as const
 
 type SettingsTabValue = (typeof SETTINGS_TABS)[number]['value']
@@ -73,6 +75,9 @@ const Settings = () => {
         </TabsContent>
         <TabsContent value='shortcutKeys'>
           <ShortcutKeySettings />
+        </TabsContent>
+        <TabsContent value='about'>
+          <AboutSettings />
         </TabsContent>
       </Tabs>
     </section>
