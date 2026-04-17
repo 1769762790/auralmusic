@@ -1,16 +1,15 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { toast } from 'sonner'
-import { applyAudioOutputDevice } from '@/lib/audio-output'
-import { resolvePlaybackSource } from '@/services/music-source/playback-source-resolver'
+import { playbackRuntime } from '@/audio/playback-runtime/playback-runtime'
+import { resolvePlaybackSource } from '@/services/music-source/playback-source-resolver.ts'
 import { useConfigStore } from '@/stores/config-store'
 import { usePlaybackStore } from '@/stores/playback-store'
 import {
   applyPlaybackSpeedToAudio,
   normalizePlaybackSpeedValue,
 } from '@/pages/Settings/components/playback-speed.model'
-import { prepareAudioForPendingTrack } from './playback-engine.model'
 
-const PLAYBACK_UNAVAILABLE_MESSAGE = '暂时无法播放'
+const PLAYBACK_UNAVAILABLE_MESSAGE = '鏆傛椂鏃犳硶鎾斁'
 
 const STALE_PLAYBACK_REQUEST = Symbol('STALE_PLAYBACK_REQUEST')
 
@@ -85,7 +84,6 @@ function throwIfPlaybackRequestStale(
 }
 
 const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null)
   const volumeRef = useRef(70)
   const configRef = useRef(useConfigStore.getState().config)
   const qualityRef = useRef(useConfigStore.getState().config.quality)
@@ -112,7 +110,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
   useImperativeHandle(
     ref,
     () => ({
-      getAudioElement: () => audioRef.current,
+      getAudioElement: () => playbackRuntime.getAudioElement(),
     }),
     []
   )
@@ -129,41 +127,33 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
     const normalizedPlaybackSpeed = normalizePlaybackSpeedValue(playbackSpeed)
     playbackSpeedRef.current = normalizedPlaybackSpeed
 
-    const audio = audioRef.current
-    if (!audio) {
-      return
-    }
-
+    const audio = playbackRuntime.getAudioElement()
     applyPlaybackSpeedToAudio(audio, normalizedPlaybackSpeed)
+    playbackRuntime.setPlaybackRate(normalizedPlaybackSpeed)
   }, [playbackSpeed])
 
   useEffect(() => {
     volumeRef.current = volume
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100
-    }
+    playbackRuntime.setVolume(volume / 100)
   }, [volume])
 
   useEffect(() => {
     audioOutputDeviceIdRef.current = audioOutputDeviceId
-    const audio = audioRef.current
 
-    if (!audio) {
-      return
-    }
+    void playbackRuntime.setOutputDevice(audioOutputDeviceId).then(applied => {
+      if (applied) {
+        return
+      }
 
-    void applyAudioOutputDevice(audio, audioOutputDeviceId).catch(error => {
-      console.error('apply audio output device failed', error)
-      toast.error('音频输出设备切换失败')
+      toast.error('闊抽杈撳嚭璁惧鍒囨崲澶辫触')
     })
   }, [audioOutputDeviceId])
 
   useEffect(() => {
-    const audio = new Audio()
+    const audio = playbackRuntime.getAudioElement()
     audio.preload = 'auto'
-    audio.volume = volumeRef.current / 100
-    applyPlaybackSpeedToAudio(audio, playbackSpeedRef.current)
-    audioRef.current = audio
+    playbackRuntime.setVolume(volumeRef.current / 100)
+    playbackRuntime.setPlaybackRate(playbackSpeedRef.current)
 
     let frameId = 0
 
@@ -233,9 +223,6 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
 
     return () => {
       stopProgressSync()
-      audio.pause()
-      audio.removeAttribute('src')
-      audio.load()
       audio.removeEventListener('timeupdate', handleTimeUpdate)
       audio.removeEventListener('durationchange', handleDurationChange)
       audio.removeEventListener('loadedmetadata', handleDurationChange)
@@ -244,14 +231,11 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
       audio.removeEventListener('pause', stopProgressSync)
       audio.removeEventListener('ended', handleEnded)
       audio.removeEventListener('error', handleError)
-      audioRef.current = null
     }
   }, [])
 
   useEffect(() => {
-    const audio = audioRef.current
-
-    if (!audio || !currentTrack || requestId <= 0) {
+    if (!currentTrack || requestId <= 0) {
       return
     }
 
@@ -263,7 +247,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
       if (usePlaybackStore.getState().shouldAutoPlayOnLoad) {
         usePlaybackStore.getState().markPlaybackLoading()
       }
-      prepareAudioForPendingTrack(audio)
+      playbackRuntime.stop()
 
       try {
         let result = null
@@ -334,11 +318,10 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
           expectedTrackId,
           cancelled
         )
-        audio.pause()
-        audio.src = resolvedAudioUrl
-        audio.currentTime = 0
-        audio.volume = volumeRef.current / 100
-        applyPlaybackSpeedToAudio(audio, playbackSpeedRef.current)
+        await playbackRuntime.loadSource(resolvedAudioUrl)
+        const audio = playbackRuntime.getAudioElement()
+        playbackRuntime.setVolume(volumeRef.current / 100)
+        playbackRuntime.setPlaybackRate(playbackSpeedRef.current)
         latestState.setDuration(result.time || currentTrack.duration)
 
         const restoreProgress = latestState.pendingRestoreProgress
@@ -373,30 +356,39 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
         }
 
         try {
-          await applyAudioOutputDevice(audio, audioOutputDeviceIdRef.current)
+          const outputApplied = await playbackRuntime.setOutputDevice(
+            audioOutputDeviceIdRef.current
+          )
           throwIfPlaybackRequestStale(
             expectedRequestId,
             expectedTrackId,
             cancelled
           )
+          if (!outputApplied) {
+            toast.error(
+              '闊抽杈撳嚭璁惧鍒囨崲澶辫触锛屽皢浣跨敤榛樿杈撳嚭璁惧鎾斁'
+            )
+          }
         } catch (error) {
           if (error === STALE_PLAYBACK_REQUEST) {
             throw error
           }
           console.error('apply audio output device failed', error)
-          toast.error('音频输出设备切换失败，将使用默认输出设备播放')
+          toast.error(
+            '闊抽杈撳嚭璁惧鍒囨崲澶辫触锛屽皢浣跨敤榛樿杈撳嚭璁惧鎾斁'
+          )
         }
 
         const currentPlaybackState = usePlaybackStore.getState()
 
         if (!currentPlaybackState.shouldAutoPlayOnLoad) {
           currentPlaybackState.markPlaybackPaused()
-          audio.pause()
+          playbackRuntime.pause()
           return
         }
 
         if (currentPlaybackState.status === 'paused') {
-          audio.pause()
+          playbackRuntime.pause()
           return
         }
 
@@ -405,7 +397,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
           expectedTrackId,
           cancelled
         )
-        await audio.play()
+        await playbackRuntime.play()
         throwIfPlaybackRequestStale(
           expectedRequestId,
           expectedTrackId,
@@ -436,19 +428,15 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
   }, [currentTrack, requestId])
 
   useEffect(() => {
-    const audio = audioRef.current
-
-    if (!audio) {
-      return
-    }
+    const audio = playbackRuntime.getAudioElement()
 
     if (status === 'paused' || status === 'idle' || status === 'error') {
-      audio.pause()
+      playbackRuntime.pause()
       return
     }
 
     if (status === 'playing' && audio.src && audio.paused) {
-      void audio.play().catch(error => {
+      void playbackRuntime.play().catch(error => {
         console.error('resume playback failed', error)
         usePlaybackStore
           .getState()
@@ -459,9 +447,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
   }, [status])
 
   useEffect(() => {
-    const audio = audioRef.current
-
-    if (!audio || seekRequestId <= 0) {
+    if (seekRequestId <= 0) {
       return
     }
 
@@ -469,7 +455,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
 
     if (Number.isFinite(nextTime)) {
       try {
-        audio.currentTime = nextTime
+        playbackRuntime.seek(nextTime)
         usePlaybackStore.getState().setProgress(seekPosition)
       } catch (error) {
         console.error('seek playback failed', error)

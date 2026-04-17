@@ -66,3 +66,17 @@ test('output device failure does not clear the active source', async () => {
   assert.equal(success, false)
   assert.equal(audio.src, 'https://a.test/one.mp3')
 })
+
+test('playback runtime stops old audio before switching tracks', async () => {
+  const audio = new FakeAudio()
+  const runtime = createPlaybackRuntime({
+    createAudioElement: () => audio as unknown as HTMLAudioElement,
+  })
+
+  await runtime.loadSource('https://a.test/one.mp3')
+  await runtime.play()
+  await runtime.loadSource('https://a.test/two.mp3')
+
+  assert.equal(audio.pauseCount >= 2, true)
+  assert.equal(audio.src, 'https://a.test/two.mp3')
+})
