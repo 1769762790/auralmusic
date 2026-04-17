@@ -3,6 +3,7 @@ import ElectronStore from 'electron-store'
 import { resolveAppStoreDirectory } from '../storage/store-path.ts'
 import {
   AUDIO_QUALITY_LEVELS,
+  ANIMATION_EFFECT_LEVELS,
   DOWNLOAD_QUALITY_POLICIES,
   DOWNLOAD_FILE_NAME_PATTERNS,
   ENHANCED_SOURCE_MODULES,
@@ -24,6 +25,8 @@ import {
   normalizeDynamicCoverEnabled,
   normalizeEnhancedSourceModules,
   normalizeEqualizerConfigValue,
+  normalizeAnimationEffect,
+  normalizeImmersivePlayerControls,
   normalizeLyricsKaraokeEnabled,
   normalizePlaybackSpeed,
   normalizePlayerBackgroundMode,
@@ -215,6 +218,11 @@ const CONFIG_STORE_SCHEMA = {
     type: 'string',
     enum: ['off', 'static', 'dynamic'],
   },
+  animationEffect: {
+    type: 'string',
+    enum: ANIMATION_EFFECT_LEVELS,
+  },
+  immersivePlayerControls: { type: 'boolean' },
   diskCacheEnabled: { type: 'boolean' },
   diskCacheDir: { type: 'string' },
   diskCacheMaxBytes: { type: 'number', minimum: 1 },
@@ -323,6 +331,25 @@ class ConfigStore {
         ConfigStore.instance.set(
           'playerBackgroundMode',
           normalizedPlayerBackgroundMode
+        )
+      }
+
+      const animationEffect = ConfigStore.instance.get('animationEffect')
+      const normalizedAnimationEffect =
+        normalizeAnimationEffect(animationEffect)
+      if (animationEffect !== normalizedAnimationEffect) {
+        ConfigStore.instance.set('animationEffect', normalizedAnimationEffect)
+      }
+
+      const immersivePlayerControls = ConfigStore.instance.get(
+        'immersivePlayerControls'
+      )
+      const normalizedImmersivePlayerControls =
+        normalizeImmersivePlayerControls(immersivePlayerControls)
+      if (immersivePlayerControls !== normalizedImmersivePlayerControls) {
+        ConfigStore.instance.set(
+          'immersivePlayerControls',
+          normalizedImmersivePlayerControls
         )
       }
 

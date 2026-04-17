@@ -7,7 +7,9 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { useTheme } from '@/hooks/useTheme'
+import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/stores/config-store'
+import type { AnimationEffectLevel } from '../../../../main/config/types.ts'
 
 import ThemeColorField from './ThemeColorField'
 
@@ -38,6 +40,67 @@ const PLAYER_BACKGROUND_OPTIONS: Array<{
   },
 ]
 
+const ANIMATION_EFFECT_OPTIONS: Array<{
+  label: string
+  value: AnimationEffectLevel
+  description: string
+}> = [
+  {
+    label: '标准',
+    value: 'standard',
+    description: '保留界面过渡、背景和封面动效',
+  },
+  {
+    label: '减弱',
+    value: 'reduced',
+    description: '减少装饰动画，保留必要加载反馈',
+  },
+  {
+    label: '关闭',
+    value: 'off',
+    description: '关闭非必要动效和大部分过渡',
+  },
+]
+
+interface ToggleSettingProps {
+  enabled: boolean
+  onToggle: () => void
+}
+
+function ToggleSetting({ enabled, onToggle }: ToggleSettingProps) {
+  return (
+    <button
+      type='button'
+      aria-pressed={enabled}
+      onClick={onToggle}
+      className={cn(
+        'bg-muted/60 relative h-9 w-full rounded-full px-1 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
+        enabled
+          ? 'bg-primary/90 text-primary-foreground'
+          : 'text-muted-foreground'
+      )}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          'bg-background absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-full shadow-sm transition-transform duration-300',
+          enabled ? 'translate-x-full' : 'translate-x-0'
+        )}
+      />
+      <span className='relative z-10 grid h-full grid-cols-2 items-center'>
+        <span
+          className={cn('transition-colors', !enabled && 'text-foreground')}
+        >
+          关闭
+        </span>
+        <span className={cn('transition-colors', enabled && 'text-foreground')}>
+          开启
+        </span>
+      </span>
+    </button>
+  )
+}
+
 const BasicSettings = () => {
   const {
     currentTheme,
@@ -48,6 +111,10 @@ const BasicSettings = () => {
   } = useTheme()
   const playerBackgroundMode = useConfigStore(
     state => state.config.playerBackgroundMode
+  )
+  const animationEffect = useConfigStore(state => state.config.animationEffect)
+  const immersivePlayerControls = useConfigStore(
+    state => state.config.immersivePlayerControls
   )
   const setConfig = useConfigStore(state => state.setConfig)
 
@@ -69,6 +136,14 @@ const BasicSettings = () => {
     void setConfig('playerBackgroundMode', value)
   }
 
+  const handleAnimationEffectChange = (value: AnimationEffectLevel) => {
+    void setConfig('animationEffect', value)
+  }
+
+  const handleToggleImmersivePlayerControls = () => {
+    void setConfig('immersivePlayerControls', !immersivePlayerControls)
+  }
+
   return (
     <div className='space-y-1'>
       <div className='grid grid-cols-[minmax(0,1fr)_minmax(180px,240px)] items-center gap-6 py-3'>
@@ -85,6 +160,56 @@ const BasicSettings = () => {
             {THEME_OPTIONS.map(option => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <Separator />
+
+      <div className='grid grid-cols-[minmax(0,1fr)_minmax(180px,240px)] items-center gap-6 py-3'>
+        <div className='space-y-1'>
+          <div className='text-muted-foreground text-sm font-medium'>
+            沉浸式播放器
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            开启后，播放器主界面的全屏和关闭按钮会在静置 2 秒后淡出。
+          </p>
+        </div>
+        <ToggleSetting
+          enabled={immersivePlayerControls}
+          onToggle={handleToggleImmersivePlayerControls}
+        />
+      </div>
+      <Separator />
+
+      <div className='grid grid-cols-[minmax(0,1fr)_minmax(180px,240px)] items-center gap-6 py-3'>
+        <div className='space-y-1'>
+          <div className='text-muted-foreground text-sm font-medium'>
+            动画效果
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            控制界面过渡、背景滚动和封面装饰动效的强度。
+          </p>
+        </div>
+        <Select
+          value={animationEffect}
+          onValueChange={value =>
+            handleAnimationEffectChange(value as AnimationEffectLevel)
+          }
+        >
+          <SelectTrigger className='bg-muted/60 h-9 w-full border-none px-4 shadow-none'>
+            <SelectValue placeholder='选择动画效果' />
+          </SelectTrigger>
+          <SelectContent align='end'>
+            {ANIMATION_EFFECT_OPTIONS.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                <div className='flex flex-col items-start gap-0.5'>
+                  <span>{option.label}</span>
+                  <span className='text-muted-foreground text-[11px]'>
+                    {option.description}
+                  </span>
+                </div>
               </SelectItem>
             ))}
           </SelectContent>

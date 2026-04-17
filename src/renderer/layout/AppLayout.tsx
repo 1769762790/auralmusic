@@ -10,10 +10,12 @@ import ScrollToTopButton from '@/components/ScrollToTopButton'
 import KeepAliveRouteOutlet from 'keepalive-for-react-router'
 import { Toaster } from '@/components/ui/sonner'
 import { isWindowsPlatform } from '@/lib/electron-runtime'
+import { useAnimationEffect } from '@/hooks/useAnimationEffect'
 import { useSystemFont } from '@/hooks/useSystemFont'
 
 const AppLayout = () => {
   const isWindows = isWindowsPlatform()
+  useAnimationEffect()
   useSystemFont()
 
   return (

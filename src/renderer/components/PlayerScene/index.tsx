@@ -15,9 +15,11 @@ import PlayerSceneAmllBackground from './PlayerSceneAmllBackground'
 import PlayerSceneAmllBackgroundOverlay from './PlayerSceneAmllBackgroundOverlay'
 import PlayerSceneArtwork from './PlayerSceneArtwork'
 import PlayerSceneAmllLyrics from './PlayerSceneAmllLyrics'
+import PlayerSceneChromeButton from './PlayerSceneChromeButton'
 import PlayerSceneControls from './PlayerSceneControls'
 import PlayerSceneProgress from './PlayerSceneProgress'
 import { resolveAmllBackgroundState } from './player-background-amll.model'
+import { usePlayerSceneChromeVisibility } from './usePlayerSceneChromeVisibility'
 import { usePlayerLyrics } from './usePlayerLyrics'
 
 const PlayerScene = () => {
@@ -48,11 +50,19 @@ const PlayerScene = () => {
   const playerBackgroundMode = useConfigStore(
     state => state.config.playerBackgroundMode
   )
+  const immersivePlayerControls = useConfigStore(
+    state => state.config.immersivePlayerControls
+  )
 
   const { lyrics, lyricsLoading, lyricsError } = usePlayerLyrics({
     isOpen,
     trackId: currentTrack?.id,
   })
+  const { chromeVisible, handleChromePointerActivity } =
+    usePlayerSceneChromeVisibility({
+      immersiveEnabled: immersivePlayerControls,
+      isOpen,
+    })
   const electronWindow = getElectronWindowApi()
   const isDarkTheme = useResolvedDarkTheme()
 
@@ -158,7 +168,10 @@ const PlayerScene = () => {
           当前播放歌曲、播放控制、进度条和歌词
         </DrawerDescription>
 
-        <div className='window-no-drag relative h-full overflow-hidden bg-[var(--background)]'>
+        <div
+          className='window-no-drag relative h-full overflow-hidden bg-[var(--background)]'
+          onPointerMove={handleChromePointerActivity}
+        >
           <PlayerSceneAmllBackground
             coverUrl={coverUrl}
             playing={amllBackgroundState.playing}
@@ -176,27 +189,31 @@ const PlayerScene = () => {
             className='window-drag absolute top-0 left-1/2 z-20 h-18 w-[42vw] max-w-[680px] min-w-[260px] -translate-x-1/2'
           />
 
-          <button
+          <PlayerSceneChromeButton
             type='button'
             aria-label={isFullscreen ? '退出全屏' : '全屏播放'}
+            position='left'
+            visible={chromeVisible}
+            onReveal={handleChromePointerActivity}
             onClick={handleToggleFullscreen}
-            className='absolute top-8 left-10 z-30 flex size-11 items-center justify-center rounded-full bg-white/12 text-[var(--player-muted)] backdrop-blur-xl transition-colors hover:bg-white/20 hover:text-[var(--player-foreground)]'
           >
             {isFullscreen ? (
               <Minimize2 className='size-5' />
             ) : (
               <Maximize2 className='size-5' />
             )}
-          </button>
+          </PlayerSceneChromeButton>
 
-          <button
+          <PlayerSceneChromeButton
             type='button'
             aria-label='关闭播放器'
+            position='right'
+            visible={chromeVisible}
+            onReveal={handleChromePointerActivity}
             onClick={handleClose}
-            className='absolute top-8 right-10 z-30 flex size-11 items-center justify-center rounded-full bg-white/12 text-[var(--player-muted)] backdrop-blur-xl transition-colors hover:bg-white/20 hover:text-[var(--player-foreground)]'
           >
             <X className='size-5' />
-          </button>
+          </PlayerSceneChromeButton>
 
           <div className='relative z-10 grid h-full min-h-0 grid-cols-[minmax(320px,0.86fr)_minmax(420px,1.14fr)] items-center gap-16 px-14 py-16 xl:px-20'>
             <div className='flex min-h-0 flex-col items-center gap-8 2xl:gap-12'>

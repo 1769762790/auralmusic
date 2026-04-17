@@ -308,6 +308,38 @@
   animation: bgScroll 20s linear infinite;
 }
 
+:root[data-animation-effect='reduced'] .bg-animate,
+:root[data-animation-effect='off'] .bg-animate,
+:root[data-animation-effect='reduced'] .player-scene-artwork-shell.is-breathing,
+:root[data-animation-effect='off'] .player-scene-artwork-shell.is-breathing {
+  animation: none !important;
+}
+
+:root[data-animation-effect='reduced']
+  *:not(.animate-spin):not(.animate-pulse):not([data-slot='skeleton']),
+:root[data-animation-effect='reduced']
+  *:not(.animate-spin):not(.animate-pulse):not([data-slot='skeleton'])::before,
+:root[data-animation-effect='reduced']
+  *:not(.animate-spin):not(.animate-pulse):not([data-slot='skeleton'])::after {
+  transition-duration: 120ms !important;
+  animation-duration: 120ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+:root[data-animation-effect='off']
+  *:not(.animate-spin):not(.animate-pulse):not([data-slot='skeleton']),
+:root[data-animation-effect='off']
+  *:not(.animate-spin):not(.animate-pulse):not([data-slot='skeleton'])::before,
+:root[data-animation-effect='off']
+  *:not(.animate-spin):not(.animate-pulse):not([data-slot='skeleton'])::after {
+  scroll-behavior: auto !important;
+  transition-delay: 0ms !important;
+  transition-duration: 0ms !important;
+  animation-delay: 0ms !important;
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

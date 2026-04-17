@@ -19,6 +19,8 @@ import {
   normalizeDynamicCoverEnabled,
   normalizeEnhancedSourceModules,
   normalizeEqualizerConfigValue,
+  normalizeAnimationEffect,
+  normalizeImmersivePlayerControls,
   normalizeLyricsKaraokeEnabled,
   normalizePlaybackSpeed,
   normalizePlayerBackgroundMode,
@@ -148,6 +150,10 @@ function normalizeConfig(config: AppConfig): AppConfig {
         : defaultConfig.autoStartEnabled,
     playerBackgroundMode: normalizePlayerBackgroundMode(
       config.playerBackgroundMode
+    ),
+    animationEffect: normalizeAnimationEffect(config.animationEffect),
+    immersivePlayerControls: normalizeImmersivePlayerControls(
+      config.immersivePlayerControls
     ),
     closeBehavior: ['ask', 'minimize', 'quit'].includes(config.closeBehavior)
       ? config.closeBehavior

@@ -61,6 +61,8 @@ export type EnhancedSourceModule = (typeof ENHANCED_SOURCE_MODULES)[number]
 
 export type CloseBehavior = 'ask' | 'minimize' | 'quit'
 export type PlayerBackgroundMode = 'off' | 'static' | 'dynamic'
+export const ANIMATION_EFFECT_LEVELS = ['standard', 'reduced', 'off'] as const
+export type AnimationEffectLevel = (typeof ANIMATION_EFFECT_LEVELS)[number]
 export const MIN_PLAYBACK_SPEED = 0.5
 export const MAX_PLAYBACK_SPEED = 2.0
 export const DEFAULT_DISK_CACHE_MAX_BYTES = 1024 * 1024 * 1024
@@ -95,6 +97,8 @@ export interface AppConfig {
   closeBehavior: CloseBehavior
   rememberCloseChoice: boolean
   playerBackgroundMode: PlayerBackgroundMode
+  animationEffect: AnimationEffectLevel
+  immersivePlayerControls: boolean
   diskCacheEnabled: boolean
   diskCacheDir: string
   diskCacheMaxBytes: number
@@ -140,6 +144,8 @@ export const defaultConfig: AppConfig = {
   closeBehavior: 'ask',
   rememberCloseChoice: false,
   playerBackgroundMode: 'static',
+  animationEffect: 'standard',
+  immersivePlayerControls: false,
   diskCacheEnabled: false,
   diskCacheDir: '',
   diskCacheMaxBytes: DEFAULT_DISK_CACHE_MAX_BYTES,
@@ -181,6 +187,19 @@ export function normalizePlayerBackgroundMode(value: unknown) {
   return value === 'off' || value === 'dynamic' || value === 'static'
     ? value
     : defaultConfig.playerBackgroundMode
+}
+
+export function normalizeAnimationEffect(value: unknown) {
+  return typeof value === 'string' &&
+    ANIMATION_EFFECT_LEVELS.includes(value as AnimationEffectLevel)
+    ? (value as AnimationEffectLevel)
+    : defaultConfig.animationEffect
+}
+
+export function normalizeImmersivePlayerControls(value: unknown) {
+  return typeof value === 'boolean'
+    ? value
+    : defaultConfig.immersivePlayerControls
 }
 
 export function normalizeDiskCacheMaxBytes(value: unknown) {
