@@ -12,11 +12,7 @@ import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { cn } from '@/lib/utils'
 import { usePlaybackStore } from '@/stores/playback-store'
 import { getPlaybackQueueItemState } from '../../../shared/playback.ts'
-
-type PlaybackQueueDrawerProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
+import type { PlaybackQueueDrawerProps } from './types'
 
 const PlaybackQueueDrawer = ({
   open,

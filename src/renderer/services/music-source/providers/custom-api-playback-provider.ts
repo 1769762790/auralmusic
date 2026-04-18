@@ -1,4 +1,4 @@
-import type { PlaybackSourceProvider } from '../playback-source-resolver.ts'
+import type { PlaybackSourceProvider } from '@/types/core'
 
 export function createCustomApiPlaybackProvider(): PlaybackSourceProvider {
   return {

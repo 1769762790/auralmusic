@@ -1,14 +1,8 @@
 import { create } from 'zustand'
-import type { DailySong } from '@/pages/Home/home.type'
+import type { DailySongsStoreState } from '@/types/core'
 
-interface DailySongsStore {
-  list: DailySong[]
-  setList: (list: DailySong[]) => void
-  getTopOne: DailySong[]
-}
-
-// 每日推荐
-export const useDailySongs = create<DailySongsStore>((set, get) => ({
+// 姣忔棩鎺ㄨ崘
+export const useDailySongs = create<DailySongsStoreState>((set, get) => ({
   list: [],
   setList: list => {
     return set({ list })

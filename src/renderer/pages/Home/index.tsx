@@ -16,18 +16,13 @@ import NewAlbumList from './components/NewAlbumList'
 import { getAlbumDetail, getAlbumNewSet } from '@/api/album'
 import NewSongsList from './components/NewSongsList'
 import { HomeFeatureSkeleton } from './components/HomeSkeletons'
-import type {
-  AlbumSummary,
-  ArtistSummary,
-  HomeFmData,
-  NewSong,
-} from './home.type'
+import type { AlbumSummary, ArtistSummary, HomeFmData, NewSong } from './types'
 import { useNavigate } from 'react-router-dom'
 import {
   normalizeHomeDailyTracks,
   normalizeHomeFmTrack,
   normalizeHomeNewSongTracks,
-} from './home.model'
+} from './model'
 import type { PlaybackTrack } from '../../../shared/playback.ts'
 import { normalizeAlbumTracks } from '../Albums/Detail/album-detail.model'
 

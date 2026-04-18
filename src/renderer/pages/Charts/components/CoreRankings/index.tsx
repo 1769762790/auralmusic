@@ -1,10 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import CoreRankingCardItem from './CoreRankingCardItem'
-import type { OnlineChartSummary } from './CoreRankingCardItem.type'
-
-interface CoreRankingsProps {
-  topList?: OnlineChartSummary[]
-}
+import type { CoreRankingsProps } from '../../types'
 
 const CoreRankings = ({ topList = [] }: CoreRankingsProps) => {
   const navigate = useNavigate()

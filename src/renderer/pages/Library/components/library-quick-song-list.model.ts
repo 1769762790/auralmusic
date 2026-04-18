@@ -1,5 +1,5 @@
 import type { PlaybackTrack } from '../../../../shared/playback.ts'
-import type { LibrarySongItem } from '../library.model'
+import type { LibrarySongItem } from '../types'
 
 export function buildLibraryQuickSongPlaybackQueue(
   songs: LibrarySongItem[]

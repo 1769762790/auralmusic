@@ -1,17 +1,6 @@
 import MediaDetailHero from '@/components/MediaDetailHero'
-
-import {
-  formatAlbumPublishDate,
-  type AlbumDetailHeroData,
-} from '../album-detail.model'
-
-interface AlbumDetailHeroProps {
-  hero: AlbumDetailHeroData
-  isLiked: boolean
-  likeLoading: boolean
-  onToggleLiked: () => void
-  onPlay: () => void
-}
+import { formatAlbumPublishDate } from '../album-detail.model'
+import type { AlbumDetailHeroProps } from '../types'
 
 const AlbumDetailHero = ({
   hero,

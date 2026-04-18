@@ -9,7 +9,7 @@ import {
 import type {
   DownloadResolverProvider,
   DownloadSourceProviderOptions,
-} from './types.ts'
+} from '@/types/core'
 
 export function createOfficialDownloadProvider(): DownloadResolverProvider {
   return {
@@ -36,7 +36,7 @@ export function createOfficialDownloadProvider(): DownloadResolverProvider {
           }
         }
       } catch {
-        // Fall through to official playback fallback.
+        // Fall through to the next resolver.
       }
 
       const getSongUrl =
@@ -60,7 +60,7 @@ export function createOfficialDownloadProvider(): DownloadResolverProvider {
           }
         }
       } catch {
-        // Fall through to the next resolver family.
+        // Fall through to the next resolver.
       }
 
       return null

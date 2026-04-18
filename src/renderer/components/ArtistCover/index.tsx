@@ -1,15 +1,7 @@
 import { PlayIcon } from 'lucide-react'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import AvatarCover from '../AvatarCover'
-
-interface ArtistCoverProps {
-  artistCoverUrl: string
-  artistName: string
-  subTitle?: string
-  rounded?: 'full' | string
-  onPlay?: () => void
-  onClickCover?: () => void
-}
+import type { ArtistCoverProps } from './types'
 const ArtistCover = ({
   artistName,
   artistCoverUrl,

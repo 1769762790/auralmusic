@@ -1,14 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { ArtistFilterOption } from '@/pages/Artists/artists.model'
-
-interface ArtistFilterGroupProps<T> {
-  label: string
-  options: ArtistFilterOption<T>[]
-  value: T
-  onChange: (value: T) => void
-  compact?: boolean
-}
+import type { ArtistFilterGroupProps } from '../types'
 
 const ArtistFilterGroup = <T,>({
   label,

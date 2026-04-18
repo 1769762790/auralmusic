@@ -1,29 +1,10 @@
-import type { ReactNode } from 'react'
 import { Heart, Play } from 'lucide-react'
 
 import AvatarCover from '@/components/AvatarCover'
 import { Button } from '@/components/ui/button'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { cn } from '@/lib/utils'
-
-export type MediaDetailHeroType = 'playlist' | 'album'
-
-interface MediaDetailHeroProps {
-  type: MediaDetailHeroType
-  title: string
-  coverUrl: string
-  subtitle: string
-  metaItems: string[]
-  description?: string
-  playDisabled?: boolean
-  favoriteVisible?: boolean
-  favorited?: boolean
-  favoriteLoading?: boolean
-  onPlay?: () => void
-  onToggleFavorite?: () => void
-  moreActions?: ReactNode
-  isResize?: boolean
-}
+import type { MediaDetailHeroProps, MediaDetailHeroType } from './types'
 
 const FALLBACK_TEXT: Record<MediaDetailHeroType, string> = {
   playlist: 'PL',

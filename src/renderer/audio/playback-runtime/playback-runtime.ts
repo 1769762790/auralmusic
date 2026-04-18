@@ -1,11 +1,7 @@
-import {
-  createEqualizerGraph,
-  type EqualizerGraph,
-} from '../equalizer/equalizer-graph.ts'
+import { createEqualizerGraph } from '../equalizer/equalizer-graph.ts'
 import {
   DEFAULT_EQUALIZER_CONFIG,
   normalizeEqualizerConfig,
-  type EqualizerConfig,
 } from '../../../shared/equalizer.ts'
 import { applyAudioOutputDevice } from '../../lib/audio-output.ts'
 import {
@@ -14,27 +10,15 @@ import {
   normalizePlaybackOutputDeviceId,
   shouldReuseLoadedSource,
 } from './playback-runtime.model.ts'
+import type {
+  CreatePlaybackRuntimeOptions,
+  EqualizerGraph,
+  PlaybackRuntime,
+} from '@/types/audio'
 
-export interface PlaybackRuntime {
-  getAudioElement: () => HTMLAudioElement
-  loadSource: (url: string) => Promise<void>
-  play: () => Promise<void>
-  pause: () => void
-  stop: () => void
-  seek: (timeSeconds: number) => void
-  setVolume: (volume: number) => void
-  setPlaybackRate: (rate: number) => void
-  setOutputDevice: (deviceId: string) => Promise<boolean>
-  applyEqualizer: (config: EqualizerConfig) => void
-  requiresEqualizerCompatibleSource: () => boolean
-}
-
-export function createPlaybackRuntime(options?: {
-  createAudioElement?: () => HTMLAudioElement
-  createEqualizerGraph?: (options: {
-    audioElement: HTMLAudioElement
-  }) => EqualizerGraph
-}): PlaybackRuntime {
+export function createPlaybackRuntime(
+  options?: CreatePlaybackRuntimeOptions
+): PlaybackRuntime {
   let loadedSource = ''
   let audioElement: HTMLAudioElement | null = null
   let equalizerGraph: EqualizerGraph | null = null

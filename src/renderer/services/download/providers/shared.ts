@@ -2,7 +2,7 @@ import {
   getSongDownloadUrlV1 as defaultGetSongDownloadUrlV1,
   getSongUrlV1 as defaultGetSongUrlV1,
 } from '../../../api/list.ts'
-import type { DownloadSourceApiListModule } from './types.ts'
+import type { DownloadSourceApiListModule } from '@/types/core'
 
 export async function loadDefaultSongApiListModule(): Promise<DownloadSourceApiListModule> {
   return {

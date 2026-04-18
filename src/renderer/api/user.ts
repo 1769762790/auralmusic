@@ -1,24 +1,18 @@
 import request from '@/lib/request'
-import { normalizeCollectPlaylistTargets } from '@/model/collect-to-playlist.model'
+import { normalizeCollectPlaylistTargets } from '@/model'
+import type { UserPlaylistParams } from '@/types/api'
 
 /**
- * 获取用户歌单
- * 说明 : 登录后调用此接口 , 传入用户 id, 可以获取用户歌单
- * - uid : 用户 id
- * - limit : 返回数量 , 默认为 30
- * - offset : 偏移数量，用于分页 , 如 :( 页数 -1)*30, 其中 30 为 limit 的值 , 默认为 0
+ * 鑾峰彇鐢ㄦ埛姝屽崟
+ * 璇存槑 : 鐧诲綍鍚庤皟鐢ㄦ鎺ュ彛 , 浼犲叆鐢ㄦ埛 id, 鍙互鑾峰彇鐢ㄦ埛姝屽崟
+ * - uid : 鐢ㄦ埛 id
+ * - limit : 杩斿洖鏁伴噺 , 榛樿涓?30
+ * - offset : 鍋忕Щ鏁伴噺锛岀敤浜庡垎椤?, 濡?:( 椤垫暟 -1)*30, 鍏朵腑 30 涓?limit 鐨勫€?, 榛樿涓?0
  * @param {Object} params
  * @param {number} params.uid
  * @param {number} params.limit
  * @param {number=} params.offset
  */
-export interface UserPlaylistParams {
-  uid: number | string
-  limit?: number
-  offset?: number
-  timestamp?: number
-}
-
 export function userPlaylist(params: UserPlaylistParams) {
   return request({
     url: '/user/playlist',

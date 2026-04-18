@@ -1,15 +1,6 @@
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
-
-type AvatarCoverProps = {
-  url: string
-  rounded?: 'full' | string
-  className?: string
-  shadowClassName?: string
-  wrapperClass?: string
-  isAutoHovered?: boolean
-  onClickCover?: () => void
-}
+import type { AvatarCoverProps } from './types'
 
 const AvatarCover = ({
   url,

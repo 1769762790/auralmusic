@@ -3,19 +3,8 @@ import type {
   ArtistDetailProfile,
   ArtistMvItem,
   ArtistSimilarItem,
-} from '../artist-detail.model.ts'
-
-type ImageResolveResult = {
-  url: string
-  fromCache: boolean
-}
-
-type ImageResolver = {
-  resolveImageSource: (
-    cacheKey: string,
-    sourceUrl: string
-  ) => Promise<ImageResolveResult>
-}
+} from '../types'
+import type { ImageResolver } from './types'
 
 function hasImageUrl(url: string) {
   return typeof url === 'string' && url.trim().length > 0

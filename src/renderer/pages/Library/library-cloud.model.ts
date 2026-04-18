@@ -1,56 +1,11 @@
-import type { DailySongRowItem } from '../DailySongs/daily-songs.model'
-
-interface RawCloudArtist {
-  name?: string
-}
-
-interface RawCloudAlbum {
-  name?: string
-  picUrl?: string
-  coverUrl?: string
-}
-
-interface RawCloudSimpleSong {
-  id?: number
-  name?: string
-  dt?: number
-  ar?: RawCloudArtist[]
-  al?: RawCloudAlbum
-}
-
-interface RawCloudItem {
-  id?: number
-  songId?: number
-  name?: string
-  songName?: string
-  fileName?: string
-  artist?: string
-  artistName?: string
-  album?: string
-  albumName?: string
-  cover?: string
-  coverUrl?: string
-  duration?: number
-  dt?: number
-  simpleSong?: RawCloudSimpleSong
-}
-
-interface RawLibraryCloudBody {
-  data?: RawLibraryCloudBody | RawCloudItem[]
-  more?: boolean
-  hasMore?: boolean
-  count?: number
-}
-
-interface NormalizeLibraryCloudPageOptions {
-  limit: number
-  offset: number
-}
-
-export interface LibraryCloudPage {
-  list: DailySongRowItem[]
-  hasMore: boolean
-}
+import type { DailySongRowItem } from '../DailySongs/types'
+import type {
+  LibraryCloudPage,
+  NormalizeLibraryCloudPageOptions,
+  RawCloudArtist,
+  RawCloudItem,
+  RawLibraryCloudBody,
+} from './types'
 
 function unwrapLibraryCloudBody(
   response?: RawLibraryCloudBody | RawCloudItem[] | null
@@ -96,7 +51,7 @@ function resolveArtistNames(item: RawCloudItem) {
     simpleSongArtists ||
     item.artist?.trim() ||
     item.artistName?.trim() ||
-    '未知歌手'
+    '鏈煡姝屾墜'
   )
 }
 
@@ -120,13 +75,13 @@ function normalizeLibraryCloudList(items?: RawCloudItem[]): DailySongRowItem[] {
           item.songName ||
           item.name ||
           item.fileName ||
-          '未知歌曲',
+          '鏈煡姝屾洸',
         artistNames: resolveArtistNames(item),
         albumName:
           item.simpleSong?.al?.name ||
           item.album?.trim() ||
           item.albumName?.trim() ||
-          '未知专辑',
+          '鏈煡涓撹緫',
         coverUrl:
           item.simpleSong?.al?.picUrl ||
           item.simpleSong?.al?.coverUrl ||

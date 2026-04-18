@@ -4,16 +4,14 @@ import { getSongUrlV1 as defaultGetSongUrlV1 } from '../../../api/list.ts'
 import type {
   PlaybackSourceProvider,
   PlaybackSourceProviderOptions,
-} from '../playback-source-resolver.ts'
-
-type GetSongUrlV1 = typeof defaultGetSongUrlV1
+} from '@/types/core'
 
 function getQuality(options: PlaybackSourceProviderOptions): AudioQualityLevel {
   return options.context.config.quality ?? 'higher'
 }
 
 export function createOfficialPlaybackProvider(
-  getSongUrlV1: GetSongUrlV1 = defaultGetSongUrlV1
+  getSongUrlV1: typeof defaultGetSongUrlV1 = defaultGetSongUrlV1
 ): PlaybackSourceProvider {
   return {
     resolve: async options => {

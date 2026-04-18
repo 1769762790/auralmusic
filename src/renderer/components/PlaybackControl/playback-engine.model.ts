@@ -1,9 +1,4 @@
-export interface PendingTrackAudio {
-  currentTime: number
-  pause: () => void
-  removeAttribute: (name: string) => void
-  load: () => void
-}
+import type { PendingTrackAudio } from './types'
 
 export function prepareAudioForPendingTrack(audio: PendingTrackAudio) {
   audio.pause()

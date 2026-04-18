@@ -4,56 +4,22 @@ import { getSubscribedAlbums } from '@/api/album'
 import { getSubscribedArtists } from '@/api/artist'
 import { getLikeList } from '@/api/list'
 import { userPlaylist } from '@/api/user'
-import type { AlbumListItem } from '@/pages/Albums/albums.model'
-import type { ArtistListItem } from '@/pages/Artists/artists.model'
-import { normalizeLibraryAlbumPage } from '@/pages/Library/library-albums.model'
-import { normalizeSubscribedArtistList } from '@/pages/Library/library-artists.model'
-import { resolveLibraryLikedSongIds } from '@/pages/Library/library.model'
+import type { AlbumListItem } from '@/pages/Albums/types'
+import type { ArtistListItem } from '@/pages/Artists/types'
+import {
+  normalizeLibraryAlbumPage,
+  normalizeSubscribedArtistList,
+  resolveLibraryLikedSongIds,
+} from '@/pages/Library/model'
 import {
   applySongLikePendingState,
   applySongLikeState,
 } from '../../shared/song-like-state'
+import type { UserStoreState } from '@/types/core'
 import { useAuthStore } from './auth-store'
 
 const LIKED_ARTISTS_LIMIT = 2000
 const LIKED_ALBUMS_PAGE_SIZE = 100
-
-interface UserStoreState {
-  likedPlaylist: unknown[]
-  myLikedPlaylistId: number | null
-  likedArtists: ArtistListItem[]
-  likedAlbums: AlbumListItem[]
-  likedArtistIds: Set<number>
-  likedAlbumIds: Set<number>
-  likedSongIds: Set<number>
-  likedSongPendingIds: Set<number>
-  likedArtistsLoaded: boolean
-  likedAlbumsLoaded: boolean
-  likedSongsLoaded: boolean
-  likedArtistsLoading: boolean
-  likedAlbumsLoading: boolean
-  likedSongsLoading: boolean
-  fetchLikedPlaylist: () => Promise<void>
-  fetchLikedArtists: () => Promise<void>
-  fetchLikedAlbums: () => Promise<void>
-  fetchLikedSongs: () => Promise<void>
-  isArtistLiked: (artistId: number) => boolean
-  isAlbumLiked: (albumId: number) => boolean
-  isSongLiked: (songId: number) => boolean
-  resetUserData: () => void
-  toggleFollowed: (
-    artistId: number,
-    nextFollowed: boolean,
-    artist?: ArtistListItem
-  ) => void
-  toggleLikedAlbum: (
-    albumId: number,
-    nextLiked: boolean,
-    album?: AlbumListItem
-  ) => void
-  toggleLikedSong: (songId: number, nextLiked: boolean) => void
-  setSongLikePending: (songId: number, pending: boolean) => void
-}
 
 const initialUserState = {
   likedPlaylist: [],

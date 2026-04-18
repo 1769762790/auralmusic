@@ -1,13 +1,6 @@
 import DownloadTaskRow from './DownloadTaskRow'
 import DownloadsEmptyState from './DownloadsEmptyState'
-import type { DownloadTask } from '../downloads.types'
-
-interface DownloadsTaskListProps {
-  tasks: DownloadTask[]
-  onOpenFile: (taskId: string) => void
-  onOpenFolder: (taskId: string) => void
-  onRemoveTask: (taskId: string) => void
-}
+import type { DownloadsTaskListProps } from '../types'
 
 const DownloadsTaskList = ({
   tasks,

@@ -1,12 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { AlbumArea, AlbumFilterOption } from '@/pages/Albums/albums.model'
-
-interface AlbumFiltersProps {
-  options: AlbumFilterOption<AlbumArea>[]
-  value: AlbumArea
-  onChange: (value: AlbumArea) => void
-}
+import type { AlbumFiltersProps } from '../types'
 
 const AlbumFilters = ({ options, value, onChange }: AlbumFiltersProps) => {
   return (

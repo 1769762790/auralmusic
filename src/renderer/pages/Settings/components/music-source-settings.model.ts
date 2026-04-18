@@ -1,21 +1,8 @@
 import type { AppConfig } from '../../../../main/config/types.ts'
-
-type MusicSourceSettingsDraftInput = Pick<
-  AppConfig,
-  | 'musicSourceProviders'
-  | 'enhancedSourceModules'
-  | 'luoxueSourceEnabled'
-  | 'customMusicApiEnabled'
-  | 'customMusicApiUrl'
->
-
-export type MusicSourceSettingsDraft = {
-  hasLegacyProviders: boolean
-  enhancedSourceModules: AppConfig['enhancedSourceModules']
-  luoxueSourceEnabled: boolean
-  customMusicApiEnabled: boolean
-  customMusicApiUrl: string
-}
+import type {
+  MusicSourceSettingsDraft,
+  MusicSourceSettingsDraftInput,
+} from '../types'
 
 export function createMusicSourceSettingsDraft(
   config: MusicSourceSettingsDraftInput

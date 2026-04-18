@@ -1,37 +1,11 @@
-import type { DailySongRowItem } from '../DailySongs/daily-songs.model.ts'
-import { normalizeLibrarySongs } from '../Library/library.model.ts'
-
-interface RawUserPlaylistItem {
-  id?: number
-  trackCount?: number
-  coverImgUrl: string
-}
-
-interface RawUserPlaylistResponse {
-  data?: RawUserPlaylistResponse
-  playlist?: RawUserPlaylistItem[]
-}
-
-interface NormalizeLikedSongsTrackPageOptions {
-  offset: number
-  totalSongs: number
-}
-
-export interface LikedSongsPageState {
-  totalSongs: number
-  songs: DailySongRowItem[]
-}
-
-export interface LikedSongsPlaylistMeta {
-  id: number
-  totalSongs: number
-  coverImgUrl: string
-}
-
-export interface LikedSongsTrackPage {
-  list: DailySongRowItem[]
-  hasMore: boolean
-}
+import { normalizeLibrarySongs } from '../Library/model'
+import type {
+  LikedSongsPageState,
+  LikedSongsPlaylistMeta,
+  LikedSongsTrackPage,
+  NormalizeLikedSongsTrackPageOptions,
+  RawUserPlaylistResponse,
+} from './types'
 
 export const EMPTY_LIKED_SONGS_PAGE_STATE: LikedSongsPageState = {
   totalSongs: 0,

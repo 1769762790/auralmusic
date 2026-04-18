@@ -5,26 +5,14 @@ export const ACCOUNT_MENU_LABELS = {
   settings: '设置',
   logout: '退出账号',
 } as const
+import type {
+  AccountMenuAction,
+  CreateAccountMenuActionsOptions,
+} from './types'
 
-export type AccountMenuActionKey = 'theme' | 'downloads' | 'settings' | 'logout'
-
-export interface AccountMenuAction {
-  key: AccountMenuActionKey
-  label: string
-  disabled?: boolean
-  requiresSeparatorBefore?: boolean
-  onSelect: () => void | Promise<void>
-}
-
-export function createAccountMenuActions(options: {
-  isDark: boolean
-  isLoading: boolean
-  hasUser: boolean
-  onToggleTheme: () => void
-  onOpenDownloads: () => void
-  onOpenSettings: () => void
-  onLogout: () => Promise<void>
-}) {
+export function createAccountMenuActions(
+  options: CreateAccountMenuActionsOptions
+) {
   const actions: AccountMenuAction[] = [
     {
       key: 'theme',

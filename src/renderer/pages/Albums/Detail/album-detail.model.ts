@@ -1,72 +1,13 @@
-import type { AlbumListItem } from '../albums.model'
-
-export interface AlbumDetailHeroData {
-  id: number
-  name: string
-  coverUrl: string
-  artistNames: string
-  publishTime?: number
-  trackCount: number
-  description: string
-}
-
-export interface AlbumTrackItem {
-  id: number
-  name: string
-  artistNames: string
-  albumName: string
-  duration: number
-  coverUrl: string
-}
-
-export interface AlbumDetailPageState {
-  hero: AlbumDetailHeroData | null
-  tracks: AlbumTrackItem[]
-}
-
-interface RawAlbumArtist {
-  name?: string
-}
-
-interface RawAlbumDetail {
-  id?: number
-  name?: string
-  picUrl?: string
-  publishTime?: number
-  description?: string
-  size?: number
-  artists?: RawAlbumArtist[]
-  artist?: RawAlbumArtist
-}
-
-interface RawAlbumDetailResponse {
-  album?: RawAlbumDetail
-}
-
-interface RawTrackArtist {
-  name?: string
-}
-
-interface RawTrackAlbum {
-  name?: string
-  picUrl?: string
-}
-
-interface RawAlbumTrack {
-  id: number
-  name?: string
-  dt?: number
-  al?: RawTrackAlbum
-  ar?: RawTrackArtist[]
-}
-
-interface RawAlbumTracksResponse extends RawAlbumDetailResponse {
-  songs?: RawAlbumTrack[]
-}
-
-interface NormalizeAlbumTracksOptions {
-  fallbackCoverUrl?: string
-}
+import type { AlbumListItem } from '../types'
+import type {
+  AlbumDetailHeroData,
+  AlbumDetailPageState,
+  AlbumTrackItem,
+  NormalizeAlbumTracksOptions,
+  RawAlbumArtist,
+  RawAlbumDetailResponse,
+  RawAlbumTracksResponse,
+} from './types'
 
 export const EMPTY_ALBUM_DETAIL_STATE: AlbumDetailPageState = {
   hero: null,

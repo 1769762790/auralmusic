@@ -4,7 +4,7 @@ import type {
   DownloadTaskFilterValue,
   DownloadTaskStatus,
   DownloadTaskViewModel,
-} from './downloads.types'
+} from './types'
 
 export const DOWNLOAD_TASK_FILTER_LABELS = {
   all: '所有任务',

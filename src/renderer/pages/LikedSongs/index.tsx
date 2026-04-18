@@ -10,10 +10,8 @@ import { useAuthStore } from '@/stores/auth-store'
 import LikedSongsHero from './components/LikedSongsHero'
 import LikedSongsSkeleton from './components/LikedSongsSkeleton'
 import LikedSongsTrackPanel from './components/LikedSongsTrackPanel'
-import {
-  resolveLikedSongsPlaylist,
-  type LikedSongsPlaylistMeta,
-} from './liked-songs.model'
+import { resolveLikedSongsPlaylist } from './liked-songs.model'
+import type { LikedSongsPlaylistMeta } from './types'
 
 const LikedSongs = () => {
   const location = useLocation()

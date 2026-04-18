@@ -9,22 +9,12 @@ import {
   applyPlaybackSpeedToAudio,
   normalizePlaybackSpeedValue,
 } from '@/pages/Settings/components/playback-speed.model'
+import type { CurrentPlaybackSource, PlaybackEngineRef } from './types'
 
 const PLAYBACK_UNAVAILABLE_MESSAGE = '暂时无法播放'
 const OUTPUT_DEVICE_UNAVAILABLE_MESSAGE = '音频输出设备切换失败'
 
 const STALE_PLAYBACK_REQUEST = Symbol('STALE_PLAYBACK_REQUEST')
-
-interface PlaybackEngineRef {
-  getAudioElement: () => HTMLAudioElement | null
-}
-
-type CurrentPlaybackSource = {
-  trackId: number
-  sourceUrl: string
-  loadedUrl: string
-  cacheKey: string | null
-}
 
 async function applyPersistedProgress(
   audio: HTMLAudioElement,

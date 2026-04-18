@@ -1,23 +1,7 @@
 import { Pause, Play, SkipBack, SkipForward } from 'lucide-react'
-import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
-
-type PlayerSceneControlsProps = {
-  disabled: boolean
-  isPlaying: boolean
-  onPrevious: () => void
-  onTogglePlay: () => void
-  onNext: () => void
-}
-
-type SceneControlButtonProps = {
-  label: string
-  disabled?: boolean
-  variant?: 'default' | 'primary'
-  children: ReactNode
-  onClick: () => void
-}
+import type { PlayerSceneControlsProps, SceneControlButtonProps } from './types'
 
 const SceneControlButton = ({
   label,

@@ -5,14 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { SEARCH_TYPE_LABEL_MAP, type SearchType } from '../search-dialog.model'
-
-interface SearchInputBarProps {
-  value: string
-  type: SearchType
-  onValueChange: (value: string) => void
-  onTypeChange: (value: SearchType) => void
-}
+import { SEARCH_TYPE_LABEL_MAP } from '../search-dialog.model'
+import type { SearchInputBarProps, SearchType } from '../types'
 
 const SEARCH_TYPE_OPTIONS: SearchType[] = [
   'song',

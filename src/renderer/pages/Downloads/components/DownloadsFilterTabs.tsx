@@ -1,11 +1,9 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DOWNLOAD_TASK_FILTERS } from '../downloads.model'
-import type { DownloadTaskFilterValue } from '../downloads.types'
-
-interface DownloadsFilterTabsProps {
-  activeFilter: DownloadTaskFilterValue
-  onFilterChange: (value: DownloadTaskFilterValue) => void
-}
+import type {
+  DownloadTaskFilterValue,
+  DownloadsFilterTabsProps,
+} from '../types'
 
 const DownloadsFilterTabs = ({
   activeFilter,

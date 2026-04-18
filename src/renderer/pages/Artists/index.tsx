@@ -10,7 +10,7 @@ import type {
   ArtistListItem,
   ArtistListResponse,
   ArtistType,
-} from './artists.model'
+} from './types'
 import {
   ARTIST_AREA_OPTIONS,
   ARTIST_INITIAL_OPTIONS,

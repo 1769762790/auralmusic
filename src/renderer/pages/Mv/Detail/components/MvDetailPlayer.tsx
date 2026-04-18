@@ -3,16 +3,7 @@ import { Play } from 'lucide-react'
 import { Plyr, type PlyrSource } from 'plyr-react'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import 'plyr-react/plyr.css'
-import {
-  type MvDetailHeroData,
-  type MvPlaybackData,
-} from '../../mv-detail.model'
-
-interface MvDetailPlayerProps {
-  hero: MvDetailHeroData
-  playback: MvPlaybackData | null
-  loading?: boolean
-}
+import type { MvDetailPlayerProps } from '../types'
 
 const PLAYER_OPTIONS = {
   controls: [

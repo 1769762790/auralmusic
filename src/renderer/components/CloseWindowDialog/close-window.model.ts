@@ -1,6 +1,5 @@
 import type { CloseBehavior } from '../../../main/config/types.ts'
-
-export type CloseWindowAction = Exclude<CloseBehavior, 'ask'>
+import type { CloseWindowAction } from './types'
 
 export function shouldShowCloseWindowDialog(closeBehavior: CloseBehavior) {
   return closeBehavior === 'ask'

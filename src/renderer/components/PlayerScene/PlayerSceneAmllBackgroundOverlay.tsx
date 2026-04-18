@@ -1,12 +1,7 @@
 import type { CSSProperties } from 'react'
 
 import { resolvePlayerBackgroundOverlayState } from './player-background-overlay.model'
-
-type PlayerSceneAmllBackgroundOverlayProps = {
-  enabled: boolean
-  staticMode: boolean
-  isDarkTheme: boolean
-}
+import type { PlayerSceneAmllBackgroundOverlayProps } from './types'
 
 const PlayerSceneAmllBackgroundOverlay = ({
   enabled,

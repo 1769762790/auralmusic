@@ -10,11 +10,13 @@ import { useTheme } from '@/hooks/useTheme'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/stores/config-store'
 import type { AnimationEffectLevel } from '../../../../main/config/types.ts'
+import type {
+  PlayerBackgroundMode,
+  ThemeValue,
+  ToggleSettingProps,
+} from '../types'
 
 import ThemeColorField from './ThemeColorField'
-
-type ThemeValue = 'system' | 'light' | 'dark'
-type PlayerBackgroundMode = 'off' | 'static' | 'dynamic'
 
 const THEME_OPTIONS: Array<{ label: string; value: ThemeValue }> = [
   { label: '自动', value: 'system' },
@@ -61,11 +63,6 @@ const ANIMATION_EFFECT_OPTIONS: Array<{
     description: '关闭非必要动效和大部分过渡',
   },
 ]
-
-interface ToggleSettingProps {
-  enabled: boolean
-  onToggle: () => void
-}
 
 function ToggleSetting({ enabled, onToggle }: ToggleSettingProps) {
   return (

@@ -1,6 +1,5 @@
 import { MoreHorizontal, Play, UserCheck, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { ArtistDetailProfile } from '@/pages/Artists/artist-detail.model'
 import {
   Tooltip,
   TooltipContent,
@@ -10,14 +9,7 @@ import {
 import AvatarCover from '@/components/AvatarCover'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { ARTIST_DETAIL_HERO_LAYOUT } from '../artist-detail-layout.model'
-
-interface ArtistHeroProps {
-  profile: ArtistDetailProfile
-  summary: string
-  isFollowed: boolean
-  followLoading: boolean
-  onToggleFollowedArtist: () => void
-}
+import type { ArtistHeroProps } from '../types'
 
 const ArtistHero = ({
   profile,

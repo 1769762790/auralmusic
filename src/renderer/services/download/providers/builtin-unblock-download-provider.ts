@@ -7,7 +7,7 @@ import {
 import type {
   DownloadResolverProvider,
   DownloadSourceProviderOptions,
-} from './types.ts'
+} from '@/types/core'
 
 export function createBuiltinUnblockDownloadProvider(): DownloadResolverProvider {
   return {

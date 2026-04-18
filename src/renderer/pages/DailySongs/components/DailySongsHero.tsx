@@ -1,6 +1,4 @@
-interface DailySongsHeroProps {
-  totalSongs: number
-}
+import type { DailySongsHeroProps } from '../types'
 
 const DailySongsHero = ({ totalSongs }: DailySongsHeroProps) => {
   return (

@@ -2,80 +2,16 @@ import type {
   LxInitedData,
   LxMusicInfo,
   LxQuality,
-  LxScriptInfo,
   LxScriptRequestPayload,
   LxScriptRequestResult,
   LxSourceKey,
 } from '../../../shared/lx-music-source.ts'
 import { parseLxScriptInfo } from '../../../shared/lx-music-source.ts'
-
-type WorkerInitializeMessage = {
-  type: 'initialize'
-  script: string
-  scriptInfo: LxScriptInfo
-}
-
-type WorkerHttpResponseMessage = {
-  type: 'http-response'
-  requestId: string
-  response: unknown
-  body: unknown
-  error?: string
-}
-
-type WorkerInvokeRequestMessage = {
-  type: 'invoke-request'
-  callId: string
-  payload: LxScriptRequestPayload
-}
-
-type RunnerToWorkerMessage =
-  | WorkerInitializeMessage
-  | WorkerHttpResponseMessage
-  | WorkerInvokeRequestMessage
-
-type WorkerInitializedMessage = {
-  type: 'initialized'
-  data: LxInitedData
-}
-
-type WorkerScriptErrorMessage = {
-  type: 'script-error'
-  message: string
-}
-
-type WorkerHttpRequestMessage = {
-  type: 'http-request'
-  requestId: string
-  url: string
-  options: RequestInit
-}
-
-type WorkerLogMessage = {
-  type: 'log'
-  level: 'log' | 'warn' | 'error' | 'info'
-  args: unknown[]
-}
-
-type WorkerInvokeResultMessage = {
-  type: 'invoke-result'
-  callId: string
-  result: LxScriptRequestResult
-}
-
-type WorkerInvokeErrorMessage = {
-  type: 'invoke-error'
-  callId: string
-  message: string
-}
-
-type WorkerToRunnerMessage =
-  | WorkerInitializedMessage
-  | WorkerScriptErrorMessage
-  | WorkerHttpRequestMessage
-  | WorkerLogMessage
-  | WorkerInvokeResultMessage
-  | WorkerInvokeErrorMessage
+import type {
+  RunnerToWorkerMessage,
+  WorkerHttpRequestMessage,
+  WorkerToRunnerMessage,
+} from '@/types/core'
 
 const LX_QUALITY_FALLBACK_ORDER: LxQuality[] = [
   'flac24bit',
@@ -135,7 +71,7 @@ export function selectSupportedLxQuality(
 
 export class LxMusicSourceRunner {
   private readonly script: string
-  private readonly scriptInfo: LxScriptInfo
+  private readonly scriptInfo: ReturnType<typeof parseLxScriptInfo>
   private worker: Worker | null = null
   private initialized = false
   private sources: LxInitedData['sources'] = {}

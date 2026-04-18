@@ -1,14 +1,6 @@
+import type { PlayerSceneChromeEvent, PlayerSceneChromeState } from './types'
+
 export const PLAYER_SCENE_CHROME_HIDE_DELAY_MS = 2000
-
-export type PlayerSceneChromeEvent =
-  | 'scene-opened'
-  | 'pointer-activity'
-  | 'hide-timeout'
-
-export interface PlayerSceneChromeState {
-  visible: boolean
-  hideDelayMs: number | null
-}
 
 const VISIBLE_STATE: PlayerSceneChromeState = {
   visible: true,

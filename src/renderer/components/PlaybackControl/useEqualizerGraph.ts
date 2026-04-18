@@ -1,10 +1,8 @@
 import { useEffect, useRef } from 'react'
 
 import type { EqualizerConfig } from '../../../shared/equalizer.ts'
-import {
-  createEqualizerGraph,
-  type EqualizerGraph,
-} from '../../audio/equalizer/equalizer-graph.ts'
+import { createEqualizerGraph } from '../../audio/equalizer/equalizer-graph.ts'
+import type { EqualizerGraph } from '@/types/audio'
 
 export function useEqualizerGraph(
   audioElement: HTMLAudioElement | null,

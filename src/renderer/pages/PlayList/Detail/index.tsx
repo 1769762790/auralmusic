@@ -22,8 +22,8 @@ import {
   EMPTY_PLAYLIST_DETAIL_STATE,
   normalizePlaylistDetailHero,
   normalizePlaylistTracks,
-  type PlaylistDetailPageState,
 } from './playlist-detail.model'
+import type { PlaylistDetailPageState } from './types'
 
 const PlaylistDetail = () => {
   const navigate = useNavigate()

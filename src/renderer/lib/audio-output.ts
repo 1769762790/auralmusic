@@ -1,8 +1,6 @@
-export const DEFAULT_AUDIO_OUTPUT_DEVICE_ID = 'default'
+import type { SinkIdMediaElement } from '@/types/core'
 
-type SinkIdMediaElement = HTMLMediaElement & {
-  setSinkId?: (sinkId: string) => Promise<void>
-}
+export const DEFAULT_AUDIO_OUTPUT_DEVICE_ID = 'default'
 
 export async function applyAudioOutputDevice(
   mediaElement: HTMLMediaElement,
@@ -12,7 +10,7 @@ export async function applyAudioOutputDevice(
 
   if (!element.setSinkId) {
     if (deviceId && deviceId !== DEFAULT_AUDIO_OUTPUT_DEVICE_ID) {
-      throw new Error('当前运行环境不支持切换音频输出设备。')
+      throw new Error('褰撳墠杩愯鐜涓嶆敮鎸佸垏鎹㈤煶棰戣緭鍑鸿澶囥€?')
     }
 
     return

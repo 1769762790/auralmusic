@@ -13,6 +13,7 @@ import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 import { createAccountMenuActions } from './account-menu.model'
+import type { AccountControlProps } from './types'
 
 const getAvatarFallback = (nickname: string | null) => {
   if (!nickname?.trim()) {
@@ -20,11 +21,6 @@ const getAvatarFallback = (nickname: string | null) => {
   }
 
   return nickname.trim().slice(0, 1).toUpperCase()
-}
-
-interface AccountControlProps {
-  currentTheme: string
-  onToggleTheme: () => void
 }
 
 const AccountControl = ({

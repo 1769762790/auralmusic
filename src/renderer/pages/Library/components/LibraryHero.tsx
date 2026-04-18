@@ -1,14 +1,7 @@
 import { Play } from 'lucide-react'
 
-import type { LibrarySongItem } from '../library.model'
 import LibraryQuickSongList from './LibraryQuickSongList'
-
-interface LibraryHeroProps {
-  songs: LibrarySongItem[]
-  songCount: number
-  coverImgUrl?: string
-  onOpenLikedSongs: () => void
-}
+import type { LibraryHeroProps } from '../types'
 
 const LibraryHero = ({
   songs,

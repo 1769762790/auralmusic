@@ -37,11 +37,7 @@ import {
   formatEqualizerGainLabel,
   resolveEqualizerSliderCommitValue,
 } from './equalizer-settings.model'
-
-interface EqualizerSettingsDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
+import type { EqualizerSettingsDialogProps } from '../types'
 
 function setEqualizerPreview(nextConfig: EqualizerConfig) {
   useConfigStore.setState(state => ({

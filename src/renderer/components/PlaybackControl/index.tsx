@@ -11,7 +11,7 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { toggleSongLike } from '@/api/list'
@@ -30,12 +30,7 @@ import {
   normalizePlaybackVolume,
   type PlaybackMode,
 } from '../../../shared/playback.ts'
-
-type PlaybackControlTrack = {
-  name: string
-  artistName: string
-  coverUrl: string
-}
+import type { ControlButtonProps, PlaybackControlTrack } from './types'
 
 const DEFAULT_TRACK: PlaybackControlTrack = {
   name: '暂无播放歌曲',
@@ -56,14 +51,6 @@ function clampPercent(value: number) {
   }
 
   return Math.min(100, Math.max(0, value))
-}
-
-type ControlButtonProps = {
-  label: string
-  children: ReactNode
-  className?: string
-  disabled?: boolean
-  onClick?: () => void
 }
 
 const ControlButton = ({

@@ -1,10 +1,6 @@
 ﻿import { Link } from 'react-router-dom'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-import type { ArtistListItem } from '@/pages/Artists/artists.model'
-
-interface ArtistCardProps {
-  artist: ArtistListItem
-}
+import type { ArtistCardProps } from '../types'
 
 const ArtistCard = ({ artist }: ArtistCardProps) => {
   return (

@@ -1,12 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { Play } from 'lucide-react'
-import type { NewSong } from '../home.type'
-
-interface SongItemProps {
-  song: NewSong
-  onPlay?: () => void
-}
+import type { SongItemProps } from '../types'
 
 const SongItem = ({ song, onPlay }: SongItemProps) => {
   return (

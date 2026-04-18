@@ -17,13 +17,7 @@ import {
   resolveCloseWindowDialogConfig,
   type CloseWindowAction,
 } from './close-window.model'
-
-interface CloseWindowDialogProps {
-  open: boolean
-  setOpen: (value: boolean) => void
-  handleCloseWindow: () => void
-  handleMiniWindow: () => void
-}
+import type { CloseWindowDialogProps } from './types'
 
 const CloseWindowDialog = ({
   open,

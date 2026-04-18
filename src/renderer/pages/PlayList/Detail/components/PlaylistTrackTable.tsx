@@ -1,12 +1,6 @@
-import {
-  formatTrackDuration,
-  type PlaylistTrackItem,
-} from '../playlist-detail.model'
+import { formatTrackDuration } from '../playlist-detail.model'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-
-interface PlaylistTrackTableProps {
-  tracks: PlaylistTrackItem[]
-}
+import type { PlaylistTrackTableProps } from '../types'
 
 const PlaylistTrackTable = ({ tracks }: PlaylistTrackTableProps) => {
   if (tracks.length === 0) {

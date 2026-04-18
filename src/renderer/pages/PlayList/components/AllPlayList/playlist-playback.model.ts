@@ -1,32 +1,9 @@
 import type { PlaybackTrack } from '../../../../../shared/playback.ts'
-
-export interface PlaylistPlaybackTracksRequest {
-  id: number
-  limit: number
-  offset: number
-  timestamp: number
-}
-
-interface RawPlaylistPlaybackArtist {
-  name?: string
-}
-
-interface RawPlaylistPlaybackAlbum {
-  name?: string
-  picUrl?: string
-}
-
-interface RawPlaylistPlaybackSong {
-  id?: number
-  name?: string
-  dt?: number
-  al?: RawPlaylistPlaybackAlbum
-  ar?: RawPlaylistPlaybackArtist[]
-}
-
-interface RawPlaylistPlaybackTracksResponse {
-  songs?: RawPlaylistPlaybackSong[]
-}
+import type {
+  PlaylistPlaybackTracksRequest,
+  RawPlaylistPlaybackSong,
+  RawPlaylistPlaybackTracksResponse,
+} from '../../types'
 
 export function buildPlaylistPlaybackTracksRequest(
   playlistId: number,

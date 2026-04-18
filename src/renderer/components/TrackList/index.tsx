@@ -1,30 +1,9 @@
 import { useMemo } from 'react'
 
 import { usePlaybackStore } from '@/stores/playback-store'
-import type { PlaybackTrack } from '../../../shared/playback.ts'
-import TrackListItem, { songProps } from './TrackListItem'
-
-interface TrackListProps {
-  data: songProps[]
-  coverUrl?: string
-  onLikeChangeSuccess?: (songId: number, nextLiked: boolean) => void
-}
-
-function toPlaybackTrack(
-  item: songProps,
-  fallbackCoverUrl = ''
-): PlaybackTrack {
-  return {
-    id: item.id,
-    name: item.name,
-    artistNames:
-      item.artistNames ||
-      (item.artists || []).map(artist => artist.name).join(' / '),
-    albumName: item.albumName || '',
-    coverUrl: item.coverUrl || fallbackCoverUrl,
-    duration: item.duration,
-  }
-}
+import type { TrackListProps } from './types'
+import { toPlaybackTrack } from './model'
+import TrackListItem from './TrackListItem'
 
 const TrackList = ({
   data = [],

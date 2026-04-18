@@ -2,15 +2,11 @@ import { useMemo, useState } from 'react'
 
 import TrackListItem from '@/components/TrackList/TrackListItem'
 import { usePlaybackStore } from '@/stores/playback-store'
-import type { LibrarySongItem } from '../library.model'
 import {
   buildLibraryQuickSongPlaybackQueue,
   filterLibraryQuickSongs,
 } from './library-quick-song-list.model'
-
-interface LibraryQuickSongListProps {
-  songs: LibrarySongItem[]
-}
+import type { LibraryQuickSongListProps } from '../types'
 
 const LibraryQuickSongList = ({ songs }: LibraryQuickSongListProps) => {
   const [hiddenSongIds, setHiddenSongIds] = useState<Set<number>>(new Set())

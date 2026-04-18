@@ -2,14 +2,11 @@ import { useCallback, useEffect, useRef } from 'react'
 
 import ArtistCover from '@/components/ArtistCover'
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
-import type { ArtistListItem } from '@/pages/Artists/artists.model'
+import type { ArtistListItem } from '@/pages/Artists/types'
 import { useAuthStore } from '@/stores/auth-store'
 import { useUserStore } from '@/stores/user'
 import { useNavigate } from 'react-router-dom'
-
-interface LibraryArtistPanelProps {
-  active: boolean
-}
+import type { LibraryArtistPanelProps } from '../types'
 
 const PAGE_SIZE = 25
 

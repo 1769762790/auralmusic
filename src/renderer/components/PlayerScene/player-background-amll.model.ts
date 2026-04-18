@@ -1,10 +1,4 @@
-export type PlayerBackgroundMode = 'off' | 'static' | 'dynamic'
-
-export type AmllBackgroundState = {
-  enabled: boolean
-  staticMode: boolean
-  playing: boolean
-}
+import type { AmllBackgroundState, PlayerBackgroundMode } from './types'
 
 export function resolveAmllBackgroundState(
   mode: PlayerBackgroundMode,

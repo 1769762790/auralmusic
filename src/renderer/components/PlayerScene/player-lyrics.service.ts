@@ -3,8 +3,8 @@ import {
   createLyricCacheKey,
   hasLyricTextBundle,
   readLyricTextBundle,
-  type LyricTextBundle,
 } from './player-lyrics.data'
+import type { LyricTextBundle } from './types'
 
 async function readCachedLyricPayload(cacheKey: string) {
   try {

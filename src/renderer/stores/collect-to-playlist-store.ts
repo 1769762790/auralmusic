@@ -1,14 +1,6 @@
 import { create } from 'zustand'
 
-import type { CollectPlaylistSongContext } from '../model/collect-to-playlist.model.ts'
-
-interface CollectToPlaylistStoreState {
-  open: boolean
-  song: CollectPlaylistSongContext | null
-  setOpen: (open: boolean) => void
-  openDrawer: (song: CollectPlaylistSongContext) => void
-  closeDrawer: () => void
-}
+import type { CollectToPlaylistStoreState } from '@/types/core'
 
 export const useCollectToPlaylistStore = create<CollectToPlaylistStoreState>(
   set => ({

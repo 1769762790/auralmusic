@@ -1,8 +1,4 @@
-import type { ArtistDescPayload } from '@/pages/Artists/artist-detail.model'
-
-interface ArtistDescriptionProps {
-  description: ArtistDescPayload
-}
+import type { ArtistDescriptionProps } from '../types'
 
 const ArtistDescription = ({ description }: ArtistDescriptionProps) => {
   const hasContent = Boolean(

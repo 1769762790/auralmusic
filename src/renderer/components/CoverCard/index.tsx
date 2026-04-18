@@ -1,20 +1,7 @@
 import { Play } from 'lucide-react'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { Button } from '../ui/button'
-
-interface CoverCardData {
-  id?: number | string
-  coverImgUrl?: string
-  count?: number | string
-  name?: string
-}
-
-interface CoverCardProps {
-  data?: CoverCardData
-  isResize?: boolean
-  onOpen?: (id: number | string) => void
-  onPlay?: (id: number | string) => void
-}
+import type { CoverCardProps } from './types'
 
 const CoverCard = ({
   data = {},

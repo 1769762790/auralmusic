@@ -4,58 +4,11 @@ import type {
   LxScriptRequestPayload,
   LxScriptRequestResult,
 } from '../../../../shared/lx-music-source.ts'
-
-type WorkerInitMessage = {
-  type: 'initialize'
-  script: string
-  scriptInfo: LxScriptInfo
-}
-
-type WorkerHttpResponseMessage = {
-  type: 'http-response'
-  requestId: string
-  response: unknown
-  body: unknown
-  error?: string
-}
-
-type WorkerInvokeRequestMessage = {
-  type: 'invoke-request'
-  callId: string
-  payload: LxScriptRequestPayload
-}
-
-type HostMessage =
-  | WorkerInitMessage
-  | WorkerHttpResponseMessage
-  | WorkerInvokeRequestMessage
-
-type WorkerMessage =
-  | { type: 'initialized'; data: LxInitedData }
-  | { type: 'script-error'; message: string }
-  | {
-      type: 'http-request'
-      requestId: string
-      url: string
-      options: RequestInit
-    }
-  | {
-      type: 'invoke-result'
-      callId: string
-      result: LxScriptRequestResult
-    }
-  | {
-      type: 'invoke-error'
-      callId: string
-      message: string
-    }
-  | { type: 'log'; level: 'log' | 'warn' | 'error' | 'info'; args: unknown[] }
-
-type LxRequestCallback = (
-  err: Error | null,
-  response: unknown,
-  body: unknown
-) => void
+import type {
+  HostMessage,
+  LxRequestCallback,
+  WorkerMessage,
+} from '@/types/core'
 
 let requestCounter = 0
 let requestHandler:

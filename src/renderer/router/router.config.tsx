@@ -1,4 +1,4 @@
-import type { RouteMenuConfig } from './router.type'
+import type { RouteMenuConfig } from '@/types/core'
 import AppLayout from '@/layout/AppLayout'
 
 import {
@@ -37,7 +37,7 @@ export const routeMenuConfig: RouteMenuConfig[] = [
       {
         path: '/library',
         element: <Library />,
-        meta: { title: '乐库', icon: '', authOnly: true },
+        meta: { title: '音乐库', icon: '', authOnly: true },
       },
       {
         path: '/library/liked-songs',

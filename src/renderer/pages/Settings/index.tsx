@@ -7,6 +7,7 @@ import DownloadSettings from './components/DownloadSettings'
 import PlaySettings from './components/PlaySettings'
 import ShortcutKeySettings from './components/ShortcutKeySettings'
 import SystemSettings from './components/SystemSettings'
+import type { SettingsTabValue, SettingsTabsNavProps } from './types'
 
 const SETTINGS_TABS = [
   { label: '基础设置', value: 'basic' },
@@ -17,9 +18,7 @@ const SETTINGS_TABS = [
   { label: '关于', value: 'about' },
 ] as const
 
-type SettingsTabValue = (typeof SETTINGS_TABS)[number]['value']
-
-const SettingsTabsNav = ({ value }: { value: SettingsTabValue }) => {
+const SettingsTabsNav = ({ value }: SettingsTabsNavProps) => {
   const activeIndex = SETTINGS_TABS.findIndex(tab => tab.value === value)
 
   return (

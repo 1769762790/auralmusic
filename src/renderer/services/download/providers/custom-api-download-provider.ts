@@ -1,4 +1,4 @@
-import type { DownloadResolverProvider } from './types.ts'
+import type { DownloadResolverProvider } from '@/types/core'
 
 export function createCustomApiDownloadProvider(): DownloadResolverProvider {
   return {

@@ -3,19 +3,7 @@ import { Canvas, useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Plane, useCursor, useTexture } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import { DoubleSide, Mesh, PlaneGeometry, Texture, Vector2 } from 'three'
-
-interface WaterRipple3DCoverProps {
-  src: string
-  className?: string
-  playBeat?: boolean
-  blurEnabled?: boolean
-}
-
-interface WaterSurfaceProps {
-  url: string
-  playBeat: boolean
-  onLoad: () => void
-}
+import type { WaterRipple3DCoverProps, WaterSurfaceProps } from './types'
 
 export default function WaterRipple3DCover({
   src,

@@ -1,59 +1,16 @@
 import { create } from 'zustand'
 import {
-  createShuffleOrder,
   createPlaybackQueueSnapshot,
+  createShuffleOrder,
   normalizePlaybackMode,
   resolvePlaybackQueueStep,
-  type PlaybackAdvanceReason,
-  type PlaybackMode,
-  type PlaybackStatus,
-  type PlaybackTrack,
 } from '../../shared/playback.ts'
-import type { PlaybackSessionSnapshot } from './playback-session-storage'
-
-interface PlaybackStoreState {
-  queue: PlaybackTrack[]
-  currentIndex: number
-  currentTrack: PlaybackTrack | null
-  playbackMode: PlaybackMode
-  shuffleOrder: number[]
-  shuffleCursor: number
-  status: PlaybackStatus
-  shouldAutoPlayOnLoad: boolean
-  progress: number
-  pendingRestoreProgress: number
-  duration: number
-  volume: number
-  lastAudibleVolume: number
-  error: string
-  requestId: number
-  seekRequestId: number
-  seekPosition: number
-  isPlayerSceneOpen: boolean
-  isPlayerSceneFullscreen: boolean
-  playQueueFromIndex: (tracks: PlaybackTrack[], startIndex: number) => void
-  appendToQueue: (tracks: PlaybackTrack[]) => void
-  togglePlay: () => void
-  setPlaybackMode: (mode: PlaybackMode) => void
-  playNext: (reason?: PlaybackAdvanceReason) => boolean
-  playPrevious: () => boolean
-  setProgress: (progress: number) => void
-  setDuration: (duration: number) => void
-  setVolume: (volume: number) => void
-  toggleMute: () => void
-  seekTo: (positionMs: number) => void
-  setPlayerSceneOpen: (open: boolean) => void
-  setPlayerSceneFullscreen: (fullscreen: boolean) => void
-  openPlayerScene: () => void
-  closePlayerScene: () => void
-  restoreSession: (snapshot: PlaybackSessionSnapshot) => void
-  clearPendingRestoreProgress: () => void
-  markPlaybackLoading: () => void
-  markPlaybackPlaying: () => void
-  markPlaybackPaused: () => void
-  markPlaybackError: (error: string) => void
-  resetPlayback: () => void
-}
+import type {
+  PlaybackMode,
+  PlaybackStatus,
+  PlaybackTrack,
+} from '../../shared/playback.ts'
+import type { PlaybackStoreState } from '@/types/core'
 
 const INITIAL_PLAYBACK_STATE = {
   queue: [],

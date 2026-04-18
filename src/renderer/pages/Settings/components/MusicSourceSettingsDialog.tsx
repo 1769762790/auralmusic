@@ -27,13 +27,12 @@ import {
   ENHANCED_SOURCE_MODULES,
   type EnhancedSourceModule,
 } from '../../../../main/config/types'
-
-type MusicSourceTab = 'enhanced-unblock' | 'luoxue' | 'custom-api'
-
-interface MusicSourceSettingsDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
+import type {
+  MusicSourceSettingsDialogProps,
+  MusicSourceTab,
+  ScriptInfoCardProps,
+  SourceToggleProps,
+} from '../types'
 
 const ENHANCED_SOURCE_MODULE_LABELS: Record<EnhancedSourceModule, string> = {
   unm: 'UNM',
@@ -44,15 +43,7 @@ const ENHANCED_SOURCE_MODULE_LABELS: Record<EnhancedSourceModule, string> = {
   baka: 'Baka',
 }
 
-const SourceToggle = ({
-  checked,
-  disabled,
-  onChange,
-}: {
-  checked: boolean
-  disabled?: boolean
-  onChange: () => void
-}) => {
+const SourceToggle = ({ checked, disabled, onChange }: SourceToggleProps) => {
   return (
     <button
       type='button'
@@ -87,13 +78,7 @@ const ScriptInfoCard = ({
   disabled,
   onActivate,
   onRemove,
-}: {
-  script: ImportedLxMusicSource
-  active: boolean
-  disabled: boolean
-  onActivate: () => void
-  onRemove: () => void
-}) => {
+}: ScriptInfoCardProps) => {
   const meta = [
     script.version ? `版本 ${script.version}` : null,
     script.author ? `作者 ${script.author}` : null,

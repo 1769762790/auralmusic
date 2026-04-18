@@ -2,14 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { getUserCloud } from '@/api/cloud'
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
-import type { DailySongRowItem } from '@/pages/DailySongs/daily-songs.model'
+import type { DailySongRowItem } from '@/pages/DailySongs/types'
 
 import { normalizeLibraryCloudPage } from '../library-cloud.model'
 import TrackList from '@/components/TrackList'
-
-interface LibraryCloudPanelProps {
-  active: boolean
-}
+import type { LibraryCloudPanelProps } from '../types'
 
 const PAGE_SIZE = 30
 

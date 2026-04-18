@@ -1,28 +1,12 @@
-import {
-  LyricPlayer,
-  type LyricPlayerProps,
-} from '@applemusic-like-lyrics/react'
+import { LyricPlayer } from '@applemusic-like-lyrics/react'
 import { useCallback, useMemo, type CSSProperties } from 'react'
 
 import { cn } from '@/lib/utils'
-import type { LyricLine } from './player-lyrics.model'
 import {
   adaptLyricsToAmll,
   resolveAmllLyricClickSeekTime,
 } from './player-lyrics-amll.adapter'
-
-type PlayerSceneAmllLyricsProps = {
-  lines: LyricLine[]
-  progressMs: number
-  showTranslation: boolean
-  karaokeEnabled: boolean
-  playing: boolean
-  loading: boolean
-  error: string
-  onSeek: (positionMs: number) => void
-}
-
-type LyricLineClickHandler = NonNullable<LyricPlayerProps['onLyricLineClick']>
+import type { LyricLineClickHandler, PlayerSceneAmllLyricsProps } from './types'
 
 const AMLL_PLAYER_STYLE = {
   '--amll-lp-color': 'var(--player-foreground)',

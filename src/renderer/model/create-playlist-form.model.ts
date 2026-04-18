@@ -1,9 +1,6 @@
-export const CREATE_PLAYLIST_TITLE_MAX_LENGTH = 40
+import type { CreatePlaylistFormPayload } from '@/types/core'
 
-export interface CreatePlaylistFormPayload {
-  name: string
-  privacy?: '10'
-}
+export const CREATE_PLAYLIST_TITLE_MAX_LENGTH = 40
 
 export function buildCreatePlaylistPayload(
   title: string,

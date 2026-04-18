@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { Slider } from '@/components/ui/slider'
-
-type PlayerSceneProgressProps = {
-  disabled: boolean
-  progress: number
-  duration: number
-  onSeek: (positionMs: number) => void
-}
+import type { PlayerSceneProgressProps } from './types'
 
 function formatTime(value: number) {
   const totalSeconds = Math.max(0, Math.floor(value / 1000))

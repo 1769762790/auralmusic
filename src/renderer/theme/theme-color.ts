@@ -1,4 +1,6 @@
-const THEME_COLOR_VARIABLES = [
+import type { ThemeColorTokenMap, ThemeColorVariableName } from '@/types/core'
+
+const THEME_COLOR_VARIABLES: readonly ThemeColorVariableName[] = [
   '--primary',
   '--primary-foreground',
   '--ring',
@@ -8,11 +10,7 @@ const THEME_COLOR_VARIABLES = [
   '--sidebar-primary-foreground',
   '--sidebar-accent',
   '--sidebar-accent-foreground',
-] as const
-
-type ThemeColorVariableName = (typeof THEME_COLOR_VARIABLES)[number]
-
-export type ThemeColorTokenMap = Record<ThemeColorVariableName, string>
+]
 
 function clampChannel(value: number) {
   return Math.max(0, Math.min(255, Math.round(value)))

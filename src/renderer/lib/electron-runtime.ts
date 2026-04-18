@@ -1,10 +1,4 @@
-import type { RuntimeApi } from '@preload/api/runtime-api'
-import type { WindowApi } from '@preload/api/window-api'
-
-type ElectronRuntimeWindow = {
-  appRuntime?: RuntimeApi
-  electronWindow?: WindowApi
-}
+import type { ElectronRuntimeWindow } from '@/types/core'
 
 const missingApiWarnings = new Set<string>()
 

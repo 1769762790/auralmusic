@@ -1,23 +1,19 @@
 import type { AudioQualityLevel } from '../../../../main/config/types.ts'
-import {
-  resolveTrackWithLxMusicSource,
-  type LxPlaybackResolverConfig,
-} from '../lx-playback-resolver.ts'
+import { resolveTrackWithLxMusicSource } from '../lx-playback-resolver.ts'
 import type {
+  LxPlaybackResolverConfig,
   PlaybackResolverConfig,
   PlaybackSourceProvider,
   PlaybackSourceProviderOptions,
-} from '../playback-source-resolver.ts'
+} from '@/types/core'
 
 function getQuality(options: PlaybackSourceProviderOptions): AudioQualityLevel {
   return options.context.config.quality ?? 'higher'
 }
 
-type LxPlaybackConfig = PlaybackResolverConfig & LxPlaybackResolverConfig
-
 function isValidLxPlaybackConfig(
   config: PlaybackResolverConfig
-): config is LxPlaybackConfig {
+): config is PlaybackResolverConfig & LxPlaybackResolverConfig {
   return (
     Array.isArray(config.luoxueMusicSourceScripts) &&
     (typeof config.activeLuoxueMusicSourceScriptId === 'string' ||

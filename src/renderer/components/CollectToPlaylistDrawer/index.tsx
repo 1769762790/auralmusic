@@ -17,22 +17,35 @@ import {
 import {
   buildCreatePlaylistPayload,
   CREATE_PLAYLIST_TITLE_MAX_LENGTH,
-} from '@/model/create-playlist-form.model'
-import {
   findCreatedCollectPlaylistTarget,
   insertCollectPlaylistTarget,
   isSongInPlaylistTrackIds,
-  type CollectPlaylistTarget,
-} from '@/model/collect-to-playlist.model'
+} from '@/model'
 import { useAuthStore } from '@/stores/auth-store'
 import { useCollectToPlaylistStore } from '@/stores/collect-to-playlist-store'
 import { useUserStore } from '@/stores/user'
+import type { CollectPlaylistTarget } from '@/types/core'
 import { RefreshCw, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 import CollectToPlaylistCreateForm from './components/CollectToPlaylistCreateForm'
 import CollectToPlaylistSongSummary from './components/CollectToPlaylistSongSummary'
 import CollectToPlaylistTargetList from './components/CollectToPlaylistTargetList'
+
+const COLLECT_PLAYLIST_LOAD_ERROR =
+  '\u6b4c\u5355\u5217\u8868\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5'
+const COLLECT_PLAYLIST_DUPLICATE_ERROR =
+  '\u6b4c\u66f2\u5df2\u5728\u6b4c\u5355\u4e2d'
+const COLLECT_PLAYLIST_ADD_ERROR =
+  '\u6536\u85cf\u5230\u6b4c\u5355\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5'
+const COLLECT_PLAYLIST_CREATE_ERROR =
+  '\u6b4c\u5355\u521b\u5efa\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5'
+const COLLECT_PLAYLIST_TITLE = '\u6dfb\u52a0\u5230\u6b4c\u5355'
+const COLLECT_PLAYLIST_DESCRIPTION =
+  '\u9009\u62e9\u76ee\u6807\u6b4c\u5355\uff0c\u6216\u5148\u521b\u5efa\u4e00\u4e2a\u65b0\u6b4c\u5355\u3002'
+const COLLECT_PLAYLIST_CLOSE_LABEL =
+  '\u5173\u95ed\u6dfb\u52a0\u5230\u6b4c\u5355\u62bd\u5c49'
+const COLLECT_PLAYLIST_RELOAD_LABEL = '\u91cd\u65b0\u52a0\u8f7d'
 
 const CollectToPlaylistDrawer = () => {
   const userId = useAuthStore(state => state.user?.userId)
@@ -92,8 +105,8 @@ const CollectToPlaylistDrawer = () => {
         return nextTargets
       } catch (error) {
         console.error('collect playlist targets fetch failed', error)
-        setLoadError('歌单列表加载失败，请稍后重试')
-        toast.error('歌单列表加载失败，请稍后重试')
+        setLoadError(COLLECT_PLAYLIST_LOAD_ERROR)
+        toast.error(COLLECT_PLAYLIST_LOAD_ERROR)
         return []
       } finally {
         setLoading(false)
@@ -138,7 +151,7 @@ const CollectToPlaylistDrawer = () => {
         }
 
         if (useUserStore.getState().likedSongIds.has(song.songId)) {
-          toast.error('歌曲已在歌单中')
+          toast.error(COLLECT_PLAYLIST_DUPLICATE_ERROR)
           return false
         }
       } else {
@@ -154,7 +167,7 @@ const CollectToPlaylistDrawer = () => {
         }
 
         if (isSongInPlaylistTrackIds(song.songId, trackIds)) {
-          toast.error('歌曲已在歌单中')
+          toast.error(COLLECT_PLAYLIST_DUPLICATE_ERROR)
           return false
         }
       }
@@ -178,12 +191,12 @@ const CollectToPlaylistDrawer = () => {
         ])
       }
 
-      toast.success(`已添加到 ${playlist.name}`)
+      toast.success(`\u5df2\u6dfb\u52a0\u5230 ${playlist.name}`)
       closeDrawer()
       return true
     } catch (error) {
       console.error('collect song to playlist failed', error)
-      toast.error('收藏到歌单失败，请稍后重试')
+      toast.error(COLLECT_PLAYLIST_ADD_ERROR)
       return false
     } finally {
       setPendingPlaylistId(null)
@@ -231,7 +244,7 @@ const CollectToPlaylistDrawer = () => {
       }
     } catch (error) {
       console.error('create playlist and collect failed', error)
-      toast.error('歌单创建失败，请稍后重试')
+      toast.error(COLLECT_PLAYLIST_CREATE_ERROR)
     } finally {
       setCreateSubmitting(false)
     }
@@ -247,10 +260,10 @@ const CollectToPlaylistDrawer = () => {
         <DrawerHeader className='flex-row items-start justify-between gap-3 border-b px-5 py-4'>
           <div className='space-y-1'>
             <DrawerTitle className='text-lg font-semibold'>
-              添加到歌单
+              {COLLECT_PLAYLIST_TITLE}
             </DrawerTitle>
             <DrawerDescription>
-              选择目标歌单，或先创建一个新歌单
+              {COLLECT_PLAYLIST_DESCRIPTION}
             </DrawerDescription>
           </div>
 
@@ -260,7 +273,7 @@ const CollectToPlaylistDrawer = () => {
             size='icon'
             onClick={closeDrawer}
             className='rounded-full'
-            aria-label='关闭添加到歌单抽屉'
+            aria-label={COLLECT_PLAYLIST_CLOSE_LABEL}
           >
             <X className='size-4' />
           </Button>
@@ -298,7 +311,7 @@ const CollectToPlaylistDrawer = () => {
                     className='mt-3 h-9 rounded-[14px]'
                   >
                     <RefreshCw className='mr-2 size-4' />
-                    重新加载
+                    {COLLECT_PLAYLIST_RELOAD_LABEL}
                   </Button>
                 </div>
               </div>

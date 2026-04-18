@@ -2,15 +2,12 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
-import type { AlbumListItem } from '@/pages/Albums/albums.model'
+import type { AlbumListItem } from '@/pages/Albums/types'
 import { useAuthStore } from '@/stores/auth-store'
 import { useUserStore } from '@/stores/user'
 import ArtistCover from '@/components/ArtistCover'
 import { isDef } from '@/lib/utils'
-
-interface LibraryAlbumPanelProps {
-  active: boolean
-}
+import type { LibraryAlbumPanelProps } from '../types'
 
 const PAGE_SIZE = 25
 

@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-interface ScrollToTopButtonProps {
-  threshold?: number
-  className?: string
-}
+import type { ScrollToTopButtonProps } from './types'
 
 const ScrollToTopButton = ({
   threshold = 200,

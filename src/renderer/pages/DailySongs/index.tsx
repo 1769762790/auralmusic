@@ -5,8 +5,8 @@ import DailySongsSkeleton from './components/DailySongsSkeleton'
 import {
   EMPTY_DAILY_SONGS_STATE,
   normalizeDailySongs,
-  type DailySongsPageState,
 } from './daily-songs.model'
+import type { DailySongsPageState } from './types'
 import TrackList from '@/components/TrackList'
 
 const DailySongs = () => {

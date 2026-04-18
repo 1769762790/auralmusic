@@ -1,18 +1,9 @@
 export const PLAYLIST_NAME_MAX_LENGTH = 40
-
-export type PlaylistDetailMoreAction = 'edit' | 'delete'
-
-export interface PlaylistUpdateDraft {
-  id: number
-  name: string
-  description: string
-}
-
-export interface PlaylistUpdatePayload {
-  id: number
-  name: string
-  desc: string
-}
+import type {
+  PlaylistDetailMoreAction,
+  PlaylistUpdateDraft,
+  PlaylistUpdatePayload,
+} from './types'
 
 export function resolvePlaylistDetailMoreActions(
   isOwnPlaylist: boolean

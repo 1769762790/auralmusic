@@ -1,19 +1,15 @@
-import {
-  resolveTrackWithLxMusicSource,
-  type LxPlaybackResolverConfig,
-} from '../../music-source/lx-playback-resolver.ts'
+import { resolveTrackWithLxMusicSource } from '../../music-source/lx-playback-resolver.ts'
 import { inferFileExtensionFromUrl } from './shared.ts'
 import type {
   DownloadResolverConfig,
   DownloadResolverProvider,
   DownloadSourceProviderOptions,
-} from './types.ts'
-
-type LxDownloadConfig = DownloadResolverConfig & LxPlaybackResolverConfig
+  LxPlaybackResolverConfig,
+} from '@/types/core'
 
 function isValidLxDownloadConfig(
   config: DownloadResolverConfig
-): config is LxDownloadConfig {
+): config is DownloadResolverConfig & LxPlaybackResolverConfig {
   return (
     Array.isArray(config.luoxueMusicSourceScripts) &&
     (typeof config.activeLuoxueMusicSourceScriptId === 'string' ||

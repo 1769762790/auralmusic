@@ -1,0 +1,136 @@
+import type {
+  ArtistAlbumItem,
+  ArtistDescPayload,
+  ArtistDetailProfile,
+  ArtistDetailResponse,
+  ArtistMvItem,
+  ArtistTopSongItem,
+} from '../../types'
+import type {
+  RawArtistAlbum,
+  RawArtistDescResponse,
+  RawArtistDetailPayload,
+  RawArtistMv,
+  RawTopSong,
+} from '../types'
+
+export function unwrapArtistDetailPayload<T>(
+  response: ArtistDetailResponse<T> | null | undefined
+): T | null {
+  if (!response?.data) {
+    return null
+  }
+
+  if (
+    typeof response.data === 'object' &&
+    response.data !== null &&
+    'data' in response.data
+  ) {
+    return (response.data as { data?: T }).data ?? null
+  }
+
+  return response.data as T
+}
+
+export function normalizeArtistProfile(
+  response: ArtistDetailResponse<RawArtistDetailPayload>
+): ArtistDetailProfile | null {
+  const payload = unwrapArtistDetailPayload(response) || {}
+  const artist = payload.artist || {}
+
+  if (!artist.id) {
+    return null
+  }
+
+  return {
+    id: artist.id,
+    name: artist.name || '鏈煡姝屾墜',
+    coverUrl:
+      artist.cover || artist.avatar || artist.picUrl || artist.img1v1Url || '',
+    musicSize: artist.musicSize || 0,
+    albumSize: artist.albumSize || 0,
+    mvSize: artist.mvSize || 0,
+    identity:
+      payload.identify?.imageDesc ||
+      payload.identify?.identityName ||
+      artist.identifyTag?.[0] ||
+      '鑹轰汉',
+  }
+}
+
+export function normalizeArtistTopSongs(
+  response: ArtistDetailResponse<{ songs?: RawTopSong[] }>
+): ArtistTopSongItem[] {
+  const payload = unwrapArtistDetailPayload(response)
+  return (payload?.songs || []).map(song => ({
+    id: song.id,
+    name: song.name || '鏈煡姝屾洸',
+    subtitle: song.alia?.[0] || song.tns?.[0] || '',
+    duration: song.dt || 0,
+    albumName: song.al?.name || '',
+    coverUrl: song.al?.picUrl || song.album?.picUrl || '',
+    artists: (song.ar || []).map(artist => ({
+      id: artist.id,
+      name: artist.name || '鏈煡姝屾墜',
+    })),
+  }))
+}
+
+export function normalizeArtistAlbums(
+  response: ArtistDetailResponse<{
+    hotAlbums?: RawArtistAlbum[]
+    albums?: RawArtistAlbum[]
+  }>
+): ArtistAlbumItem[] {
+  const payload = unwrapArtistDetailPayload(response)
+  return (payload?.hotAlbums || payload?.albums || []).map(album => ({
+    id: album.id,
+    name: album.name || '鏈煡涓撹緫',
+    picUrl: album.picUrl || album.blurPicUrl || '',
+    publishTime: album.publishTime,
+    size: album.size,
+  }))
+}
+
+export function normalizeArtistMvs(
+  response: ArtistDetailResponse<{ mvs?: RawArtistMv[] }>
+): ArtistMvItem[] {
+  const payload = unwrapArtistDetailPayload(response)
+  return (payload?.mvs || []).map(mv => ({
+    id: mv.id || mv.vid || 0,
+    name: mv.name || '鏈煡 MV',
+    coverUrl: mv.imgurl16v9 || mv.cover || '',
+    publishTime: mv.publishTime,
+    playCount: mv.playCount,
+  }))
+}
+
+export function normalizeArtistDescription(
+  response: ArtistDetailResponse<RawArtistDescResponse>
+): ArtistDescPayload {
+  const payload = unwrapArtistDetailPayload(response) || {}
+  const briefDesc = (payload.briefDesc || '').trim()
+  const sections = (payload.introduction || [])
+    .map(item => ({
+      title: item.ti || '',
+      content: (item.txt || '').trim(),
+    }))
+    .filter(section => Boolean(section.content))
+
+  const summary =
+    briefDesc || sections.map(section => section.content).join('\n\n')
+
+  return {
+    summary,
+    sections,
+  }
+}
+
+export function getArtistHeroSummary(description: ArtistDescPayload) {
+  const source = description.summary || description.sections[0]?.content || ''
+  if (!source) {
+    return ''
+  }
+
+  return source.length > 180 ? `${source.slice(0, 180)}...` : source
+}

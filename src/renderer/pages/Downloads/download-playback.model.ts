@@ -1,6 +1,6 @@
 import type { PlaybackTrack } from '../../../shared/playback.ts'
 import { createLocalMediaUrl } from '../../../shared/local-media.ts'
-import type { DownloadTask } from './downloads.types'
+import type { DownloadTask } from './types'
 
 function resolveDownloadPlaybackId(task: DownloadTask) {
   const numericSongId =

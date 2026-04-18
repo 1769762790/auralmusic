@@ -1,39 +1,10 @@
-export interface DailySongRowItem {
-  id: number
-  name: string
-  artistNames: string
-  albumName: string
-  coverUrl: string
-  duration: number
-}
-
-export interface DailySongsPageState {
-  songs: DailySongRowItem[]
-}
-
-interface RawDailySongArtist {
-  name?: string
-}
-
-interface RawDailySongAlbum {
-  name?: string
-  picUrl?: string
-}
-
-interface RawDailySong {
-  id?: number
-  name?: string
-  dt?: number
-  al?: RawDailySongAlbum
-  ar?: RawDailySongArtist[]
-}
-
-interface RawRecommendSongsResponse {
-  dailySongs?: RawDailySong[]
-  data?: {
-    dailySongs?: RawDailySong[]
-  }
-}
+import type {
+  DailySongRowItem,
+  DailySongsPageState,
+  RawDailySong,
+  RawDailySongArtist,
+  RawRecommendSongsResponse,
+} from './types'
 
 export const EMPTY_DAILY_SONGS_STATE: DailySongsPageState = {
   songs: [],

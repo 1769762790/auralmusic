@@ -1,14 +1,7 @@
 import { Ellipsis, Heart, Music4 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  formatMvDuration,
-  formatMvPublishDate,
-  type MvDetailHeroData,
-} from '../../mv-detail.model'
-
-interface MvDetailHeaderProps {
-  hero: MvDetailHeroData
-}
+import { formatMvDuration, formatMvPublishDate } from '../../mv-detail.model'
+import type { MvDetailHeaderProps } from '../types'
 
 function formatPlayCount(playCount: number) {
   return new Intl.NumberFormat('zh-CN').format(playCount)

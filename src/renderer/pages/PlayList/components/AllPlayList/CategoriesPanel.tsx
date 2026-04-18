@@ -1,22 +1,6 @@
 import { cn } from '@/lib/utils'
 import { useMemo } from 'react'
-
-interface PlaylistCategoryItem {
-  name: string
-  category?: number
-}
-
-interface PlaylistCategories {
-  sub?: PlaylistCategoryItem[]
-  categories?: Record<string, string>
-}
-
-interface CategoriesPanelProps {
-  categoryData?: PlaylistCategories
-  className?: string
-  currentCat?: string | null
-  onSelect?: (categoryName: string) => void
-}
+import type { CategoriesPanelProps, PlaylistCategoryItem } from '../../types'
 
 const CategoriesPanel = ({
   categoryData,

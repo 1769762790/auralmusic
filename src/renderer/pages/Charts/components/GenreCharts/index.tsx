@@ -1,10 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import GenreChartsCardItem from './GenreChartsCardItem'
-import type { OnlineChartSummary } from '../CoreRankings/CoreRankingCardItem.type'
-
-interface GenreChartsProps {
-  list: OnlineChartSummary[]
-}
+import type { GenreChartsProps } from '../../types'
 
 const GenreCharts = ({ list }: GenreChartsProps) => {
   const navigate = useNavigate()

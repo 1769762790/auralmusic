@@ -1,13 +1,6 @@
 import { BackgroundRender } from '@applemusic-like-lyrics/react'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-
-type PlayerSceneAmllBackgroundProps = {
-  coverUrl: string
-  playing: boolean
-  hasLyrics: boolean
-  enabled: boolean
-  staticMode: boolean
-}
+import type { PlayerSceneAmllBackgroundProps } from './types'
 
 const PlayerSceneAmllBackground = ({
   coverUrl,

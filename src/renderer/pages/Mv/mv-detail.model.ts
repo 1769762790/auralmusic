@@ -1,93 +1,16 @@
-export interface MvDetailHeroData {
-  id: number
-  name: string
-  artistName: string
-  coverUrl: string
-  playCount: number
-  publishTime?: number
-  duration: number
-  description: string
-  resolutions: number[]
-}
-
-export interface MvPlaybackData {
-  url: string
-  size?: number
-  quality?: number
-}
-
-export interface SimilarMvItem {
-  id: number
-  name: string
-  artistName: string
-  coverUrl: string
-  duration: number
-  playCount: number
-  publishTime?: number
-}
-
-export interface MvDetailPageState {
-  hero: MvDetailHeroData | null
-  playback: MvPlaybackData | null
-  similarMvs: SimilarMvItem[]
-}
-
-interface RawMvArtist {
-  name?: string
-}
-
-interface RawMvDetail {
-  id?: number
-  name?: string
-  artistName?: string
-  artists?: RawMvArtist[]
-  cover?: string
-  coverUrl?: string
-  imgurl?: string
-  imgurl16v9?: string
-  playCount?: number
-  publishTime?: number
-  duration?: number
-  desc?: string
-  brs?: number[]
-  videoGroup?: Array<{ id?: number; name?: string }>
-}
-
-interface RawMvDetailResponse {
-  data?: RawMvDetail | { data?: RawMvDetail }
-}
-
-interface RawMvPlaybackItem {
-  url?: string
-  size?: number
-  br?: number
-}
-
-interface RawMvPlaybackResponse {
-  data?:
-    | RawMvPlaybackItem[]
-    | { data?: RawMvPlaybackItem[] }
-    | RawMvPlaybackItem
-    | { data?: RawMvPlaybackItem }
-}
-
-interface RawSimilarMv {
-  id?: number
-  name?: string
-  artistName?: string
-  artists?: RawMvArtist[]
-  cover?: string
-  coverUrl?: string
-  imgurl?: string
-  imgurl16v9?: string
-  playCount?: number
-  publishTime?: number
-  duration?: number
-}
-
-interface RawSimilarMvResponse {
-  mvs?: RawSimilarMv[]
-}
+import type {
+  MvDetailHeroData,
+  MvDetailPageState,
+  MvPlaybackData,
+  RawMvArtist,
+  RawMvDetail,
+  RawMvDetailResponse,
+  RawMvPlaybackItem,
+  RawMvPlaybackResponse,
+  RawSimilarMv,
+  RawSimilarMvResponse,
+  SimilarMvItem,
+} from './types'
 
 export const EMPTY_MV_DETAIL_STATE: MvDetailPageState = {
   hero: null,

@@ -1,8 +1,4 @@
-export type LyricTextBundle = {
-  lrc: string
-  tlyric: string
-  yrc: string
-}
+import type { LyricTextBundle } from './types'
 
 export function createLyricCacheKey(trackId: number | string) {
   return `lyrics:new:${trackId}`

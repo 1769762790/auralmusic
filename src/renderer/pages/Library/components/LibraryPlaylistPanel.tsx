@@ -1,11 +1,5 @@
 import ArtistCover from '@/components/ArtistCover'
-import type { LibraryPlaylistItem } from '../library.model'
-
-interface LibraryPlaylistPanelProps {
-  playlists: LibraryPlaylistItem[]
-  loading?: boolean
-  onOpen: (id: number) => void
-}
+import type { LibraryPlaylistPanelProps } from '../types'
 
 const LibraryPlaylistPanel = ({
   playlists,

@@ -1,42 +1,7 @@
-import type { FormEventHandler } from 'react'
-import type { FieldErrors, UseFormRegister } from 'react-hook-form'
-import type { LucideIcon } from 'lucide-react'
 import { QrCode } from 'lucide-react'
 
-import type { LoginMode } from '@/api/auth'
-import {
-  LOGIN_FORM_DEFAULT_VALUES,
-  type LoginFormValues,
-} from './login-form.schema'
-
-export type LoginFormState = LoginFormValues
-
-export interface QrViewState {
-  key: string
-  qrImg: string
-  qrUrl: string
-}
-
-export interface LoginModeOption {
-  value: LoginMode
-  label: string
-  shortLabel: string
-  icon: LucideIcon
-}
-
-export interface LoginPanelBaseProps {
-  isLoading: boolean
-}
-
-export interface CredentialLoginPanelProps extends LoginPanelBaseProps {
-  errors: FieldErrors<LoginFormState>
-  register: UseFormRegister<LoginFormState>
-  onSubmit: FormEventHandler<HTMLFormElement>
-}
-
-export interface PhoneCaptchaLoginPanelProps extends CredentialLoginPanelProps {
-  onSendCaptcha: () => void
-}
+import { LOGIN_FORM_DEFAULT_VALUES } from './login-form.schema'
+import type { LoginFormState, LoginModeOption } from './types'
 
 export const LOGIN_FORM_INITIAL_STATE: LoginFormState =
   LOGIN_FORM_DEFAULT_VALUES

@@ -1,6 +1,5 @@
 import { z } from 'zod'
-
-export type LoginFormMode = 'email' | 'phone-password' | 'phone-captcha' | 'qr'
+import type { LoginFormMode, LoginFormValues } from './types'
 
 export const LOGIN_FORM_DEFAULT_VALUES = {
   email: '',
@@ -19,9 +18,7 @@ const baseLoginFormSchema = z.object({
   phone: z.string(),
   captcha: z.string(),
   countrycode: z.string(),
-})
-
-export type LoginFormValues = z.infer<typeof baseLoginFormSchema>
+}) satisfies z.ZodType<LoginFormValues>
 
 const emailFormatSchema = z.string().email()
 const CHINA_MAINLAND_PHONE_REGEX = /^1[3-9]\d{9}$/

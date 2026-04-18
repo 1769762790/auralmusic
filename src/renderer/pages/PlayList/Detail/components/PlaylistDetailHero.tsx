@@ -1,19 +1,7 @@
 import MediaDetailHero from '@/components/MediaDetailHero'
-import type { ReactNode } from 'react'
 
-import {
-  formatPlaylistUpdateDate,
-  type PlaylistDetailHeroData,
-} from '../playlist-detail.model'
-
-interface PlaylistDetailHeroProps {
-  hero: PlaylistDetailHeroData
-  showFavoriteButton: boolean
-  favoriteLoading: boolean
-  onToggleFavorite: () => void
-  onPlay: () => void
-  moreActions?: ReactNode
-}
+import { formatPlaylistUpdateDate } from '../playlist-detail.model'
+import type { PlaylistDetailHeroProps } from '../types'
 
 const PlaylistDetailHero = ({
   hero,

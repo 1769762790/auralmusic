@@ -6,8 +6,8 @@ import {
   normalizeMvDetailHero,
   normalizeMvPlayback,
   normalizeSimilarMvs,
-  type MvDetailPageState,
 } from '../mv-detail.model'
+import type { MvDetailPageState } from '../types'
 import MvDetailHeader from './components/MvDetailHeader'
 import MvDetailPlayer from './components/MvDetailPlayer'
 import MvDetailSkeleton from './components/MvDetailSkeleton'

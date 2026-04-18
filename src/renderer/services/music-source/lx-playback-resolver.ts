@@ -1,7 +1,4 @@
-import type {
-  AppConfig,
-  AudioQualityLevel,
-} from '../../../main/config/types.ts'
+import type { AudioQualityLevel } from '../../../main/config/types.ts'
 import type {
   LxInitedData,
   LxMusicInfo,
@@ -13,14 +10,7 @@ import type {
   SongUrlV1Result,
 } from '../../../shared/playback.ts'
 import { getLxMusicRunner, initLxMusicRunner } from './LxMusicSourceRunner.ts'
-
-export type LxPlaybackResolverConfig = Pick<
-  AppConfig,
-  | 'musicSourceEnabled'
-  | 'luoxueSourceEnabled'
-  | 'activeLuoxueMusicSourceScriptId'
-  | 'luoxueMusicSourceScripts'
->
+import type { LxPlaybackResolverConfig } from '@/types/core'
 
 const AUDIO_QUALITY_TO_LX: Record<AudioQualityLevel, LxQuality> = {
   standard: '128k',
@@ -34,8 +24,6 @@ const AUDIO_QUALITY_TO_LX: Record<AudioQualityLevel, LxQuality> = {
   jymaster: 'flac',
 }
 
-// LX custom sources resolve playable resources for an existing track.
-// They are intentionally not part of global search; search stays on the app's existing APIs.
 export function formatLxInterval(durationMs: number) {
   const totalSeconds = Math.max(0, Math.floor(durationMs / 1000))
   const minutes = Math.floor(totalSeconds / 60)

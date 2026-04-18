@@ -1,18 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  resolvePlayerSceneChromeState,
-  type PlayerSceneChromeEvent,
-  type PlayerSceneChromeState,
-} from './player-scene-chrome.model'
+import { resolvePlayerSceneChromeState } from './player-scene-chrome.model'
+import type {
+  PlayerSceneChromeEvent,
+  PlayerSceneChromeState,
+  UsePlayerSceneChromeVisibilityOptions,
+} from './types'
 
 const INITIAL_CHROME_STATE: PlayerSceneChromeState = {
   visible: true,
   hideDelayMs: null,
-}
-
-interface UsePlayerSceneChromeVisibilityOptions {
-  immersiveEnabled: boolean
-  isOpen: boolean
 }
 
 export function usePlayerSceneChromeVisibility({

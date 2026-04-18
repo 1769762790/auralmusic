@@ -1,14 +1,6 @@
-﻿import type { ArtistLatestReleaseData } from '@/pages/Artists/artist-detail.model'
 import { formatArtistPublishDate } from '@/pages/Artists/artist-detail.model'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-
-interface ArtistLatestReleaseProps {
-  latestRelease: ArtistLatestReleaseData
-  albumsLoading?: boolean
-  mvsLoading?: boolean
-  onToAlbumDetail: (id: number) => void
-  onToMvDetail: (id: number) => void
-}
+import type { ArtistLatestReleaseProps } from '../types'
 
 const ArtistLatestRelease = ({
   latestRelease,

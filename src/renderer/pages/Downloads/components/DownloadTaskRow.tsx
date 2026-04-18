@@ -6,14 +6,7 @@ import {
   formatDownloadTaskProgress,
   getDownloadTaskStatusLabel,
 } from '../downloads.model'
-import type { DownloadTask } from '../downloads.types'
-
-interface DownloadTaskRowProps {
-  task: DownloadTask
-  onOpenFile: (taskId: string) => void
-  onOpenFolder: (taskId: string) => void
-  onRemoveTask: (taskId: string) => void
-}
+import type { DownloadTaskRowProps } from '../types'
 
 const DownloadTaskRow = ({
   task,

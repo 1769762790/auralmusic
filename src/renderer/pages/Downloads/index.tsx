@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import DownloadsPageView from './components/DownloadsPageView'
 import { buildDownloadTaskPlaybackQueue } from './download-playback.model'
 import { filterDownloadTasks } from './downloads.model'
-import type { DownloadTaskFilterValue } from './downloads.types'
+import type { DownloadTaskFilterValue } from './types'
 import { useDownloadTaskStore } from '@/stores/download-task-store'
 import { usePlaybackStore } from '@/stores/playback-store'
 

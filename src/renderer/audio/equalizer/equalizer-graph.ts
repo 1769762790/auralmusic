@@ -2,34 +2,13 @@ import {
   DEFAULT_EQUALIZER_CONFIG,
   EQ_BANDS,
   normalizeEqualizerConfig,
-  type EqualizerConfig,
 } from '../../../shared/equalizer.ts'
 import { DEFAULT_AUDIO_OUTPUT_DEVICE_ID } from '../../lib/audio-output.ts'
-
-type ConnectableAudioNode = {
-  connect: (node: unknown) => unknown
-  disconnect: () => void
-}
-
-type EqualizerAudioContext = Pick<
-  AudioContext,
-  | 'destination'
-  | 'state'
-  | 'createMediaElementSource'
-  | 'createGain'
-  | 'createBiquadFilter'
-  | 'resume'
-  | 'close'
-> & {
-  setSinkId?: (sinkId: string) => Promise<void>
-}
-
-export interface EqualizerGraph {
-  update: (config: EqualizerConfig) => void
-  resume: () => Promise<void>
-  setOutputDevice: (deviceId: string) => Promise<boolean>
-  dispose: () => void
-}
+import type {
+  ConnectableAudioNode,
+  EqualizerAudioContext,
+  EqualizerGraph,
+} from '@/types/audio'
 
 export function equalizerDbToLinearGain(db: number) {
   return Math.pow(10, db / 20)

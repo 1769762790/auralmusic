@@ -1,14 +1,8 @@
 import { chunkArray } from '@/lib/utils'
 import { memo } from 'react'
-import type { NewSong } from '../home.type'
+import type { NewSong, NewSongsListProps } from '../types'
 import { NewSongsSkeleton } from './HomeSkeletons'
 import SongItem from './SongItem'
-
-interface NewSongsListProps {
-  list?: NewSong[]
-  isLoading?: boolean
-  onPlaySong?: (song: NewSong) => void
-}
 
 const NewSongsList = ({
   list = [],

@@ -4,10 +4,8 @@ import { RotateCcw } from 'lucide-react'
 
 import { resetQrLoginState, useAuthStore } from '@/stores/auth-store'
 
-import type { QrViewState } from '../login-dialog.model'
+import type { QrPanelStatus, QrViewState } from '../types'
 import { QR_LOGIN_EXPIRE_SECONDS } from '../login-dialog.model'
-
-type QrPanelStatus = 'loading' | 'active' | 'expired'
 
 const QrLoginPanel = () => {
   const isLoading = useAuthStore(state => state.isLoading)

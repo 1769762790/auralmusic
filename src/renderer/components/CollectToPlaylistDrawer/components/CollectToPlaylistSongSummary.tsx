@@ -1,14 +1,13 @@
 import AvatarCover from '@/components/AvatarCover'
 import { Button } from '@/components/ui/button'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-import type { CollectPlaylistSongContext } from '@/model/collect-to-playlist.model'
 import { Music4, Plus, Sparkles } from 'lucide-react'
+import type { CollectToPlaylistSongSummaryProps } from '../types'
 
-interface CollectToPlaylistSongSummaryProps {
-  song: CollectPlaylistSongContext
-  createExpanded: boolean
-  onToggleCreate: () => void
-}
+const COLLECT_PLAYLIST_CURRENT_SONG = '\u5f53\u524d\u6b4c\u66f2'
+const COLLECT_PLAYLIST_UNKNOWN_ARTIST = '\u672a\u77e5\u6b4c\u624b'
+const COLLECT_PLAYLIST_CANCEL_CREATE = '\u53d6\u6d88\u521b\u5efa'
+const COLLECT_PLAYLIST_CREATE_NEW = '\u521b\u5efa\u65b0\u6b4c\u5355'
 
 const CollectToPlaylistSongSummary = ({
   song,
@@ -37,11 +36,11 @@ const CollectToPlaylistSongSummary = ({
 
         <div className='min-w-0 flex-1'>
           <p className='text-muted-foreground text-xs font-medium tracking-[0.12em]'>
-            当前歌曲
+            {COLLECT_PLAYLIST_CURRENT_SONG}
           </p>
           <h3 className='truncate text-base font-semibold'>{song.songName}</h3>
           <p className='text-muted-foreground truncate text-sm'>
-            {song.artistName || '未知歌手'}
+            {song.artistName || COLLECT_PLAYLIST_UNKNOWN_ARTIST}
           </p>
         </div>
       </div>
@@ -57,7 +56,9 @@ const CollectToPlaylistSongSummary = ({
         ) : (
           <Plus className='mr-2 size-4' />
         )}
-        {createExpanded ? '取消创建' : '创建新歌单'}
+        {createExpanded
+          ? COLLECT_PLAYLIST_CANCEL_CREATE
+          : COLLECT_PLAYLIST_CREATE_NEW}
       </Button>
     </section>
   )

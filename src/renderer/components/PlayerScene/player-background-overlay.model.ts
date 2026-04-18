@@ -1,16 +1,7 @@
-export type PlayerBackgroundOverlayState = {
-  ambientOpacity: number
-  lyricPanelOpacity: number
-  vignetteOpacity: number
-  glowOpacity: number
-  bottomOpacity: number
-}
-
-type ResolvePlayerBackgroundOverlayStateInput = {
-  enabled: boolean
-  staticMode: boolean
-  isDarkTheme: boolean
-}
+import type {
+  PlayerBackgroundOverlayState,
+  ResolvePlayerBackgroundOverlayStateInput,
+} from './types'
 
 export function resolvePlayerBackgroundOverlayState({
   enabled,

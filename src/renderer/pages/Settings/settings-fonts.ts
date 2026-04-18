@@ -1,10 +1,4 @@
-export type SystemFontQueryStatus = 'ok' | 'unsupported' | 'empty' | 'error'
-
-export interface SystemFontQueryResult {
-  fonts: string[]
-  status: SystemFontQueryStatus
-  message?: string
-}
+import type { SystemFontQueryResult } from './types'
 
 const BUILT_IN_FONT_FAMILIES = [
   'Inter Variable',

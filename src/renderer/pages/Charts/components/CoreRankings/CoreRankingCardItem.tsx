@@ -1,7 +1,7 @@
 import { ArrowUpRight, Play } from 'lucide-react'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { cn } from '@/lib/utils'
-import { OnlineChartHeroCardProps } from './CoreRankingCardItem.type'
+import type { OnlineChartHeroCardProps } from '../../types'
 
 const HERO_CARD_STYLES = [
   {

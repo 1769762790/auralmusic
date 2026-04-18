@@ -1,12 +1,7 @@
 ﻿import { Play } from 'lucide-react'
 
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-import type { LibraryMvItem } from '../library.model'
-
-interface LibraryMvCardProps {
-  mv: LibraryMvItem
-  onOpen: (id: number) => void
-}
+import type { LibraryMvCardProps } from '../types'
 
 const LibraryMvCard = ({ mv, onOpen }: LibraryMvCardProps) => {
   return (

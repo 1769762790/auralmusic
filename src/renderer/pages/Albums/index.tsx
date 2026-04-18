@@ -3,12 +3,8 @@ import { getNewAlbums } from '@/api/album'
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
 import AlbumFilters from './components/AlbumFilters'
 import { AlbumsGridSkeleton } from './components/AlbumsSkeletons'
-import {
-  ALBUM_AREA_OPTIONS,
-  type AlbumArea,
-  type AlbumListItem,
-  type NewAlbumsResponse,
-} from './albums.model'
+import { ALBUM_AREA_OPTIONS } from './albums.model'
+import type { AlbumArea, AlbumListItem, NewAlbumsResponse } from './types'
 import { useNavigate } from 'react-router-dom'
 import ArtistCover from '@/components/ArtistCover'
 import { isDef } from '@/lib/utils'

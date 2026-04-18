@@ -1,6 +1,6 @@
 import { Play } from 'lucide-react'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-import { GenreChartsCardProps } from './GenreChartsCard.type'
+import type { GenreChartsCardProps } from '../../types'
 
 const GenreChartsCardItem = ({ chart, onOpen }: GenreChartsCardProps) => {
   const statLabel =

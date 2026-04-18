@@ -1,9 +1,7 @@
+import type { AppConfig } from '../../../../main/config/types.ts'
 import { normalizeSongUrlMatchResponse } from '../../../../shared/playback.ts'
 import { getSongUrlMatch as defaultGetSongUrlMatch } from '../../../api/list.ts'
-import type { PlaybackSourceProvider } from '../playback-source-resolver.ts'
-import type { AppConfig } from '../../../../main/config/types.ts'
-
-type GetSongUrlMatch = typeof defaultGetSongUrlMatch
+import type { PlaybackSourceProvider } from '@/types/core'
 
 export const DEFAULT_BUILTIN_UNBLOCK_MATCH_SOURCES = [
   'unm',
@@ -15,7 +13,7 @@ export const DEFAULT_BUILTIN_UNBLOCK_MATCH_SOURCES = [
 
 export function createBuiltinUnblockPlaybackProvider(
   deps: {
-    getSongUrlMatch?: GetSongUrlMatch
+    getSongUrlMatch?: typeof defaultGetSongUrlMatch
     matchSources?: readonly string[]
   } = {}
 ): PlaybackSourceProvider {

@@ -1,11 +1,5 @@
 import { create } from 'zustand'
-
-interface SearchDialogStoreState {
-  open: boolean
-  setOpen: (open: boolean) => void
-  openDialog: () => void
-  closeDialog: () => void
-}
+import type { SearchDialogStoreState } from '@/types/core'
 
 export const useSearchDialogStore = create<SearchDialogStoreState>(set => ({
   open: false,

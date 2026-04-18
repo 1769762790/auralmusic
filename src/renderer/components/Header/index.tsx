@@ -8,10 +8,7 @@ import SearchDialog from '../SearchDialog'
 import Back from './Back'
 import WindowControls from './WindowControls'
 import { useAuthStore } from '@/stores/auth-store'
-
-interface HeaderProps {
-  className?: string
-}
+import type { HeaderProps } from './types'
 
 const Header = ({ className = '' }: HeaderProps) => {
   const { currentTheme, setDarkTheme, setLightTheme } = useTheme()

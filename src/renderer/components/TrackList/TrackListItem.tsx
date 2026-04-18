@@ -15,40 +15,8 @@ import {
   handleTrackDownload,
   TRACK_DOWNLOAD_TOASTS,
 } from './track-list-download.model'
-
-export interface songProps {
-  artists?: Artist[] | null
-  id: number
-  coverUrl?: string
-  name: string
-  artistNames?: string
-  duration: number
-  albumName?: string
-}
-
-interface TrackListItemProps {
-  item: songProps
-  type?: 'default' | 'hot' | 'quick'
-  coverUrl?: string
-  isActive?: boolean
-  isPlaying?: boolean
-  onPlay?: () => void
-  onAddToQueue?: () => void
-  onLikeChangeSuccess?: (songId: number, nextLiked: boolean) => void
-}
-
-interface Artist {
-  id?: number
-  name: string
-}
-
-function formatArtistNames(artists?: Artist[] | null) {
-  if (!artists?.length) {
-    return ''
-  }
-
-  return artists.map(artist => artist.name).join(' / ')
-}
+import { formatTrackListArtistNames } from './model'
+import type { TrackListItemProps } from './types'
 
 const TrackListItem = ({
   item,
@@ -80,7 +48,8 @@ const TrackListItem = ({
     item.id ? state.likedSongPendingIds.has(item.id) : false
   )
 
-  const artistName = item.artistNames || formatArtistNames(item.artists)
+  const artistName =
+    item.artistNames || formatTrackListArtistNames(item.artists)
 
   const handleToggleSongLike = async (
     event?: MouseEvent<HTMLButtonElement>
@@ -226,7 +195,9 @@ const TrackListItem = ({
               {item.name}
             </div>
             <div className='text-primary/50 truncate text-xs md:text-sm'>
-              {type === 'hot' ? formatArtistNames(item.artists) : artistName}
+              {type === 'hot'
+                ? formatTrackListArtistNames(item.artists)
+                : artistName}
             </div>
           </div>
         </div>

@@ -8,92 +8,22 @@ import {
   checkLoginQr,
   getLoginQrKey,
   sendLoginCaptcha,
-  type LoginMode,
 } from '@/api/auth'
-import {
-  normalizeAuthSession,
-  type AuthSession,
-  type AuthUser,
-} from '../../shared/auth'
+import type { LoginMode } from '@/types/api'
+import { normalizeAuthSession } from '../../shared/auth'
+import type { AuthSession, AuthUser } from '../../shared/auth'
+import type {
+  AuthStoreState,
+  LoginQrCheckResponse,
+  LoginQrCreateResponse,
+  LoginQrKeyResponse,
+  QrState,
+} from '@/types/core'
 import { useUserStore } from './user'
-
-type LoginStatus = 'anonymous' | 'authenticated' | 'expired'
 
 const DEFAULT_LOGIN_MODE: LoginMode = 'qr'
 
-interface AuthStoreState {
-  user: AuthUser | null
-  session: AuthSession | null
-  isLoading: boolean
-  dialogOpen: boolean
-  loginMode: LoginMode
-  loginStatus: LoginStatus
-  errorMessage: string | null
-  hasHydrated: boolean
-  hydrateAuth: () => Promise<void>
-  openLoginDialog: (mode?: LoginMode) => void
-  closeLoginDialog: () => void
-  setLoginMode: (mode: LoginMode) => void
-  clearError: () => void
-  loginWithCurrentMode: (payload: LoginPayload) => Promise<void>
-  sendCaptchaCode: (phone: string, ctcode?: string) => Promise<void>
-  refreshQrCode: () => Promise<QrState>
-  pollQrLogin: () => Promise<void>
-  logout: () => Promise<void>
-}
-
-type LoginPayload =
-  | {
-      mode: 'email'
-      email: string
-      password: string
-    }
-  | {
-      mode: 'phone-password'
-      phone: string
-      password: string
-      countrycode?: string
-    }
-  | {
-      mode: 'phone-captcha'
-      phone: string
-      captcha: string
-      countrycode?: string
-    }
-
-interface QrState {
-  key: string
-  qrImg: string
-  qrUrl: string
-  polling: boolean
-}
-
 const emptyUser = null
-
-interface LoginQrKeyResponse {
-  data?: {
-    unikey?: string
-  }
-  unikey?: string
-}
-
-interface LoginQrCreateResponse {
-  data?: {
-    qrimg?: string
-    qrurl?: string
-  }
-  qrimg?: string
-  qrurl?: string
-}
-
-interface LoginQrCheckResponse {
-  code?: number
-  cookie?: string
-  data?: {
-    code?: number
-    cookie?: string
-  }
-}
 
 function unwrapNestedData<T>(response: T): T {
   let current: unknown = response
@@ -343,7 +273,7 @@ export const useAuthStore = create<AuthStoreState>(set => ({
       console.error('refresh qr failed', error)
       set({
         errorMessage:
-          error instanceof Error ? error.message : '二维码生成失败，请稍后重试',
+          error instanceof Error ? error.message : '二维码刷新失败，请稍后重试',
       })
       return qrState
     } finally {
@@ -368,7 +298,7 @@ export const useAuthStore = create<AuthStoreState>(set => ({
         const code = response?.code ?? response?.data?.code ?? 0
 
         if (code === 800) {
-          throw new Error('二维码已过期，请刷新')
+          throw new Error('二维码已失效，请刷新后重试')
         }
 
         if (code === 801) {
@@ -400,13 +330,13 @@ export const useAuthStore = create<AuthStoreState>(set => ({
           return
         }
 
-        throw new Error('二维码登录状态异常')
+        throw new Error('二维码登录状态异常，请稍后重试')
       }
     } catch (error) {
       console.error('poll qr login failed', error)
       set({
         errorMessage:
-          error instanceof Error ? error.message : '扫码登录失败，请稍后重试',
+          error instanceof Error ? error.message : '二维码登录失败，请稍后重试',
       })
     } finally {
       qrState = { ...qrState, polling: false }

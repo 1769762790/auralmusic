@@ -14,15 +14,9 @@ import { Input } from '@/components/ui/input'
 import {
   buildCreatePlaylistPayload,
   CREATE_PLAYLIST_TITLE_MAX_LENGTH,
-} from '@/model/create-playlist-form.model'
+} from '@/model'
 import { Separator } from '@/components/ui/separator'
-
-interface CreatePlaylistDialogProps {
-  open: boolean
-  submitting?: boolean
-  onOpenChange: (open: boolean) => void
-  onSubmit: (payload: { name: string; privacy?: '10' }) => Promise<void> | void
-}
+import type { CreatePlaylistDialogProps } from '../types'
 
 const CreatePlaylistDialog = ({
   open,

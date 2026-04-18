@@ -2,14 +2,7 @@ import { Music2 } from 'lucide-react'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { cn } from '@/lib/utils'
 import WaterRipple3DCover from './WaterRippleCover'
-
-type PlayerSceneArtworkProps = {
-  coverUrl: string
-  title: string
-  artistNames: string
-  isPlaying: boolean
-  dynamicCoverEnabled: boolean
-}
+import type { PlayerSceneArtworkProps } from './types'
 
 const PlayerSceneArtwork = ({
   coverUrl,

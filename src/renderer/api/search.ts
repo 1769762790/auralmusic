@@ -1,16 +1,7 @@
 import request from '@/lib/request'
 
-import {
-  SEARCH_TYPE_CODE_MAP,
-  type SearchType,
-} from '@/components/SearchDialog/search-dialog.model'
-
-interface SearchResourcesParams {
-  keywords: string
-  type: SearchType
-  limit?: number
-  offset?: number
-}
+import { SEARCH_TYPE_CODE_MAP } from '@/components/SearchDialog/search-dialog.model'
+import type { SearchResourcesParams } from '@/types/api'
 
 export function searchResources({
   keywords,

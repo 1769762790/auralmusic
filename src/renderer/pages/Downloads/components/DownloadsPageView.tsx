@@ -1,15 +1,6 @@
 import DownloadsFilterTabs from './DownloadsFilterTabs'
 import DownloadsTaskList from './DownloadsTaskList'
-import type { DownloadTask, DownloadTaskFilterValue } from '../downloads.types'
-
-interface DownloadsPageViewProps {
-  activeFilter: DownloadTaskFilterValue
-  tasks: DownloadTask[]
-  onFilterChange: (value: DownloadTaskFilterValue) => void
-  onOpenFile: (taskId: string) => void
-  onOpenFolder: (taskId: string) => void
-  onRemoveTask: (taskId: string) => void
-}
+import type { DownloadsPageViewProps } from '../types'
 
 const DownloadsPageView = ({
   activeFilter,

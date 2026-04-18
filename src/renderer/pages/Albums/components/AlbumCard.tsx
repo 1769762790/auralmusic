@@ -1,12 +1,7 @@
 import { Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-import type { AlbumListItem } from '@/pages/Albums/albums.model'
-
-interface AlbumCardProps {
-  album: AlbumListItem
-  onToAlbumDetail: (id: number) => void
-}
+import type { AlbumCardProps } from '../types'
 
 const AlbumCard = ({ album, onToAlbumDetail }: AlbumCardProps) => {
   const coverUrl = album.picUrl || album.blurPicUrl

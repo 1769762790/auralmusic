@@ -4,6 +4,11 @@ import {
   type DownloadResolutionPolicy,
   type ResolvedDownloadSource,
 } from '../../services/download/download-source-resolver.ts'
+import type {
+  ResolveDownloadSource,
+  TrackDownloadSource,
+  TrackListDownloadSong,
+} from './types'
 
 export const TRACK_DOWNLOAD_TOASTS = {
   disabled: '下载功能未开启，请先在设置中打开',
@@ -14,35 +19,6 @@ export const TRACK_DOWNLOAD_TOASTS = {
 } as const
 
 const defaultResolveDownloadSource = createDownloadSourceResolver()
-
-export interface TrackListDownloadSong {
-  artists?: Array<{ name: string }> | null
-  id: number
-  coverUrl?: string
-  name: string
-  artistNames?: string
-  duration: number
-  albumName?: string
-}
-
-type TrackDownloadSource = {
-  id: number
-  name: string
-  artistNames: string
-  albumName: string
-  coverUrl: string
-  duration: number
-}
-
-type ResolveDownloadSourceInput = {
-  track: TrackDownloadSource
-  requestedQuality: SongDownloadPayload['requestedQuality']
-  policy: DownloadResolutionPolicy
-}
-
-type ResolveDownloadSource = (
-  input: ResolveDownloadSourceInput
-) => Promise<ResolvedDownloadSource | null>
 
 function formatArtistNames(artists?: Array<{ name: string }> | null) {
   if (!artists?.length) {

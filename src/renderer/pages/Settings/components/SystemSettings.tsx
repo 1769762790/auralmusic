@@ -18,6 +18,7 @@ import {
   querySystemFontFamilies,
   type SystemFontQueryStatus,
 } from '../settings-fonts'
+import type { ToggleSettingProps } from '../types'
 
 const FONT_LABELS: Record<string, string> = {
   'Inter Variable': 'Inter',
@@ -34,11 +35,6 @@ const EMPTY_CACHE_STATUS = {
   usedBytes: 0,
   audioCount: 0,
   lyricsCount: 0,
-}
-
-type ToggleSettingProps = {
-  enabled: boolean
-  onToggle: () => void
 }
 
 function clampCacheSizeGb(value: number) {

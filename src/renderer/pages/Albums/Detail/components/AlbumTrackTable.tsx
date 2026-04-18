@@ -1,11 +1,5 @@
-import {
-  formatAlbumTrackDuration,
-  type AlbumTrackItem,
-} from '../album-detail.model'
-
-interface AlbumTrackTableProps {
-  tracks: AlbumTrackItem[]
-}
+import { formatAlbumTrackDuration } from '../album-detail.model'
+import type { AlbumTrackTableProps } from '../types'
 
 const AlbumTrackTable = ({ tracks }: AlbumTrackTableProps) => {
   if (tracks.length === 0) {

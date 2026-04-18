@@ -1,10 +1,6 @@
 import { Link } from 'react-router-dom'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-import type { ArtistSimilarItem } from '@/pages/Artists/artist-detail.model'
-
-interface SimilarArtistsProps {
-  artists: ArtistSimilarItem[]
-}
+import type { SimilarArtistsProps } from '../types'
 
 const SimilarArtists = ({ artists }: SimilarArtistsProps) => {
   return (

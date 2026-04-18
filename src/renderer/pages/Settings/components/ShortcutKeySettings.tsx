@@ -18,6 +18,7 @@ import {
   type ShortcutBindings,
   type ShortcutScope,
 } from '../../../../shared/shortcut-keys'
+import type { RecordingTarget, ShortcutRecorderProps } from '../types'
 
 const SHORTCUT_ACTION_LABELS = {
   playPause: '播放/暂停',
@@ -32,20 +33,6 @@ const SHORTCUT_ACTION_LABELS = {
 SHORTCUT_ACTION_LABELS.openSearch = '呼出搜索'
 
 const MODIFIER_KEY_NAMES = new Set(['Alt', 'Control', 'Meta', 'Shift'])
-
-type RecordingTarget = {
-  actionId: ShortcutActionId
-  scope: ShortcutScope
-}
-
-type ShortcutRecorderProps = {
-  value: string
-  recording: boolean
-  disabled?: boolean
-  onStartRecording: () => void
-  onCancelRecording: () => void
-  onCommit: (value: string) => void
-}
 
 const ShortcutRecorder = ({
   value,

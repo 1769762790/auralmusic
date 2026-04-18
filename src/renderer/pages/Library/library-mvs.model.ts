@@ -1,43 +1,16 @@
-import type { LibraryMvItem } from './library.model'
-
-interface RawMvArtist {
-  name?: string
-}
-
-interface RawMvItem {
-  id?: number
-  name?: string
-  cover?: string
-  coverUrl?: string
-  imgurl16v9?: string
-  artistName?: string
-  artists?: RawMvArtist[]
-  playCount?: number
-  publishTime?: number
-}
-
-interface RawSubscribedMvsBody {
-  data?: RawSubscribedMvsBody | RawMvItem[]
-  mvs?: RawMvItem[]
-  more?: boolean
-  hasMore?: boolean
-  count?: number
-}
-
-interface NormalizeLibraryMvPageOptions {
-  limit: number
-  offset: number
-}
-
-export interface LibraryMvPage {
-  list: LibraryMvItem[]
-  hasMore: boolean
-}
+import type { LibraryMvItem } from './types'
+import type {
+  LibraryMvPage,
+  NormalizeLibraryMvPageOptions,
+  RawLibraryMvItem,
+  RawMvArtist,
+  RawSubscribedMvsBody,
+} from './types'
 
 function unwrapSubscribedMvsBody(
-  response?: RawSubscribedMvsBody | RawMvItem[] | null
+  response?: RawSubscribedMvsBody | RawLibraryMvItem[] | null
 ): {
-  mvs: RawMvItem[]
+  mvs: RawLibraryMvItem[]
   more?: boolean
   hasMore?: boolean
   count?: number
@@ -53,7 +26,7 @@ function unwrapSubscribedMvsBody(
   const nested =
     response.data && typeof response.data === 'object'
       ? unwrapSubscribedMvsBody(response.data)
-      : { mvs: [] as RawMvItem[] }
+      : { mvs: [] as RawLibraryMvItem[] }
 
   return {
     mvs: Array.isArray(response.mvs) ? response.mvs : nested.mvs,
@@ -75,10 +48,10 @@ function formatMVArtistNames(artistName?: string, artists?: RawMvArtist[]) {
       .filter(Boolean)
       .join(' / ') || ''
 
-  return joined || '未知歌手'
+  return joined || '鏈煡姝屾墜'
 }
 
-function normalizeMvList(mvs?: RawMvItem[]): LibraryMvItem[] {
+function normalizeMvList(mvs?: RawLibraryMvItem[]): LibraryMvItem[] {
   if (!Array.isArray(mvs)) {
     return []
   }
@@ -91,7 +64,7 @@ function normalizeMvList(mvs?: RawMvItem[]): LibraryMvItem[] {
     return [
       {
         id: mv.id,
-        name: mv.name || '未知 MV',
+        name: mv.name || '鏈煡 MV',
         coverUrl: mv.coverUrl || mv.cover || mv.imgurl16v9 || '',
         artistName: formatMVArtistNames(mv.artistName, mv.artists),
         playCount: mv.playCount || 0,

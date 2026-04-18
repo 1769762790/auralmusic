@@ -23,10 +23,13 @@ import {
   normalizeLibrarySongs,
   normalizeLibraryUserPlaylists,
   resolveLibraryLikedPlaylist,
-  type LibraryPageData,
-  type PlaylistSourceValue,
 } from './library.model'
 import { isDef } from '@/lib/utils'
+import type {
+  CreatePlaylistPayload,
+  LibraryPageData,
+  PlaylistSourceValue,
+} from './types'
 
 const Library = () => {
   const navigate = useNavigate()
@@ -191,10 +194,7 @@ const Library = () => {
     navigate(`/mv/${mvId}`)
   }
 
-  const handleCreatePlaylist = async (payload: {
-    name: string
-    privacy?: '10'
-  }) => {
+  const handleCreatePlaylist = async (payload: CreatePlaylistPayload) => {
     if (!user?.userId || createPlaylistSubmitting) {
       return
     }

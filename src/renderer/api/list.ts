@@ -1,11 +1,32 @@
 import request from '../lib/request.ts'
-import type { AudioQualityLevel } from '../../main/config/types.ts'
+import type {
+  AddSongToPlaylistParams,
+  CreatePlaylistParams,
+  DeletePlaylistParams,
+  FmTrashParams,
+  GetPlaylistSongIdsParams,
+  LikeListParams,
+  LyricParams,
+  PersonalFmParams,
+  PlaylistSubscribeParams,
+  PlaylistTrackAllResponse,
+  PlaylistTracksParams,
+  SongDownloadUrlV1Params,
+  SongUrlMatchParams,
+  SongUrlV1Params,
+  TopArtistsParams,
+  TopPlaylistParams,
+  ToggleSongLikeParams,
+  UpdatePlaylistParams,
+  UpdatePlaylistTracksParams,
+} from '@/types/api'
 
-// 获取排行榜列表
+// 鑾峰彇鎺掕姒滃垪琛?
 export function getTopList() {
   return request.get('/toplist')
 }
-// 获取排行榜详情
+
+// 鑾峰彇鎺掕姒滆鎯?
 export function getTopListDetailById(id: string) {
   return request.get(`/playlist/detail?id=${id}`)
 }
@@ -16,21 +37,10 @@ export function getPlaylistDetail(id: number | string, timestamp?: number) {
   })
 }
 
-export interface CreatePlaylistParams {
-  name: string
-  privacy?: '10'
-  type?: 'NORMAL' | 'VIDEO' | 'SHARED'
-}
-
 export function createPlaylist(params: CreatePlaylistParams) {
   return request.get('/playlist/create', {
     params,
   })
-}
-
-export interface DeletePlaylistParams {
-  id: number | string
-  timestamp?: number
 }
 
 export function deletePlaylist(params: DeletePlaylistParams) {
@@ -39,25 +49,10 @@ export function deletePlaylist(params: DeletePlaylistParams) {
   })
 }
 
-export interface UpdatePlaylistParams {
-  id: number | string
-  name: string
-  desc?: string
-  tags?: string
-  timestamp?: number
-}
-
 export function updatePlaylist(params: UpdatePlaylistParams) {
   return request.get('/playlist/update', {
     params,
   })
-}
-
-export interface UpdatePlaylistTracksParams {
-  op: 'add' | 'del'
-  pid: number | string
-  tracks: Array<number | string> | number | string
-  timestamp?: number
 }
 
 export function updatePlaylistTracks(params: UpdatePlaylistTracksParams) {
@@ -73,14 +68,6 @@ export function updatePlaylistTracks(params: UpdatePlaylistTracksParams) {
       timestamp: params.timestamp,
     },
   })
-}
-
-export interface AddSongToPlaylistParams {
-  playlistId: number | string
-  trackId: number | string
-  isLikedPlaylist?: boolean
-  userId?: number | string
-  timestamp?: number
 }
 
 export function addSongToPlaylist(params: AddSongToPlaylistParams) {
@@ -104,26 +91,19 @@ export function addSongToPlaylist(params: AddSongToPlaylistParams) {
   })
 }
 
-// 获取推荐歌单
+// 鑾峰彇鎺ㄨ崘姝屽崟
 export function getRecommendPlayList(limit: number = 1) {
   return request.get('/personalized', {
     params: { limit },
   })
 }
 
-export interface TopPlaylistParams {
-  order?: 'new' | 'hot'
-  cat?: string
-  limit?: number
-  offset?: number
-}
-
 /**
- * 歌单 ( 网友精选碟 )
- * 说明 : 调用此接口 , 可获取网友精选碟歌单
- * - order: 可选值为 'new' 和 'hot', 分别对应最新和最热 , 默认为 'hot'
- * - cat: tag, 比如 " 华语 "、" 古风 " 、" 欧美 "、" 流行 ", 默认为 "全部",可从歌单分类接口获取(/playlist/catlist)
- * - limit: 取出歌单数量 , 默认为 50
+ * 姝屽崟 ( 缃戝弸绮鹃€夌 )
+ * 璇存槑 : 璋冪敤姝ゆ帴鍙?, 鍙幏鍙栫綉鍙嬬簿閫夌姝屽崟
+ * - order: 鍙€夊€间负 'new' 鍜?'hot', 鍒嗗埆瀵瑰簲鏈€鏂板拰鏈€鐑?, 榛樿涓?'hot'
+ * - cat: tag, 姣斿 " 鍗庤 "銆? 鍙ら " 銆? 娆х編 "銆? 娴佽 ", 榛樿涓?"鍏ㄩ儴",鍙粠姝屽崟鍒嗙被鎺ュ彛鑾峰彇(/playlist/catlist)
+ * - limit: 鍙栧嚭姝屽崟鏁伴噺 , 榛樿涓?50
  * @param {object} params
  * @param {string} params.order
  * @param {string} params.cat
@@ -135,22 +115,10 @@ export function geTopPlayList(params: TopPlaylistParams) {
   })
 }
 
-export interface PlaylistTracksParams {
-  id: number | string
-  limit?: number
-  offset?: number
-  timestamp?: number
-}
-
 export function getPlaylistTracks(params: PlaylistTracksParams) {
   return request.get('/playlist/track/all', {
     params,
   })
-}
-
-export interface PlaylistSubscribeParams {
-  id: number | string
-  t: 1 | 2
 }
 
 export function togglePlaylistSubscription(params: PlaylistSubscribeParams) {
@@ -158,24 +126,17 @@ export function togglePlaylistSubscription(params: PlaylistSubscribeParams) {
     params,
   })
 }
-// 获取热门歌单
+
+// 鑾峰彇鐑棬姝屽崟
 export function gePlayListCatList() {
   return request.get('/playlist/catlist')
 }
 
-export interface PersonalFmParams {
-  timestamp?: number
-}
-
-// 私人FM
+// 绉佷汉FM
 export function getPersonalFm(params?: PersonalFmParams) {
   return request.get('/personal_fm', {
     params,
   })
-}
-
-export interface FmTrashParams {
-  id: number | string
 }
 
 export function fmTrash(params: FmTrashParams) {
@@ -183,14 +144,10 @@ export function fmTrash(params: FmTrashParams) {
     params,
   })
 }
-//每日推荐
+
+//姣忔棩鎺ㄨ崘
 export function getRecommendSongs() {
   return request.get('/recommend/songs')
-}
-
-export interface LikeListParams {
-  uid: number | string
-  timestamp?: number
 }
 
 export function getLikeList(params: LikeListParams) {
@@ -199,22 +156,10 @@ export function getLikeList(params: LikeListParams) {
   })
 }
 
-export interface ToggleSongLikeParams {
-  id: number | string
-  uid: number | string
-  like: boolean
-}
-
 export function toggleSongLike(params: ToggleSongLikeParams) {
   return request.get('/song/like', {
     params,
   })
-}
-
-export interface SongUrlV1Params {
-  id: number | string
-  level: AudioQualityLevel
-  unblock: boolean
 }
 
 export function getSongUrlV1(params: SongUrlV1Params) {
@@ -223,20 +168,10 @@ export function getSongUrlV1(params: SongUrlV1Params) {
   })
 }
 
-export interface SongUrlMatchParams {
-  id: number | string
-  source: string
-}
-
 export function getSongUrlMatch(params: SongUrlMatchParams) {
   return request.get('/song/url/match', {
     params,
   })
-}
-
-export interface SongDownloadUrlV1Params {
-  id: number | string
-  level: AudioQualityLevel
 }
 
 export function getSongDownloadUrlV1(params: SongDownloadUrlV1Params) {
@@ -245,11 +180,7 @@ export function getSongDownloadUrlV1(params: SongDownloadUrlV1Params) {
   })
 }
 
-export interface LyricParams {
-  id: number | string
-}
-
-// 按接口文档使用 /lyric/new，返回字段中的 yrc 为逐字歌词。
+// 鎸夋帴鍙ｆ枃妗ｄ娇鐢?/lyric/new锛岃繑鍥炲瓧娈典腑鐨?yrc 涓洪€愬瓧姝岃瘝銆?
 export function getLyricNew(params: LyricParams) {
   return request.get('/lyric/new', {
     params,
@@ -264,13 +195,8 @@ export function getSongDetail(ids: Array<number | string> | number | string) {
   })
 }
 
-export interface TopArtistsParams {
-  limit?: number
-  offset?: number
-}
-
 /**
- * 热门歌手
+ * 鐑棬姝屾墜
  * @param {object} params
  * @param {number} params.limit
  * @param {number} params.offset
@@ -282,7 +208,7 @@ export function getTopArtists(params: TopArtistsParams) {
   })
 }
 
-// 获取推荐新音乐
+// 鑾峰彇鎺ㄨ崘鏂伴煶涔?
 export function getPersonalizedNewSong(limit?: number) {
   return request.get('/personalized/newsong', {
     params: {
@@ -293,7 +219,7 @@ export function getPersonalizedNewSong(limit?: number) {
 
 /**
  *
- * @param id 歌单 id
+ * @param id 姝屽崟 id
  * @param limit
  * @param offset
  * @returns
@@ -312,20 +238,6 @@ export function getPlaylistTrackAll(
       timestamp,
     },
   })
-}
-
-interface PlaylistTrackAllSong {
-  id?: number
-}
-
-interface PlaylistTrackAllResponse {
-  songs?: PlaylistTrackAllSong[]
-}
-
-export interface GetPlaylistSongIdsParams {
-  id: number
-  trackCount?: number
-  timestamp?: number
 }
 
 export async function getPlaylistSongIds(params: GetPlaylistSongIdsParams) {

@@ -7,10 +7,7 @@ import { useConfigStore } from '@/stores/config-store'
 
 import CloseWindowDialog from '../CloseWindowDialog'
 import { shouldShowCloseWindowDialog } from '../CloseWindowDialog/close-window.model'
-
-interface WindowControlsProps {
-  className?: string
-}
+import type { WindowControlsProps } from './types'
 
 const WindowControls = ({ className = '' }: WindowControlsProps) => {
   const [isMaximized, setIsMaximized] = useState(false)

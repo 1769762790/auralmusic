@@ -1,12 +1,8 @@
-import { type ArtistTopSongItem } from '@/pages/Artists/artist-detail.model'
 import { useMemo, useState } from 'react'
 import TrackListItem from '@/components/TrackList/TrackListItem'
 import { usePlaybackStore } from '@/stores/playback-store'
 import type { PlaybackTrack } from '../../../../../shared/playback.ts'
-
-interface ArtistTopSongsProps {
-  songs: ArtistTopSongItem[]
-}
+import type { ArtistTopSongsProps } from '../types'
 
 const ArtistTopSongs = ({ songs }: ArtistTopSongsProps) => {
   const [isMore, setIsMore] = useState(false)

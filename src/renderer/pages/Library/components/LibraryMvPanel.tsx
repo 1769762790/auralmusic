@@ -3,14 +3,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { getSubscribedMvs } from '@/api/mv'
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
 
-import type { LibraryMvItem } from '../library.model'
+import type { LibraryMvItem } from '../types'
 import { normalizeLibraryMvPage } from '../library-mvs.model'
 import LibraryMvCard from './LibraryMvCard'
-
-interface LibraryMvPanelProps {
-  active: boolean
-  onOpen: (id: number) => void
-}
+import type { LibraryMvPanelProps } from '../types'
 
 const PAGE_SIZE = 25
 

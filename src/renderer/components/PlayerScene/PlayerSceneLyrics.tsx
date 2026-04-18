@@ -2,16 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 
 import { cn } from '@/lib/utils'
 import type { KaraokeSegment, LyricLine } from './player-lyrics.model'
-
-type PlayerSceneLyricsProps = {
-  lines: LyricLine[]
-  activeIndex: number
-  progressMs: number
-  showTranslation: boolean
-  karaokeEnabled: boolean
-  loading: boolean
-  error: string
-}
+import type { PlayerSceneLyricsProps } from './types'
 
 function clamp01(value: number) {
   if (value <= 0) {

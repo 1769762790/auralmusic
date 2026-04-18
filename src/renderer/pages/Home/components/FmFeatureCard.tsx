@@ -1,20 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { Pause, Play, SkipForward, ThumbsDown } from 'lucide-react'
-
-interface FmFeatureCardProps {
-  coverUrl?: string
-  title?: string
-  artist?: string
-  isLoading?: boolean
-  isActiveFm?: boolean
-  isPlayingFm?: boolean
-  actionLoading?: boolean
-  disabled?: boolean
-  onTogglePlay?: () => void
-  moveToNext?: () => void
-  trashCurrent?: () => void
-}
+import type { FmFeatureCardProps } from '../types'
 
 const FmFeatureCard = ({
   coverUrl,

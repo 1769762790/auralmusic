@@ -1,14 +1,10 @@
 import { useEffect, useState } from 'react'
-import { buildLyricLines, type LyricLine } from './player-lyrics.model'
+import { buildLyricLines } from './player-lyrics.model'
 import { fetchLyricTextBundle } from './player-lyrics.service'
+import type { LyricLine, UsePlayerLyricsParams } from './types'
 
 const EMPTY_LYRICS: LyricLine[] = []
 const NO_LYRIC_ERROR = '暂无歌词'
-
-type UsePlayerLyricsParams = {
-  isOpen: boolean
-  trackId?: number | string
-}
 
 export function usePlayerLyrics({ isOpen, trackId }: UsePlayerLyricsParams) {
   const [lyrics, setLyrics] = useState<LyricLine[]>(EMPTY_LYRICS)

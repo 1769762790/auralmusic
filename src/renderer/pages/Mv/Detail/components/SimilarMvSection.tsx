@@ -1,13 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
-import { type SimilarMvItem } from '../../mv-detail.model'
 import SimilarMvCard from './SimilarMvCard'
-
-interface SimilarMvSectionProps {
-  items: SimilarMvItem[]
-  loading?: boolean
-  error?: string
-  onOpen: (id: number) => void
-}
+import type { SimilarMvSectionProps } from '../types'
 
 const SimilarMvSection = ({
   items,

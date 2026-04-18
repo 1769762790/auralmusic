@@ -1,15 +1,5 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-
-interface PlayerSceneChromeButtonProps extends Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'children'
-> {
-  children: ReactNode
-  position: 'left' | 'right'
-  visible: boolean
-  onReveal: () => void
-}
+import type { PlayerSceneChromeButtonProps } from './types'
 
 const POSITION_CLASS = {
   left: 'left-8',

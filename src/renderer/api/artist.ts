@@ -1,17 +1,11 @@
 import request from '@/lib/request'
-
-export interface ArtistListParams {
-  area: -1 | 7 | 96 | 8 | 16 | 0
-  type: -1 | 1 | 2 | 3
-  initial: -1 | 0 | string
-  offset?: number
-  limit?: number
-}
-
-export interface SubscribedArtistListParams {
-  limit?: number
-  offset?: number
-}
+import type {
+  ArtistDetailParams,
+  ArtistListPageParams,
+  ArtistListParams,
+  SubscribedArtistListParams,
+  ToggleArtistSubscriptionParams,
+} from '@/types/api'
 
 export function getArtistList(params: ArtistListParams) {
   return request.get('/artist/list', {
@@ -23,15 +17,6 @@ export function getSubscribedArtists(params: SubscribedArtistListParams) {
   return request.get('/artist/sublist', {
     params,
   })
-}
-
-export interface ArtistDetailParams {
-  id: number | string
-}
-
-export interface ArtistListPageParams extends ArtistDetailParams {
-  limit?: number
-  offset?: number
 }
 
 export function getArtistDetail(params: ArtistDetailParams) {
@@ -71,15 +56,15 @@ export function getArtistDesc(params: ArtistDetailParams) {
 }
 
 /**
- * 收藏歌手
- * 说明 : 调用此接口 , 传入歌手 id, 可收藏歌手
- * - id: 歌手 id
- * - t: 操作,1 为收藏,其他为取消收藏
+ * 鏀惰棌姝屾墜
+ * 璇存槑 : 璋冪敤姝ゆ帴鍙?, 浼犲叆姝屾墜 id, 鍙敹钘忔瓕鎵?
+ * - id: 姝屾墜 id
+ * - t: 鎿嶄綔,1 涓烘敹钘?鍏朵粬涓哄彇娑堟敹钘?
  * @param {Object} params
  * @param {number} params.id
  * @param {number} params.t
  */
-export function followArtist(params: any) {
+export function followArtist(params: ToggleArtistSubscriptionParams) {
   return request.get('/artist/sub', {
     params,
   })

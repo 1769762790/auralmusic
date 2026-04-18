@@ -12,28 +12,17 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
-import {
-  LIBRARY_TAB_OPTIONS,
-  PLAYLIST_FILTER_OPTIONS,
-  type LibraryPageData,
-  type LibraryTabValue,
-  type PlaylistSourceValue,
-} from '../library.model'
+import { LIBRARY_TAB_OPTIONS, PLAYLIST_FILTER_OPTIONS } from '../library.model'
+import type {
+  LibraryTabValue,
+  PlaylistSourceValue,
+  LibraryTabsSectionProps,
+} from '../types'
 import LibraryAlbumPanel from './LibraryAlbumPanel'
 import LibraryArtistPanel from './LibraryArtistPanel'
 import LibraryCloudPanel from './LibraryCloudPanel'
 import LibraryMvPanel from './LibraryMvPanel'
 import LibraryPlaylistPanel from './LibraryPlaylistPanel'
-
-interface LibraryTabsSectionProps {
-  data: LibraryPageData
-  playlistLoading?: boolean
-  onOpenPlaylist: (id: number) => void
-  onOpenMv: (id: number) => void
-  playlistSource: PlaylistSourceValue
-  onPlaylistSourceChange: (value: PlaylistSourceValue) => void
-  onOpenCreatePlaylist: () => void
-}
 
 const LibraryTabsSection = ({
   data,

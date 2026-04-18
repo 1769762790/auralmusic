@@ -1,21 +1,7 @@
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  SEARCH_TYPE_LABEL_MAP,
-  type SearchResultRowItem,
-  type SearchType,
-} from '../search-dialog.model'
+import { SEARCH_TYPE_LABEL_MAP } from '../search-dialog.model'
+import type { SearchResultListProps } from '../types'
 import SearchResultRow from './SearchResultRow'
-
-interface SearchResultListProps {
-  query: string
-  type: SearchType
-  items: SearchResultRowItem[]
-  loading: boolean
-  hasMore: boolean
-  error: string
-  sentinelRef: (node: HTMLDivElement | null) => void
-  onSelect: (item: SearchResultRowItem) => void
-}
 
 const SearchResultList = ({
   query,

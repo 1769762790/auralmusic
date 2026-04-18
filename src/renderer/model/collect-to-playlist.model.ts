@@ -1,34 +1,8 @@
-interface RawPlaylistItem {
-  id?: number
-  name?: string
-  coverImgUrl?: string
-  picUrl?: string
-  trackCount?: number
-  subscribed?: boolean
-  specialType?: number
-}
-
-interface RawResponse<T> {
-  data?: T
-  [key: string]: unknown
-}
-
-export interface CollectPlaylistTarget {
-  id: number
-  name: string
-  coverImgUrl: string
-  trackCount: number
-  specialType: number
-  editable: boolean
-  isLikedPlaylist: boolean
-}
-
-export interface CollectPlaylistSongContext {
-  songId: number
-  songName: string
-  artistName: string
-  coverUrl: string
-}
+import type {
+  CollectPlaylistTarget,
+  RawPlaylistItem,
+  RawResponse,
+} from '@/types/core'
 
 function unwrapData<T>(response?: RawResponse<T> | null): T | undefined {
   if (!response) {
@@ -63,7 +37,8 @@ export function normalizeCollectPlaylistTargets(
     }
 
     const isLikedPlaylist =
-      playlist.specialType === 5 || playlist.name?.trim() === '我喜欢的音乐'
+      playlist.specialType === 5 ||
+      playlist.name?.trim() === '鎴戝枩娆㈢殑闊充箰'
     const isCreatedPlaylist = playlist.subscribed !== true
 
     if (!isLikedPlaylist && !isCreatedPlaylist) {
@@ -73,7 +48,7 @@ export function normalizeCollectPlaylistTargets(
     return [
       {
         id: playlist.id,
-        name: playlist.name?.trim() || '未知歌单',
+        name: playlist.name?.trim() || '鏈煡姝屽崟',
         coverImgUrl: playlist.coverImgUrl || playlist.picUrl || '',
         trackCount: playlist.trackCount || 0,
         specialType: playlist.specialType || 0,

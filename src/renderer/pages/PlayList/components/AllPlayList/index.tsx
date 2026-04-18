@@ -13,33 +13,11 @@ import {
   buildPlaylistPlaybackTracksRequest,
   normalizePlaylistPlaybackQueue,
 } from './playlist-playback.model'
+import type { AllPlaylistProps, PlaylistItem } from '../../types'
 
 const SHOW_CAT_COUNT = 8
 
-interface PlayListItem {
-  id: number
-  name: string
-  coverImgUrl: string
-  count?: number
-}
-
-interface PlaylistCategoryItem {
-  name: string
-  category?: number
-  [key: string]: unknown
-}
-
-interface PlaylistCategories {
-  sub: PlaylistCategoryItem[]
-  categories?: Record<string, string>
-  [key: string]: unknown
-}
-
-const AllPlaylist = ({
-  categories = { sub: [] },
-}: {
-  categories?: PlaylistCategories
-}) => {
+const AllPlaylist = ({ categories = { sub: [] } }: AllPlaylistProps) => {
   const navigate = useNavigate()
   const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
   const [isShow, setIsShow] = useState(false)
@@ -73,7 +51,7 @@ const AllPlaylist = ({
     loading,
     sentinelRef,
     reset,
-  } = useIntersectionLoadMore<PlayListItem>(fetchPlayListData, {
+  } = useIntersectionLoadMore<PlaylistItem>(fetchPlayListData, {
     limit: 50,
   })
 

@@ -1,14 +1,8 @@
 import { LOCAL_MEDIA_PROTOCOL } from '../../../shared/local-media.ts'
 import { DEFAULT_AUDIO_OUTPUT_DEVICE_ID } from '../../lib/audio-output.ts'
+import type { PlaybackRuntimeFailureKind } from '@/types/audio'
 
 export const DEFAULT_PLAYBACK_RUNTIME_ERROR = 'play_failed'
-
-export type PlaybackRuntimeFailureKind =
-  | 'output_device_failed'
-  | 'source_load_failed'
-  | 'audio_context_failed'
-  | 'graph_failed'
-  | 'play_failed'
 
 export function normalizePlaybackOutputDeviceId(deviceId: string) {
   return deviceId || DEFAULT_AUDIO_OUTPUT_DEVICE_ID

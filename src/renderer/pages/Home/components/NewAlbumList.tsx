@@ -1,13 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
-import type { AlbumSummary } from '../home.type'
+import type { NewAlbumListProps } from '../types'
 import { NewAlbumSkeleton } from './HomeSkeletons'
 import ArtistCover from '@/components/ArtistCover'
-
-interface NewAlbumListProps {
-  list?: AlbumSummary[]
-  isLoading?: boolean
-  onPlayAlbum?: (album: AlbumSummary) => void
-}
 
 const NewAlbumList = ({
   list = [],

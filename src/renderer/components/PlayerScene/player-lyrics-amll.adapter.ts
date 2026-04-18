@@ -3,23 +3,13 @@ import type {
   LyricWord,
 } from '@applemusic-like-lyrics/core'
 
-import type { LyricLine as PlayerLyricLine } from './player-lyrics.model'
+import type {
+  AdaptLyricsToAmllOptions,
+  AmllLyricLineClickEvent,
+  LyricLine as PlayerLyricLine,
+} from './types'
 
 const DEFAULT_LINE_DURATION_MS = 4000
-
-type AdaptLyricsToAmllOptions = {
-  showTranslation: boolean
-  karaokeEnabled: boolean
-}
-
-type AmllLyricLineClickEvent = {
-  lineIndex?: number
-  line?: {
-    getLine: () => {
-      startTime?: number | null
-    }
-  } | null
-}
 
 function resolveLineEndTime(
   line: PlayerLyricLine,

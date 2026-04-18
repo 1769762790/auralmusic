@@ -1,127 +1,21 @@
-﻿import type { AlbumListItem } from '@/pages/Albums/albums.model'
-
-export type LibraryTabValue =
-  | 'playlists'
-  | 'albums'
-  | 'artists'
-  | 'mvs'
-  | 'cloud'
-
-export type PlaylistSourceValue = 'my' | 'subscribed'
-
-export interface LibrarySongItem {
-  id: number
-  name: string
-  artistNames: string
-  albumName: string
-  coverUrl: string
-  duration: number
-}
-
-export interface LibraryPlaylistItem {
-  id: number
-  name: string
-  coverUrl: string
-  subtitle: string
-  trackCount: number
-  playCount: number
-}
-
-export interface LibraryMvItem {
-  id: number
-  name: string
-  coverUrl: string
-  artistName: string
-  playCount: number
-  publishTime?: number
-}
-
-export interface LibraryPageData {
-  likedSongs: LibrarySongItem[]
-  likedSongCount: number
-  likedPlaylistCoverUrl: string
-  playlists: LibraryPlaylistItem[]
-}
-
-export interface LibraryLikedPlaylistMeta {
-  id: number
-  trackCount: number
-  coverImgUrl: string
-}
-
-export interface LibraryTabOption {
-  value: LibraryTabValue
-  label: string
-}
-
-export interface PlaylistFilterOption {
-  value: PlaylistSourceValue
-  label: string
-}
-
-interface RawDailySongArtist {
-  name?: string
-}
-
-interface RawDailySongAlbum {
-  name?: string
-  picUrl?: string
-}
-
-interface RawDailySong {
-  id?: number
-  name?: string
-  dt?: number
-  al?: RawDailySongAlbum
-  ar?: RawDailySongArtist[]
-}
-
-interface RawPlaylistItem {
-  id?: number
-  name?: string
-  coverImgUrl?: string
-  picUrl?: string
-  trackCount?: number
-  playCount?: number
-  subscribed?: boolean
-  specialType?: number
-  creator?: {
-    nickname?: string
-  }
-  copywriter?: string
-}
-
-interface RawAlbumItem {
-  id?: number
-  name?: string
-  picUrl?: string
-  blurPicUrl?: string
-  artists?: Array<{ name?: string }>
-  artist?: { name?: string }
-}
-
-interface RawMvItem {
-  id?: number
-  name?: string
-  cover?: string
-  coverUrl?: string
-  imgurl16v9?: string
-  artistName?: string
-  artists?: Array<{ name?: string }>
-  playCount?: number
-  publishTime?: number
-}
-
-interface RawLikeListResponse {
-  ids?: number[]
-  idsData?: number[]
-  data?: RawLikeListResponse
-}
-
-interface RawResponse<T> {
-  data?: T
-  [key: string]: unknown
-}
+import type { AlbumListItem } from '@/pages/Albums/types'
+import type {
+  LibraryLikedPlaylistMeta,
+  LibraryMvItem,
+  LibraryPageData,
+  LibraryPlaylistItem,
+  LibrarySongItem,
+  LibraryTabOption,
+  PlaylistFilterOption,
+  PlaylistSourceValue,
+  RawAlbumItem,
+  RawDailySong,
+  RawDailySongArtist,
+  RawLikeListResponse,
+  RawMvItem,
+  RawPlaylistItem,
+  RawResponse,
+} from './types'
 
 function unwrapData<T>(response?: RawResponse<T> | null): T | undefined {
   if (!response) {

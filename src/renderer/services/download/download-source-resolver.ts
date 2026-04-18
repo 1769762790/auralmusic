@@ -1,30 +1,22 @@
+import { createDownloadQualityFallbackChain } from '../../../main/download/download-types.ts'
 import { isAuthenticatedForMusicResolution } from '../../../shared/music-source/auth-state.ts'
 import { buildResolverPolicy } from '../../../shared/music-source/policy.ts'
 import type {
   MusicResolverId,
   ResolveContext,
 } from '../../../shared/music-source/types.ts'
-import { createDownloadQualityFallbackChain } from '../../../main/download/download-types.ts'
 import { createBuiltinUnblockDownloadProvider } from './providers/builtin-unblock-download-provider.ts'
 import { createCustomApiDownloadProvider } from './providers/custom-api-download-provider.ts'
 import { createLxDownloadProvider } from './providers/lx-download-provider.ts'
 import { createOfficialDownloadProvider } from './providers/official-download-provider.ts'
 import type {
   DownloadResolverConfig,
-  DownloadResolutionPolicy,
   DownloadResolverProvider,
+  DownloadSourceMaybePromise,
   DownloadSourceResolverDeps,
-  DownloadTrack,
+  ResolveDownloadSourceOptions,
   ResolvedDownloadSource,
-} from './providers/types.ts'
-
-type ResolveDownloadSourceOptions = {
-  track: DownloadTrack
-  requestedQuality: Parameters<typeof createDownloadQualityFallbackChain>[0]
-  policy: DownloadResolutionPolicy
-}
-
-type MaybePromise<T> = T | Promise<T>
+} from '@/types/core'
 
 function createDefaultProviders(): Record<
   MusicResolverId,
@@ -70,12 +62,6 @@ function toResolveContext(
   }
 }
 
-export type {
-  DownloadResolutionPolicy,
-  DownloadSourceResolverDeps,
-  ResolvedDownloadSource,
-} from './providers/types.ts'
-
 export function createDownloadSourceResolver(
   deps: DownloadSourceResolverDeps = {}
 ) {
@@ -93,7 +79,7 @@ export function createDownloadSourceResolver(
 
     const config = await getConfig()
     const isAuthenticated = await (
-      getIsAuthenticated as () => MaybePromise<boolean>
+      getIsAuthenticated as () => DownloadSourceMaybePromise<boolean>
     )()
     const context = toResolveContext(isAuthenticated, config)
     const resolverPolicy = buildResolverPolicy(context)

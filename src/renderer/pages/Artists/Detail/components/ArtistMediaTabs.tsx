@@ -1,31 +1,10 @@
-import type { Ref } from 'react'
 import { Play } from 'lucide-react'
 import ArtistCover from '@/components/ArtistCover'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  formatArtistPublishDate,
-  type ArtistAlbumItem,
-  type ArtistMvItem,
-  type ArtistSimilarItem,
-} from '@/pages/Artists/artist-detail.model'
+import { formatArtistPublishDate } from '@/pages/Artists/artist-detail.model'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { formatPlayCount } from '@/lib/utils'
-
-interface ArtistMediaTabsProps {
-  albums: ArtistAlbumItem[]
-  mvs: ArtistMvItem[]
-  similarArtists: ArtistSimilarItem[]
-  albumLoading?: boolean
-  mvLoading?: boolean
-  similarArtistsLoading?: boolean
-  albumHasMore?: boolean
-  mvHasMore?: boolean
-  albumSentinelRef: Ref<HTMLDivElement>
-  mvSentinelRef: Ref<HTMLDivElement>
-  onToAlbumDetail: (id: number) => void
-  onToMvDetail: (id: number) => void
-  onToArtistDetail: (id: number) => void
-}
+import type { ArtistMediaTabsProps } from '../types'
 
 const ArtistMediaTabs = ({
   albums,

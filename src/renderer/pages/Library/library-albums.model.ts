@@ -1,39 +1,15 @@
-import type { AlbumArtist, AlbumListItem } from '../Albums/albums.model.ts'
-
-interface RawAlbumArtist {
-  name?: string
-}
-
-interface RawAlbumItem {
-  id?: number
-  name?: string
-  picUrl?: string
-  blurPicUrl?: string
-  artists?: RawAlbumArtist[]
-  artist?: RawAlbumArtist
-}
-
-interface RawSubscribedAlbumsBody {
-  data?: RawSubscribedAlbumsBody | RawAlbumItem[]
-  albums?: RawAlbumItem[]
-  more?: boolean
-  hasMore?: boolean
-  count?: number
-}
-
-interface NormalizeLibraryAlbumPageOptions {
-  limit: number
-  offset: number
-}
-
-export interface LibraryAlbumPage {
-  list: AlbumListItem[]
-  hasMore: boolean
-}
+import type { AlbumArtist, AlbumListItem } from '../Albums/types'
+import type {
+  LibraryAlbumPage,
+  NormalizeLibraryAlbumPageOptions,
+  RawLibraryAlbumArtist,
+  RawLibraryAlbumItem,
+  RawSubscribedAlbumsBody,
+} from './types'
 
 function unwrapSubscribedAlbumsBody(
-  response?: RawSubscribedAlbumsBody | RawAlbumItem[] | null
-): RawSubscribedAlbumsBody | RawAlbumItem[] {
+  response?: RawSubscribedAlbumsBody | RawLibraryAlbumItem[] | null
+): RawSubscribedAlbumsBody | RawLibraryAlbumItem[] {
   if (!response) {
     return {}
   }
@@ -60,20 +36,20 @@ function unwrapSubscribedAlbumsBody(
 }
 
 function normalizeArtists(
-  artists?: RawAlbumArtist[]
+  artists?: RawLibraryAlbumArtist[]
 ): AlbumArtist[] | undefined {
   if (!Array.isArray(artists)) {
     return undefined
   }
 
   const normalized = artists.map(artist => ({
-    name: artist.name || '未知歌手',
+    name: artist.name || '鏈煡姝屾墜',
   }))
 
   return normalized.length ? normalized : undefined
 }
 
-function normalizeAlbumList(albums?: RawAlbumItem[]): AlbumListItem[] {
+function normalizeAlbumList(albums?: RawLibraryAlbumItem[]): AlbumListItem[] {
   if (!Array.isArray(albums)) {
     return []
   }
@@ -85,13 +61,13 @@ function normalizeAlbumList(albums?: RawAlbumItem[]): AlbumListItem[] {
 
     const artists = normalizeArtists(album.artists)
     const artist = album.artist?.name
-      ? { name: album.artist.name || '未知歌手' }
+      ? { name: album.artist.name || '鏈煡姝屾墜' }
       : artists?.[0]
 
     return [
       {
         id: album.id,
-        name: album.name || '未知专辑',
+        name: album.name || '鏈煡涓撹緫',
         picUrl: album.picUrl || album.blurPicUrl || '',
         blurPicUrl: album.blurPicUrl || album.picUrl || '',
         artists,

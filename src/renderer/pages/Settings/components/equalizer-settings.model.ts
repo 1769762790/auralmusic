@@ -5,15 +5,11 @@ import {
   normalizeEqualizerConfig,
   type EqualizerConfig,
 } from '../../../../shared/equalizer.ts'
+import type { EqualizerPresetOption } from '../types'
 
 export const EQUALIZER_SLIDER_MIN = EQ_GAIN_MIN
 export const EQUALIZER_SLIDER_MAX = EQ_GAIN_MAX
 export const EQUALIZER_SLIDER_STEP = 0.5
-
-export interface EqualizerPresetOption {
-  value: string
-  label: string
-}
 
 const EQUALIZER_PRESET_LABELS: Record<string, string> = {
   flat: '平直',

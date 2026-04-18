@@ -25,21 +25,7 @@ import {
   PLAYLIST_NAME_MAX_LENGTH,
   resolvePlaylistDetailMoreActions,
 } from '../playlist-detail-actions.model'
-
-interface PlaylistDetailMoreActionsProps {
-  playlistId: number
-  playlistName: string
-  playlistDescription: string
-  isOwnPlaylist: boolean
-  editSubmitting?: boolean
-  deleteSubmitting?: boolean
-  onEdit: (payload: {
-    id: number
-    name: string
-    desc: string
-  }) => Promise<void> | void
-  onDelete: (playlistId: number) => Promise<void> | void
-}
+import type { PlaylistDetailMoreActionsProps } from '../types'
 
 const PlaylistDetailMoreActions = ({
   playlistId,

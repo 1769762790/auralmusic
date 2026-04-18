@@ -22,6 +22,7 @@ import {
   type AudioOutputDeviceOption,
   type AudioOutputDeviceQueryStatus,
 } from '../settings-audio-output'
+import type { ToggleSettingProps } from '../types'
 import {
   formatPlaybackSpeedLabel,
   normalizePlaybackSpeedValue,
@@ -58,12 +59,6 @@ const AUDIO_QUALITY_OPTIONS: Array<{
   { label: '杜比全景声', value: 'dolby' },
   { label: '超清母带', value: 'jymaster' },
 ]
-
-type ToggleSettingProps = {
-  enabled: boolean
-  disabled?: boolean
-  onToggle: () => void
-}
 
 function ToggleSetting({
   enabled,

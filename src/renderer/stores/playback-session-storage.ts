@@ -1,24 +1,14 @@
 import {
   createPlaybackQueueSnapshot,
   normalizePlaybackMode,
-  type PlaybackMode,
-  type PlaybackTrack,
 } from '../../shared/playback.ts'
+import type { PlaybackMode, PlaybackTrack } from '../../shared/playback.ts'
+import type {
+  PlaybackSessionSnapshot,
+  PlaybackSessionStorageLike,
+} from '@/types/core'
 
 export const PLAYBACK_SESSION_STORAGE_KEY = 'auralmusic:playback-session'
-
-export interface PlaybackSessionSnapshot {
-  queue: PlaybackTrack[]
-  currentIndex: number
-  progress: number
-  duration: number
-  playbackMode: PlaybackMode
-}
-
-type PlaybackSessionStorageLike = Pick<
-  Storage,
-  'getItem' | 'setItem' | 'removeItem'
->
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object'

@@ -1,4 +1,3 @@
-import type { ReactElement } from 'react'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -15,26 +14,12 @@ import {
 
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { cn } from '@/lib/utils'
-import type { CollectPlaylistSongContext } from '@/model/collect-to-playlist.model'
 
 import {
   getMusicContextMenuDownloadHandler,
   shouldShowMusicContextMenuDownload,
 } from './music-context-menu.model'
-
-interface MusicContextMenuProps {
-  songId: number | undefined
-  name: string | undefined
-  artistName: string | undefined
-  coverUrl: string | undefined
-  likeStatus: boolean
-  children: ReactElement
-  onPlayClick: () => void
-  onAddToQueueClick?: () => void
-  onToggleClick: () => void
-  onCollectToPlaylist?: (song: CollectPlaylistSongContext) => void
-  onDownload?: () => void
-}
+import type { MusicContextMenuProps } from './types'
 
 const MusicContextMenu = ({
   children,

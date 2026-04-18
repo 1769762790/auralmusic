@@ -1,3 +1,5 @@
+import type { PlaybackRateAudioLike } from '../types'
+
 export const PLAYBACK_SPEED_MIN = 0.5
 export const PLAYBACK_SPEED_MAX = 2
 export const PLAYBACK_SPEED_DEFAULT = 1
@@ -32,10 +34,6 @@ export function resolvePlaybackSpeedSliderValue(
 
 export function resolvePlaybackSpeedCommitValue(value: number[]) {
   return normalizePlaybackSpeedValue(value[0])
-}
-
-type PlaybackRateAudioLike = {
-  playbackRate: number
 }
 
 export function applyPlaybackSpeedToAudio(

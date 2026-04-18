@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import CoreRankingCardList from './components/CoreRankings'
 import GenreCharts from './components/GenreCharts'
-import { CoreRankingsSkeleton, GenreChartsSkeleton } from './components/ChartsSkeletons'
+import {
+  CoreRankingsSkeleton,
+  GenreChartsSkeleton,
+} from './components/ChartsSkeletons'
 import { getTopList, getTopListDetailById } from '@api/list'
-import type { OnlineChartSummary } from './components/CoreRankings/CoreRankingCardItem.type'
+import type { OnlineChartSummary } from './types'
 
 const Charts = () => {
   const [topList, setTopList] = useState<OnlineChartSummary[]>([])
@@ -20,7 +23,9 @@ const Charts = () => {
         setTopList(list)
 
         const top4 = list.slice(0, 4)
-        const detailResponses = await Promise.all(top4.map(item => getTopListDetailById(item.id)))
+        const detailResponses = await Promise.all(
+          top4.map(item => getTopListDetailById(item.id))
+        )
         const playlistDetails = detailResponses.map(res => res.data.playlist)
 
         const newList = playlistDetails.map((item, index) => {
@@ -43,8 +48,16 @@ const Charts = () => {
 
   return (
     <div className='w-full'>
-      {isLoading ? <CoreRankingsSkeleton /> : <CoreRankingCardList topList={topListDetail} />}
-      {isLoading ? <GenreChartsSkeleton /> : <GenreCharts list={topOtherList} />}
+      {isLoading ? (
+        <CoreRankingsSkeleton />
+      ) : (
+        <CoreRankingCardList topList={topListDetail} />
+      )}
+      {isLoading ? (
+        <GenreChartsSkeleton />
+      ) : (
+        <GenreCharts list={topOtherList} />
+      )}
     </div>
   )
 }

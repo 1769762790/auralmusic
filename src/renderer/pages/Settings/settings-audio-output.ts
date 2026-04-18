@@ -2,31 +2,13 @@ import {
   applyAudioOutputDevice,
   DEFAULT_AUDIO_OUTPUT_DEVICE_ID,
 } from '@/lib/audio-output'
+import type {
+  AudioOutputDeviceOption,
+  AudioOutputDeviceQueryResult,
+  WindowWithAudioContext,
+} from './types'
 
 export { applyAudioOutputDevice, DEFAULT_AUDIO_OUTPUT_DEVICE_ID }
-
-export type AudioOutputDeviceQueryStatus =
-  | 'ok'
-  | 'empty'
-  | 'unsupported'
-  | 'permission-denied'
-  | 'error'
-
-export interface AudioOutputDeviceOption {
-  deviceId: string
-  label: string
-  isDefault: boolean
-}
-
-export interface AudioOutputDeviceQueryResult {
-  devices: AudioOutputDeviceOption[]
-  status: AudioOutputDeviceQueryStatus
-  message?: string
-}
-
-type WindowWithAudioContext = Window & {
-  webkitAudioContext?: typeof AudioContext
-}
 
 function getDeviceFallbackLabel(device: MediaDeviceInfo, index: number) {
   if (device.deviceId === DEFAULT_AUDIO_OUTPUT_DEVICE_ID) {

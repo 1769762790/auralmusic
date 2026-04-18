@@ -5,36 +5,17 @@ import {
 } from '@/api/list'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  OnlinePlaylistFeatureCard,
-  type OnlinePlaylistFeatureCardData,
-} from './components/OnlinePlaylistFeatureCard'
+import { OnlinePlaylistFeatureCard } from './components/OnlinePlaylistFeatureCard'
 import AllPlayList from './components/AllPlayList'
 import {
   OnlinePlaylistFeatureSkeleton,
   AllPlayListSkeleton,
 } from './components/PlayListSkeletons'
-
-interface PlaylistCategory {
-  name: string
-  [key: string]: unknown
-}
-
-interface PlaylistCategories {
-  sub: PlaylistCategory[]
-  categories?: Record<string, string>
-  [key: string]: unknown
-}
-
-interface PlaylistData {
-  recommend: OnlinePlaylistFeatureCardData
-  hot: OnlinePlaylistFeatureCardData
-  categories: PlaylistCategories
-}
+import type { PlaylistPageData } from './types'
 
 const PlayList = () => {
   const navigate = useNavigate()
-  const [playlistData, setPlaylistData] = useState<PlaylistData>({
+  const [playlistData, setPlaylistData] = useState<PlaylistPageData>({
     recommend: { coverImgUrl: '', id: 0, name: '', picUrl: null },
     hot: { coverImgUrl: '', id: 0, name: '', picUrl: null },
     categories: { sub: [] },

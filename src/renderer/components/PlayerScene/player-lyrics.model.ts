@@ -1,35 +1,15 @@
-export type LyricLine = {
-  time: number
-  text: string
-  translation?: string
-  duration?: number
-  segments?: KaraokeSegment[]
-}
+import type {
+  BuildLyricLinesInput,
+  KaraokeLine,
+  KaraokeSegment,
+  LyricLine,
+} from './types'
 
 const LRC_TIMESTAMP_PATTERN = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g
 const YRC_LINE_PATTERN = /^\[(\d+),(\d+)\]/
 const YRC_SEGMENT_PATTERN = /\((\d+),(\d+),[^)]*\)/g
 const LYRIC_MERGE_THRESHOLD_MS = 400
 const LYRIC_TEXT_MATCH_THRESHOLD_MS = 1500
-
-export type KaraokeSegment = {
-  start: number
-  duration: number
-  text: string
-}
-
-export type KaraokeLine = {
-  time: number
-  duration: number
-  text: string
-  segments: KaraokeSegment[]
-}
-
-type BuildLyricLinesInput = {
-  lrc: string
-  tlyric?: string
-  yrc?: string
-}
 
 function normalizeMilliseconds(value?: string) {
   if (!value) {

@@ -1,11 +1,6 @@
 import axios from 'axios'
-import type { InternalAxiosRequestConfig } from 'axios'
 import { resolveRequestBaseUrl } from './request-base-url.ts'
-
-interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-  retryCount?: number
-  noRetry?: boolean
-}
+import type { CustomAxiosRequestConfig } from '@/types/core'
 
 const runtimeBaseUrl =
   typeof window !== 'undefined'

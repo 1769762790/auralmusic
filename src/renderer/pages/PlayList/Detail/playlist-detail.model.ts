@@ -1,69 +1,10 @@
-export interface PlaylistDetailHeroData {
-  id: number
-  name: string
-  coverUrl: string
-  creatorName: string
-  creatorUserId: number | null
-  description: string
-  updateTime?: number
-  trackCount: number
-  isSubscribed: boolean
-}
-
-export interface PlaylistTrackItem {
-  id: number
-  name: string
-  artistNames: string
-  albumName: string
-  duration: number
-  coverUrl: string
-}
-
-export interface PlaylistDetailPageState {
-  hero: PlaylistDetailHeroData | null
-  tracks: PlaylistTrackItem[]
-}
-
-interface RawPlaylistCreator {
-  nickname?: string
-  userId?: number
-}
-
-interface RawPlaylistDetail {
-  id?: number
-  name?: string
-  coverImgUrl?: string
-  description?: string
-  updateTime?: number
-  trackCount?: number
-  subscribed?: boolean
-  creator?: RawPlaylistCreator
-}
-
-interface RawPlaylistDetailResponse {
-  playlist?: RawPlaylistDetail
-}
-
-interface RawTrackArtist {
-  name?: string
-}
-
-interface RawTrackAlbum {
-  name?: string
-  picUrl?: string
-}
-
-interface RawPlaylistTrack {
-  id: number
-  name?: string
-  dt?: number
-  al?: RawTrackAlbum
-  ar?: RawTrackArtist[]
-}
-
-interface RawPlaylistTracksResponse {
-  songs?: RawPlaylistTrack[]
-}
+import type {
+  PlaylistDetailHeroData,
+  PlaylistDetailPageState,
+  PlaylistTrackItem,
+  RawPlaylistDetailResponse,
+  RawPlaylistTracksResponse,
+} from './types'
 
 export const EMPTY_PLAYLIST_DETAIL_STATE: PlaylistDetailPageState = {
   hero: null,

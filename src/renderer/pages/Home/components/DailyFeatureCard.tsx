@@ -2,14 +2,7 @@ import { Button } from '@/components/ui/button'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { Play } from 'lucide-react'
 import { HomeFeatureCardSkeleton } from './HomeSkeletons'
-
-interface DailyFeatureCardProps {
-  id: number
-  isLoading?: boolean
-  onPlay?: () => void
-  coverUrl?: string
-  onOpenDailySongs?: (id: number) => void
-}
+import type { DailyFeatureCardProps } from '../types'
 
 const DailyFeatureCard = ({
   id,

@@ -1,7 +1,4 @@
-export interface ResolveRequestBaseUrlOptions {
-  runtimeBaseUrl?: string
-  viteApiBaseUrl?: string
-}
+import type { ResolveRequestBaseUrlOptions } from '@/types/core'
 
 function normalizeBaseUrl(baseUrl?: string) {
   const normalized = baseUrl?.trim()

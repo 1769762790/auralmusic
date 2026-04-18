@@ -7,15 +7,8 @@ import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
 import { useUserStore } from '@/stores/user'
 import { filterLikedSongsListItems } from '../../../../shared/liked-song-visibility'
 
-import {
-  normalizeLikedSongsTrackPage,
-  type LikedSongsPlaylistMeta,
-} from '../liked-songs.model'
-
-interface LikedSongsTrackPanelProps {
-  playlist: LikedSongsPlaylistMeta
-  refreshKey: string
-}
+import { normalizeLikedSongsTrackPage } from '../liked-songs.model'
+import type { LikedSongsTrackPanelProps } from '../types'
 
 const PAGE_SIZE = 50
 

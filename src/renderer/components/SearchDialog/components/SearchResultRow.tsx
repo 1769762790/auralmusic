@@ -1,12 +1,7 @@
 import { cn } from '@/lib/utils'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 
-import type { SearchResultRowItem } from '../search-dialog.model'
-
-interface SearchResultRowProps {
-  item: SearchResultRowItem
-  onSelect: (item: SearchResultRowItem) => void
-}
+import type { SearchResultRowProps } from '../types'
 
 const SearchResultRow = ({ item, onSelect }: SearchResultRowProps) => {
   return (

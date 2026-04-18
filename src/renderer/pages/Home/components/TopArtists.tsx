@@ -2,20 +2,10 @@ import { memo } from 'react'
 import { Autoplay, Virtual } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.css'
-import type { ArtistSummary } from '../home.type'
+import type { ArtistCardProps, TopArtistsProps } from '../types'
 import { TopArtistsSkeleton } from './HomeSkeletons'
 import { useNavigate } from 'react-router-dom'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-
-interface ArtistCardProps {
-  artist: ArtistSummary
-  onToArtistDetail: (id: number) => void
-}
-
-interface TopArtistsProps {
-  list?: ArtistSummary[]
-  isLoading?: boolean
-}
 
 const ArtistCard = memo(({ artist, onToArtistDetail }: ArtistCardProps) => (
   <div className='flex flex-col items-center text-center'>

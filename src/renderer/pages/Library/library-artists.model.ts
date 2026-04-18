@@ -1,32 +1,10 @@
-import type { ArtistListItem } from '../Artists/artists.model.ts'
-
-interface RawArtistItem {
-  id?: number
-  name?: string
-  picUrl?: string
-  img1v1Url?: string
-  alias?: string[]
-  albumSize?: number
-  musicSize?: number
-}
-
-interface RawSubscribedArtistsBody {
-  artists?: RawArtistItem[]
-  more?: boolean
-  hasMore?: boolean
-  count?: number
-  data?: RawSubscribedArtistsBody | RawArtistItem[]
-}
-
-interface NormalizeLibraryArtistPageOptions {
-  limit: number
-  offset: number
-}
-
-export interface LibraryArtistPage {
-  list: ArtistListItem[]
-  hasMore: boolean
-}
+import type { ArtistListItem } from '../Artists/types'
+import type {
+  LibraryArtistPage,
+  NormalizeLibraryArtistPageOptions,
+  RawArtistItem,
+  RawSubscribedArtistsBody,
+} from './types'
 
 function unwrapSubscribedArtistsBody(
   response?: RawSubscribedArtistsBody | null
@@ -81,7 +59,7 @@ function normalizeArtistList(artists?: RawArtistItem[]): ArtistListItem[] {
     return [
       {
         id: artist.id,
-        name: artist.name || '未知歌手',
+        name: artist.name || '鏈煡姝屾墜',
         picUrl: artist.picUrl || artist.img1v1Url || '',
         alias: artist.alias,
         albumSize: artist.albumSize,

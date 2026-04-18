@@ -1,11 +1,7 @@
 import { Play } from 'lucide-react'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-import { formatMvDuration, type SimilarMvItem } from '../../mv-detail.model'
-
-interface SimilarMvCardProps {
-  item: SimilarMvItem
-  onOpen: (id: number) => void
-}
+import { formatMvDuration } from '../../mv-detail.model'
+import type { SimilarMvCardProps } from '../types'
 
 function formatPlayCount(playCount: number) {
   if (!playCount) return '暂无播放'

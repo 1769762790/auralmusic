@@ -1,83 +1,23 @@
-import type { AppConfig } from '../../../main/config/types.ts'
 import { isAuthenticatedForMusicResolution } from '../../../shared/music-source/auth-state.ts'
 import { buildResolverPolicy } from '../../../shared/music-source/policy.ts'
 import type {
   MusicResolverId,
   ResolveContext,
-  ResolverPolicy,
 } from '../../../shared/music-source/types.ts'
-import type { AuthSession, AuthUser } from '../../../shared/auth.ts'
-import type {
-  PlaybackTrack,
-  SongUrlV1Result,
-} from '../../../shared/playback.ts'
+import type { SongUrlV1Result } from '../../../shared/playback.ts'
 import { createBuiltinUnblockPlaybackProvider } from './providers/builtin-unblock-playback-provider.ts'
 import { createCustomApiPlaybackProvider } from './providers/custom-api-playback-provider.ts'
 import { createLxPlaybackProvider } from './providers/lx-playback-provider.ts'
 import { createOfficialPlaybackProvider } from './providers/official-playback-provider.ts'
-
-type MaybePromise<T> = T | Promise<T>
-type LoginStatus = 'anonymous' | 'authenticated' | 'expired'
-
-export type PlaybackResolverAuthState = {
-  user?: AuthUser | null
-  session?: AuthSession | null
-  loginStatus?: LoginStatus | null
-}
-
-export type PlaybackResolverConfig = ResolveContext['config'] &
-  Partial<Omit<AppConfig, keyof ResolveContext['config']>>
-
-export type PlaybackSourceProviderOptions = {
-  track: PlaybackTrack
-  context: ResolveContext
-  policy: ResolverPolicy
-  config: PlaybackResolverConfig
-}
-
-export interface PlaybackSourceProvider {
-  resolve: (
-    options: PlaybackSourceProviderOptions
-  ) => Promise<SongUrlV1Result | null>
-}
-
-export type PlaybackSourceTraceEvent =
-  | {
-      type: 'start'
-      trackId: number
-      isAuthenticated: boolean
-      resolverOrder: MusicResolverId[]
-      builtinPlatforms: ResolverPolicy['builtinPlatforms']
-    }
-  | {
-      type: 'try' | 'miss' | 'hit' | 'skip'
-      trackId: number
-      resolverId: MusicResolverId
-      reason?: string
-    }
-  | {
-      type: 'error'
-      trackId: number
-      resolverId: MusicResolverId
-      error: unknown
-    }
-
-export interface PlaybackSourceTraceLogger {
-  log: (event: PlaybackSourceTraceEvent) => void
-}
-
-export type PlaybackSourceResolverDeps = {
-  getAuthState?: () => MaybePromise<PlaybackResolverAuthState>
-  getConfig?: () => MaybePromise<PlaybackResolverConfig>
-  providers?: Partial<Record<MusicResolverId, PlaybackSourceProvider>>
-  trace?: PlaybackSourceTraceLogger
-}
-
-type ResolvePlaybackSourceOptions = {
-  track: PlaybackTrack
-  authState?: PlaybackResolverAuthState
-  config?: PlaybackResolverConfig
-}
+import type {
+  PlaybackResolverAuthState,
+  PlaybackResolverConfig,
+  PlaybackSourceProvider,
+  PlaybackSourceResolverDeps,
+  PlaybackSourceTraceEvent,
+  PlaybackSourceTraceLogger,
+  ResolvePlaybackSourceOptions,
+} from '@/types/core'
 
 async function getDefaultAuthState(): Promise<PlaybackResolverAuthState> {
   const { useAuthStore } = await import('../../stores/auth-store.ts')

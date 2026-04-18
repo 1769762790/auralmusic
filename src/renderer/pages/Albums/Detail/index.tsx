@@ -16,8 +16,8 @@ import {
   normalizeAlbumDetailHero,
   normalizeAlbumTracks,
   toAlbumListItem,
-  type AlbumDetailPageState,
 } from './album-detail.model'
+import type { AlbumDetailPageState } from './types'
 
 const AlbumDetail = () => {
   const { id } = useParams()

@@ -1,39 +1,11 @@
 import type { PlaybackTrack } from '../../../shared/playback.ts'
-
-type RawArtist = {
-  name?: string
-}
-
-type RawAlbum = {
-  name?: string
-  picUrl?: string
-  artist?: RawArtist
-}
-
-type RawSongLike = {
-  id?: number
-  name?: string
-  duration?: number
-  dt?: number
-  artists?: RawArtist[]
-  ar?: RawArtist[]
-  artist?: RawArtist
-  album?: RawAlbum
-  al?: RawAlbum
-  picUrl?: string
-}
-
-export type HomeFmSong = RawSongLike
-
-export type HomeDailySong = RawSongLike
-
-export type HomeNewSong = {
-  id?: number
-  name?: string
-  picUrl?: string
-  artist?: RawArtist
-  song?: RawSongLike
-}
+import type {
+  HomeDailySong,
+  HomeFmSong,
+  HomeNewSong,
+  RawArtist,
+  RawSongLike,
+} from './types'
 
 function joinArtistNames(artists?: RawArtist[]) {
   return (artists || [])

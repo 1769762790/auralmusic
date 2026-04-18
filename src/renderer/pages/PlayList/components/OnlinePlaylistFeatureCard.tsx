@@ -1,21 +1,7 @@
 import { Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
-
-export interface OnlinePlaylistFeatureCardData {
-  coverImgUrl: string
-  id: number
-  name: string
-  picUrl: string | null
-  disabled?: boolean
-}
-
-interface OnlinePlaylistFeatureCardProps {
-  title: string
-  card: OnlinePlaylistFeatureCardData
-  onOpen: (playlistId: number) => void
-  onPlay: (playlistId: number) => void
-}
+import type { OnlinePlaylistFeatureCardProps } from '../types'
 
 export const OnlinePlaylistFeatureCard = ({
   title,

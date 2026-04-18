@@ -1,29 +1,12 @@
 import type { AxiosResponse } from 'axios'
 import request from '@/lib/request'
-import type { AuthLoginMethod, RawAuthResponseBody } from '../../shared/auth'
-
-export interface EmailLoginParams {
-  email: string
-  password?: string
-  md5_password?: string
-}
-
-export interface PhoneLoginParams {
-  phone: string
-  password?: string
-  md5_password?: string
-  captcha?: string
-  countrycode?: string
-}
-
-export interface CaptchaParams {
-  phone: string
-  ctcode?: string
-}
-
-export interface QrLoginCheckParams {
-  key: string
-}
+import type { RawAuthResponseBody } from '../../shared/auth'
+import type {
+  CaptchaParams,
+  EmailLoginParams,
+  PhoneLoginParams,
+  QrLoginCheckParams,
+} from '@/types/api'
 
 function unwrapResponse<T>(response: AxiosResponse<T>) {
   return response.data
@@ -85,7 +68,7 @@ export function createLoginQr(key: string) {
     .then(unwrapResponse)
 }
 
-export function checkLoginQr(key: string) {
+export function checkLoginQr(key: QrLoginCheckParams['key']) {
   return request
     .get<RawAuthResponseBody>('/login/qr/check', {
       params: {
@@ -128,5 +111,3 @@ export function refreshLoginStatus() {
 export function logout() {
   return request.post('/logout').then(unwrapResponse)
 }
-
-export type LoginMode = AuthLoginMethod
