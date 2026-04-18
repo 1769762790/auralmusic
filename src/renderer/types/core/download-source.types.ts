@@ -1,12 +1,9 @@
-import type {
-  AppConfig,
-  AudioQualityLevel,
-} from '../../../main/config/types.ts'
-import type { DownloadSourceProvider } from '../../../main/download/download-types.ts'
+import type { AppConfig, AudioQualityLevel } from '../../../shared/config.ts'
+import type { DownloadSourceProvider } from '../../../shared/download.ts'
 import type {
   ResolveContext,
   ResolverPolicy,
-} from '../../../shared/music-source/types.ts'
+} from '../../../shared/music-source/index.ts'
 import type { resolveTrackWithLxMusicSource } from '../../services/music-source/lx-playback-resolver.ts'
 
 export type DownloadSourceMaybePromise<T> = T | Promise<T>

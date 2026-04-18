@@ -19,7 +19,7 @@ import type {
   AudioQualityLevel,
   DownloadFileNamePattern,
   DownloadQualityPolicy,
-} from '../../../../main/config/types'
+} from '../../../../shared/config.ts'
 
 const AUDIO_QUALITY_OPTIONS: Array<{
   label: string

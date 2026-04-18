@@ -1,4 +1,4 @@
-import type { SongDownloadPayload } from '../../../main/download/download-types'
+import type { SongDownloadPayload } from '../../../shared/download.ts'
 import {
   createDownloadSourceResolver,
   type DownloadResolutionPolicy,

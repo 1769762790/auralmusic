@@ -25,6 +25,8 @@ test('renderer shared type/model skeleton exists', () => {
     'types/component/index.ts',
     'types/audio/index.ts',
     'model/index.ts',
+    '../shared/ipc/index.ts',
+    '../shared/music-source/index.ts',
     'pages/Home/types/index.ts',
     'pages/Home/model/index.ts',
     'pages/PlayList/types/index.ts',
@@ -63,8 +65,6 @@ test('renderer shared type/model skeleton exists', () => {
     'components/CollectToPlaylistDrawer/model/index.ts',
     'components/ScrollToTopButton/types/index.ts',
     'components/ScrollToTopButton/model/index.ts',
-    'components/ui/types/index.ts',
-    'components/ui/model/index.ts',
     'pages/Artists/types/index.ts',
     'pages/Artists/model/index.ts',
     'pages/Artists/Detail/types/index.ts',
@@ -143,8 +143,6 @@ test('target renderer files no longer declare business interface or type definit
     'components/CollectToPlaylistDrawer/components/CollectToPlaylistTargetList.tsx',
     'components/CollectToPlaylistDrawer/components/CollectToPlaylistSongSummary.tsx',
     'components/ScrollToTopButton/index.tsx',
-    'components/ui/carousel.tsx',
-    'components/ui/color-picker.tsx',
     'pages/Artists/components/ArtistCard.tsx',
     'pages/Artists/components/ArtistFilters.tsx',
     'pages/Artists/Detail/index.tsx',
@@ -209,6 +207,8 @@ test('target renderer files no longer declare business interface or type definit
   const declarationPattern =
     /^\s*(export\s+)?(?:interface|type)\s+[A-Za-z_]\w*(?:\s*[={<]|$)/m
 
+  // UI primitives are intentionally excluded from this refactor. The current
+  // organization contract only applies to renderer business pages/components.
   targetFiles.forEach(relativePath => {
     const content = readRendererFile(relativePath)
     assert.equal(
@@ -217,4 +217,104 @@ test('target renderer files no longer declare business interface or type definit
       `${relativePath} should not declare business interface/type inline`
     )
   })
+})
+
+test('non-main layers should not import config or download contracts from main directly', () => {
+  const sourceRoots = [
+    path.join(process.cwd(), 'src', 'renderer'),
+    path.join(process.cwd(), 'src', 'preload'),
+    path.join(process.cwd(), 'src', 'shared'),
+  ]
+  const disallowedPatterns = [
+    'main/config/types',
+    'main/download/download-types',
+    'main/cache/cache-types',
+  ]
+
+  const violations: string[] = []
+
+  function walkDirectory(rootPath: string, directoryPath: string) {
+    fs.readdirSync(directoryPath, { withFileTypes: true }).forEach(entry => {
+      const absolutePath = path.join(directoryPath, entry.name)
+
+      if (entry.isDirectory()) {
+        walkDirectory(rootPath, absolutePath)
+        return
+      }
+
+      if (!/\.(ts|tsx)$/.test(entry.name)) {
+        return
+      }
+
+      const content = fs.readFileSync(absolutePath, 'utf8')
+      const relativePath = path.relative(rootPath, absolutePath)
+      const layerName = path.basename(rootPath)
+
+      disallowedPatterns.forEach(pattern => {
+        if (content.includes(pattern)) {
+          violations.push(`${layerName}/${relativePath} imports ${pattern}`)
+        }
+      })
+    })
+  }
+
+  sourceRoots.forEach(rootPath => {
+    walkDirectory(rootPath, rootPath)
+  })
+
+  assert.deepEqual(violations, [])
+})
+
+test('source layers should consume shared ipc and music-source through barrel exports', () => {
+  const sourceRoots = [
+    path.join(process.cwd(), 'src', 'main'),
+    path.join(process.cwd(), 'src', 'preload'),
+    path.join(process.cwd(), 'src', 'renderer'),
+  ]
+  const disallowedPatterns = [
+    'shared/ipc/auth.ts',
+    'shared/ipc/cache.ts',
+    'shared/ipc/config.ts',
+    'shared/ipc/download.ts',
+    'shared/ipc/system-fonts.ts',
+    'shared/ipc/tray.ts',
+    'shared/ipc/window.ts',
+    'shared/music-source/auth-state.ts',
+    'shared/music-source/builtin-platforms.ts',
+    'shared/music-source/policy.ts',
+    'shared/music-source/types.ts',
+  ]
+
+  const violations: string[] = []
+
+  function walkDirectory(rootPath: string, directoryPath: string) {
+    fs.readdirSync(directoryPath, { withFileTypes: true }).forEach(entry => {
+      const absolutePath = path.join(directoryPath, entry.name)
+
+      if (entry.isDirectory()) {
+        walkDirectory(rootPath, absolutePath)
+        return
+      }
+
+      if (!/\.(ts|tsx)$/.test(entry.name)) {
+        return
+      }
+
+      const content = fs.readFileSync(absolutePath, 'utf8')
+      const relativePath = path.relative(rootPath, absolutePath)
+      const layerName = path.basename(rootPath)
+
+      disallowedPatterns.forEach(pattern => {
+        if (content.includes(pattern)) {
+          violations.push(`${layerName}/${relativePath} imports ${pattern}`)
+        }
+      })
+    })
+  }
+
+  sourceRoots.forEach(rootPath => {
+    walkDirectory(rootPath, rootPath)
+  })
+
+  assert.deepEqual(violations, [])
 })

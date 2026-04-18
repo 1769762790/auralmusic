@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useConfigStore } from '@/stores/config-store'
-import type { AudioQualityLevel } from '../../../../main/config/types'
+import type { AudioQualityLevel } from '../../../../shared/config.ts'
 import {
   DEFAULT_AUDIO_OUTPUT_DEVICE_ID,
   mergeSelectedAudioOutputDevice,

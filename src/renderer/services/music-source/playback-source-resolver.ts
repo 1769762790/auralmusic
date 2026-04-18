@@ -1,9 +1,11 @@
-import { isAuthenticatedForMusicResolution } from '../../../shared/music-source/auth-state.ts'
-import { buildResolverPolicy } from '../../../shared/music-source/policy.ts'
 import type {
   MusicResolverId,
   ResolveContext,
-} from '../../../shared/music-source/types.ts'
+} from '../../../shared/music-source/index.ts'
+import {
+  buildResolverPolicy,
+  isAuthenticatedForMusicResolution,
+} from '../../../shared/music-source/index.ts'
 import type { SongUrlV1Result } from '../../../shared/playback.ts'
 import { createBuiltinUnblockPlaybackProvider } from './providers/builtin-unblock-playback-provider.ts'
 import { createCustomApiPlaybackProvider } from './providers/custom-api-playback-provider.ts'

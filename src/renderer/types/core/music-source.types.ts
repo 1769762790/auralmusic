@@ -1,4 +1,4 @@
-import type { AppConfig } from '../../../main/config/types.ts'
+import type { AppConfig } from '../../../shared/config.ts'
 import type { AuthSession, AuthUser } from '../../../shared/auth.ts'
 import type {
   LxInitedData,
@@ -10,7 +10,7 @@ import type {
   MusicResolverId,
   ResolveContext,
   ResolverPolicy,
-} from '../../../shared/music-source/types.ts'
+} from '../../../shared/music-source/index.ts'
 import type {
   PlaybackTrack,
   SongUrlV1Result,

@@ -4,10 +4,12 @@ import {
   resolveAuthRequestHeaders,
 } from '../auth/request-header.ts'
 import type { AuthSession } from '../../shared/auth.ts'
-import { isAuthenticatedForMusicResolution } from '../../shared/music-source/auth-state.ts'
+import {
+  buildResolverPolicy,
+  isAuthenticatedForMusicResolution,
+  type ResolveContext,
+} from '../../shared/music-source/index.ts'
 import { normalizeSongUrlV1Response } from '../../shared/playback.ts'
-import { buildResolverPolicy } from '../../shared/music-source/policy.ts'
-import type { ResolveContext } from '../../shared/music-source/types.ts'
 import type {
   DownloadRuntimeConfig,
   ResolvedSongDownload,

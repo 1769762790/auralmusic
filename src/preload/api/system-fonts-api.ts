@@ -1,6 +1,6 @@
 import electron from 'electron'
 
-import { SYSTEM_FONTS_IPC_CHANNELS } from '../../shared/ipc/system-fonts.ts'
+import { SYSTEM_FONTS_IPC_CHANNELS } from '../../shared/ipc/index.ts'
 
 export type SystemFontsApi = {
   getAll: () => Promise<string[]>

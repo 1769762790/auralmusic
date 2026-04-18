@@ -1,4 +1,4 @@
-import { normalizeAnimationEffect } from '../../main/config/types.ts'
+import { normalizeAnimationEffect } from '../../shared/config.ts'
 import type { AnimationEffectRoot } from '@/types/core'
 
 export const ANIMATION_EFFECT_ROOT_ATTRIBUTE = 'data-animation-effect'

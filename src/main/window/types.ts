@@ -1,1 +1,1 @@
-export { WINDOW_IPC_CHANNELS } from '../../shared/ipc/window.ts'
+export { WINDOW_IPC_CHANNELS } from '../../shared/ipc/index.ts'

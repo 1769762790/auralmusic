@@ -1,11 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { CACHE_IPC_CHANNELS } from '../../shared/ipc/cache.ts'
+import { CACHE_IPC_CHANNELS } from '../../shared/ipc/index.ts'
 import type {
   CacheStatus,
   ResolveAudioSourceOptions,
   ResolveAudioSourceResult,
   ResolveImageSourceResult,
-} from '../../main/cache/cache-types'
+} from '../../shared/cache.ts'
 
 export type CacheApi = {
   getDefaultDirectory: () => Promise<string>

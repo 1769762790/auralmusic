@@ -26,7 +26,7 @@ import type {
 import {
   ENHANCED_SOURCE_MODULES,
   type EnhancedSourceModule,
-} from '../../../../main/config/types'
+} from '../../../../shared/config.ts'
 import type {
   MusicSourceSettingsDialogProps,
   MusicSourceTab,

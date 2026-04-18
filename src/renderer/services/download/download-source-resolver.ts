@@ -1,10 +1,12 @@
-import { createDownloadQualityFallbackChain } from '../../../main/download/download-types.ts'
-import { isAuthenticatedForMusicResolution } from '../../../shared/music-source/auth-state.ts'
-import { buildResolverPolicy } from '../../../shared/music-source/policy.ts'
+import { createDownloadQualityFallbackChain } from '../../../shared/download.ts'
 import type {
   MusicResolverId,
   ResolveContext,
-} from '../../../shared/music-source/types.ts'
+} from '../../../shared/music-source/index.ts'
+import {
+  buildResolverPolicy,
+  isAuthenticatedForMusicResolution,
+} from '../../../shared/music-source/index.ts'
 import { createBuiltinUnblockDownloadProvider } from './providers/builtin-unblock-download-provider.ts'
 import { createCustomApiDownloadProvider } from './providers/custom-api-download-provider.ts'
 import { createLxDownloadProvider } from './providers/lx-download-provider.ts'

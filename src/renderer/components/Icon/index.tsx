@@ -1,13 +1,23 @@
 import React from 'react'
+import type { LucideIcon, LucideProps } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 
-interface IconProps extends React.HTMLAttributes<SVGElement> {
+interface IconProps extends LucideProps {
   name: string
-  size?: number
+}
+
+function resolveLucideIcon(name: string): LucideIcon | null {
+  const candidate = LucideIcons[name as keyof typeof LucideIcons]
+
+  if (typeof candidate !== 'function') {
+    return null
+  }
+
+  return candidate as LucideIcon
 }
 
 const Icon = ({ name, size = 24, ...props }: IconProps) => {
-  const IconComponent = LucideIcons[name as keyof typeof LucideIcons] as React.ComponentType<any>
+  const IconComponent = resolveLucideIcon(name)
 
   if (!IconComponent) {
     console.warn(`Icon "${name}" not found in lucide-react`)

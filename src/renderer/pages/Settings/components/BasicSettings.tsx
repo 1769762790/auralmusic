@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import { useTheme } from '@/hooks/useTheme'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/stores/config-store'
-import type { AnimationEffectLevel } from '../../../../main/config/types.ts'
+import type { AnimationEffectLevel } from '../../../../shared/config.ts'
 import type {
   PlayerBackgroundMode,
   ThemeValue,

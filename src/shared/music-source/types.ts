@@ -1,4 +1,4 @@
-import type { AppConfig } from '../../main/config/types.ts'
+import type { AppConfig } from '../config.ts'
 
 export type ResolveScene = 'playback' | 'download'
 

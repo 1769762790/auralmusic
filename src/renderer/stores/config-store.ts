@@ -26,12 +26,12 @@ import {
   normalizePlayerBackgroundMode,
   normalizeRememberPlaybackSession,
   normalizeShowLyricTranslation,
-} from '../../main/config/types.ts'
+} from '../../shared/config.ts'
 import type {
   AppConfig,
   AudioQualityLevel,
   MusicSourceProvider,
-} from '../../main/config/types.ts'
+} from '../../shared/config.ts'
 import {
   normalizeImportedLxMusicSource,
   normalizeImportedLxMusicSources,

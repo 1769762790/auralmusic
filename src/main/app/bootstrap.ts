@@ -30,7 +30,7 @@ import {
   applyWindowTitleBarTheme,
   syncNativeThemeSource,
 } from '../window/titlebar-theme'
-import { TRAY_IPC_CHANNELS } from '../../shared/ipc/tray.ts'
+import { TRAY_IPC_CHANNELS } from '../../shared/ipc/index.ts'
 import { createMainAppState } from './app-state'
 import { registerMainAppLifecycle } from './lifecycle'
 

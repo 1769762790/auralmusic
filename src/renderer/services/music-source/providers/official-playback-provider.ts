@@ -1,4 +1,4 @@
-import type { AudioQualityLevel } from '../../../../main/config/types.ts'
+import type { AudioQualityLevel } from '../../../../shared/config.ts'
 import { normalizeSongUrlV1Response } from '../../../../shared/playback.ts'
 import { getSongUrlV1 as defaultGetSongUrlV1 } from '../../../api/list.ts'
 import type {

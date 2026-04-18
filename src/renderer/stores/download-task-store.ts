@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { DownloadTask as BridgeDownloadTask } from '../../main/download/download-types'
+import type { DownloadTask as BridgeDownloadTask } from '../../shared/download.ts'
 import type { DownloadTask } from '@/pages/Downloads/types'
 import type { DownloadTaskStoreState } from '@/types/core'
 

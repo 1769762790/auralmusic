@@ -1,4 +1,4 @@
-import type { AudioQualityLevel } from '../../../../main/config/types.ts'
+import type { AudioQualityLevel } from '../../../../shared/config.ts'
 
 export interface CreatePlaylistParams {
   name: string

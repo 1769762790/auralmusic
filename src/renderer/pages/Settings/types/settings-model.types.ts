@@ -1,4 +1,4 @@
-import type { AppConfig } from '../../../../main/config/types.ts'
+import type { AppConfig } from '../../../../shared/config.ts'
 
 export type SystemFontQueryStatus = 'ok' | 'unsupported' | 'empty' | 'error'
 

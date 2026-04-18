@@ -1,4 +1,4 @@
-import type { AppConfig } from '../../../../main/config/types.ts'
+import type { AppConfig } from '../../../../shared/config.ts'
 import { normalizeSongUrlMatchResponse } from '../../../../shared/playback.ts'
 import { getSongUrlMatch as defaultGetSongUrlMatch } from '../../../api/list.ts'
 import type { PlaybackSourceProvider } from '@/types/core'

@@ -1,3 +1,3 @@
-import type { CloseBehavior } from '../../../../main/config/types.ts'
+import type { CloseBehavior } from '../../../../shared/config.ts'
 
 export type CloseWindowAction = Exclude<CloseBehavior, 'ask'>

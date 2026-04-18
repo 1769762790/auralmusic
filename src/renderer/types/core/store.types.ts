@@ -5,7 +5,7 @@ import type {
   PlaybackStatus,
   PlaybackTrack,
 } from '../../../../shared/playback.ts'
-import type { AppConfig } from '../../../../main/config/types.ts'
+import type { AppConfig } from '../../../../shared/config.ts'
 import type { LoginMode } from '@/types/api'
 import type { AlbumListItem } from '@/pages/Albums/types'
 import type { ArtistListItem } from '@/pages/Artists/types'

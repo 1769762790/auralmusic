@@ -1,6 +1,6 @@
 import electron from 'electron'
 
-import { TRAY_IPC_CHANNELS } from '../../shared/ipc/tray.ts'
+import { TRAY_IPC_CHANNELS } from '../../shared/ipc/index.ts'
 import type { TrayCommand, TrayState } from '../../shared/tray.ts'
 
 export type TrayApi = {
