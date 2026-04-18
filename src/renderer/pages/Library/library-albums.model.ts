@@ -43,7 +43,7 @@ function normalizeArtists(
   }
 
   const normalized = artists.map(artist => ({
-    name: artist.name || '鏈煡姝屾墜',
+    name: artist.name || '未知歌手',
   }))
 
   return normalized.length ? normalized : undefined
@@ -61,13 +61,13 @@ function normalizeAlbumList(albums?: RawLibraryAlbumItem[]): AlbumListItem[] {
 
     const artists = normalizeArtists(album.artists)
     const artist = album.artist?.name
-      ? { name: album.artist.name || '鏈煡姝屾墜' }
+      ? { name: album.artist.name || '未知歌手' }
       : artists?.[0]
 
     return [
       {
         id: album.id,
-        name: album.name || '鏈煡涓撹緫',
+        name: album.name || '未知专辑',
         picUrl: album.picUrl || album.blurPicUrl || '',
         blurPicUrl: album.blurPicUrl || album.picUrl || '',
         artists,

@@ -79,10 +79,10 @@ const MvDetailPlayer = ({
             </div>
             <div className='space-y-1 text-center'>
               <p className='text-sm tracking-[0.2em] text-white/70 uppercase'>
-                MV 鎾斁鍖?
+                MV PLAYER
               </p>
               <p className='text-lg font-semibold'>
-                {loading ? '姝ｅ湪鍔犺浇瑙嗛...' : '鏆傛棤鍙挱鏀惧湴鍧€'}
+                {loading ? '正在加载播放地址...' : '暂时无法播放这个 MV'}
               </p>
             </div>
           </div>

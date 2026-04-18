@@ -4,8 +4,8 @@ import type {
   ProgressRestorableAudio,
 } from '../types'
 
-export const PLAYBACK_UNAVAILABLE_MESSAGE = '鏆傛椂鏃犳硶鎾斁'
-export const OUTPUT_DEVICE_UNAVAILABLE_MESSAGE = '闊抽杈撳嚭璁惧鍒囨崲澶辫触'
+export const PLAYBACK_UNAVAILABLE_MESSAGE = '暂时无法播放这首歌曲'
+export const OUTPUT_DEVICE_UNAVAILABLE_MESSAGE = '音频输出设备切换失败'
 export const STALE_PLAYBACK_REQUEST = Symbol('STALE_PLAYBACK_REQUEST')
 
 export function prepareAudioForPendingTrack(audio: PendingTrackAudio) {
@@ -19,6 +19,18 @@ export function advancePlaybackAfterTrackEnd(playback: {
   playNext: (reason: 'auto') => boolean
 }) {
   playback.playNext('auto')
+}
+
+export function canStartPlaybackSourceLoad({
+  hasCurrentTrack,
+  requestId,
+  configLoading,
+}: {
+  hasCurrentTrack: boolean
+  requestId: number
+  configLoading: boolean
+}) {
+  return hasCurrentTrack && requestId > 0 && !configLoading
 }
 
 export async function applyPersistedProgress(

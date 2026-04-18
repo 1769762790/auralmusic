@@ -48,7 +48,7 @@ function formatMVArtistNames(artistName?: string, artists?: RawMvArtist[]) {
       .filter(Boolean)
       .join(' / ') || ''
 
-  return joined || '鏈煡姝屾墜'
+  return joined || '未知歌手'
 }
 
 function normalizeMvList(mvs?: RawLibraryMvItem[]): LibraryMvItem[] {
@@ -64,7 +64,7 @@ function normalizeMvList(mvs?: RawLibraryMvItem[]): LibraryMvItem[] {
     return [
       {
         id: mv.id,
-        name: mv.name || '鏈煡 MV',
+        name: mv.name || '未知 MV',
         coverUrl: mv.coverUrl || mv.cover || mv.imgurl16v9 || '',
         artistName: formatMVArtistNames(mv.artistName, mv.artists),
         playCount: mv.playCount || 0,

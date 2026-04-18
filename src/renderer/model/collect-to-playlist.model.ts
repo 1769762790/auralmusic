@@ -37,8 +37,7 @@ export function normalizeCollectPlaylistTargets(
     }
 
     const isLikedPlaylist =
-      playlist.specialType === 5 ||
-      playlist.name?.trim() === '鎴戝枩娆㈢殑闊充箰'
+      playlist.specialType === 5 || playlist.name?.trim() === '我喜欢的音乐'
     const isCreatedPlaylist = playlist.subscribed !== true
 
     if (!isLikedPlaylist && !isCreatedPlaylist) {
@@ -48,7 +47,7 @@ export function normalizeCollectPlaylistTargets(
     return [
       {
         id: playlist.id,
-        name: playlist.name?.trim() || '鏈煡姝屽崟',
+        name: playlist.name?.trim() || '未知歌单',
         coverImgUrl: playlist.coverImgUrl || playlist.picUrl || '',
         trackCount: playlist.trackCount || 0,
         specialType: playlist.specialType || 0,

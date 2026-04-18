@@ -35,22 +35,25 @@ test('toLxMusicInfo maps playback tracks into lx music info', () => {
   })
 })
 
-test('selectBestLxSource prefers wy and falls back by priority', () => {
+test('selectBestLxSource prefers music info source before generic fallbacks', () => {
   assert.equal(
-    selectBestLxSource({
-      mg: {
-        name: 'Migu',
-        type: 'music',
-        actions: ['musicUrl'],
-        qualitys: ['128k'],
+    selectBestLxSource(
+      {
+        mg: {
+          name: 'Migu',
+          type: 'music',
+          actions: ['musicUrl'],
+          qualitys: ['128k'],
+        },
+        wy: {
+          name: 'NetEase',
+          type: 'music',
+          actions: ['musicUrl'],
+          qualitys: ['320k'],
+        },
       },
-      wy: {
-        name: 'NetEase',
-        type: 'music',
-        actions: ['musicUrl'],
-        qualitys: ['320k'],
-      },
-    }),
+      ['wy', 'kw', 'kg', 'tx', 'mg']
+    ),
     'wy'
   )
 
@@ -67,4 +70,24 @@ test('selectBestLxSource prefers wy and falls back by priority', () => {
   )
 
   assert.equal(selectBestLxSource({}), null)
+})
+
+test('selectBestLxSource ignores sources that cannot resolve music urls', () => {
+  assert.equal(
+    selectBestLxSource({
+      kw: {
+        name: 'Kuwo',
+        type: 'music',
+        actions: ['lyric'],
+        qualitys: ['320k'],
+      },
+      mg: {
+        name: 'Migu',
+        type: 'music',
+        actions: ['musicUrl'],
+        qualitys: ['320k'],
+      },
+    }),
+    'mg'
+  )
 })

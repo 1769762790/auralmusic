@@ -283,6 +283,127 @@ test('musicSourceEnabled false tries official directly', async () => {
   assert.deepEqual(calls, ['official'])
 })
 
+test('playback skips builtin unblock and tries LX first when enhanced modules are empty', async () => {
+  const calls: string[] = []
+  const track = createTrack()
+
+  const resolvePlaybackSource = createPlaybackSourceResolver({
+    getAuthState: () => ({
+      user: null,
+      session: null,
+      loginStatus: 'anonymous',
+    }),
+    getConfig: () => ({
+      quality: 'higher',
+      musicSourceEnabled: true,
+      musicSourceProviders: [],
+      enhancedSourceModules: [],
+      luoxueSourceEnabled: true,
+      customMusicApiEnabled: false,
+      customMusicApiUrl: '',
+    }),
+    providers: {
+      builtinUnblock: {
+        resolve: async () => {
+          calls.push('builtin')
+          return null
+        },
+      },
+      lxMusic: {
+        resolve: async options => {
+          calls.push('lx')
+          return {
+            id: options.track.id,
+            url: 'https://cdn.example.com/from-lx.flac',
+            time: options.track.duration,
+            br: 0,
+          }
+        },
+      },
+      official: {
+        resolve: async () => {
+          calls.push('official')
+          return null
+        },
+      },
+      customApi: {
+        resolve: async () => {
+          calls.push('custom')
+          return null
+        },
+      },
+    },
+  })
+
+  const result = await resolvePlaybackSource({ track })
+
+  assert.deepEqual(result, {
+    id: track.id,
+    url: 'https://cdn.example.com/from-lx.flac',
+    time: track.duration,
+    br: 0,
+  })
+  assert.deepEqual(calls, ['lx'])
+})
+
+test('unauthenticated playback does not fall back to official while music source is enabled', async () => {
+  const calls: string[] = []
+  const track = createTrack()
+
+  const resolvePlaybackSource = createPlaybackSourceResolver({
+    getAuthState: () => ({
+      user: null,
+      session: null,
+      loginStatus: 'anonymous',
+    }),
+    getConfig: () => ({
+      quality: 'higher',
+      musicSourceEnabled: true,
+      musicSourceProviders: [],
+      enhancedSourceModules: [],
+      luoxueSourceEnabled: true,
+      customMusicApiEnabled: false,
+      customMusicApiUrl: '',
+    }),
+    providers: {
+      builtinUnblock: {
+        resolve: async () => {
+          calls.push('builtin')
+          return null
+        },
+      },
+      lxMusic: {
+        resolve: async () => {
+          calls.push('lx')
+          return null
+        },
+      },
+      official: {
+        resolve: async () => {
+          calls.push('official')
+          return {
+            id: track.id,
+            url: 'https://cdn.example.com/official-should-not-run.mp3',
+            time: track.duration,
+            br: 128000,
+          }
+        },
+      },
+      customApi: {
+        resolve: async () => {
+          calls.push('custom')
+          return null
+        },
+      },
+    },
+  })
+
+  const result = await resolvePlaybackSource({ track })
+
+  assert.equal(result, null)
+  assert.deepEqual(calls, ['lx'])
+})
+
 test('playback resolver traces resolver order and hit result', async () => {
   const traceEvents: Array<Record<string, unknown>> = []
   const track = createTrack()
@@ -342,7 +463,7 @@ test('playback resolver traces resolver order and hit result', async () => {
       type: 'start',
       trackId: track.id,
       isAuthenticated: false,
-      resolverOrder: ['builtinUnblock', 'lxMusic', 'official'],
+      resolverOrder: ['builtinUnblock', 'lxMusic'],
       builtinPlatforms: ['migu'],
     },
     {

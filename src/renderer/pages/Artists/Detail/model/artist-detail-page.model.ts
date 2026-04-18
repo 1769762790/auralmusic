@@ -44,7 +44,7 @@ export function normalizeArtistProfile(
 
   return {
     id: artist.id,
-    name: artist.name || '鏈煡姝屾墜',
+    name: artist.name || '未知歌手',
     coverUrl:
       artist.cover || artist.avatar || artist.picUrl || artist.img1v1Url || '',
     musicSize: artist.musicSize || 0,
@@ -54,7 +54,7 @@ export function normalizeArtistProfile(
       payload.identify?.imageDesc ||
       payload.identify?.identityName ||
       artist.identifyTag?.[0] ||
-      '鑹轰汉',
+      '音乐人',
   }
 }
 
@@ -64,14 +64,14 @@ export function normalizeArtistTopSongs(
   const payload = unwrapArtistDetailPayload(response)
   return (payload?.songs || []).map(song => ({
     id: song.id,
-    name: song.name || '鏈煡姝屾洸',
+    name: song.name || '未知歌曲',
     subtitle: song.alia?.[0] || song.tns?.[0] || '',
     duration: song.dt || 0,
     albumName: song.al?.name || '',
     coverUrl: song.al?.picUrl || song.album?.picUrl || '',
     artists: (song.ar || []).map(artist => ({
       id: artist.id,
-      name: artist.name || '鏈煡姝屾墜',
+      name: artist.name || '未知歌手',
     })),
   }))
 }
@@ -85,7 +85,7 @@ export function normalizeArtistAlbums(
   const payload = unwrapArtistDetailPayload(response)
   return (payload?.hotAlbums || payload?.albums || []).map(album => ({
     id: album.id,
-    name: album.name || '鏈煡涓撹緫',
+    name: album.name || '未知专辑',
     picUrl: album.picUrl || album.blurPicUrl || '',
     publishTime: album.publishTime,
     size: album.size,
@@ -98,7 +98,7 @@ export function normalizeArtistMvs(
   const payload = unwrapArtistDetailPayload(response)
   return (payload?.mvs || []).map(mv => ({
     id: mv.id || mv.vid || 0,
-    name: mv.name || '鏈煡 MV',
+    name: mv.name || '未知 MV',
     coverUrl: mv.imgurl16v9 || mv.cover || '',
     publishTime: mv.publishTime,
     playCount: mv.playCount,

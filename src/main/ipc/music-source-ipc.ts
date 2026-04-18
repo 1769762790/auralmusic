@@ -9,6 +9,7 @@ import {
 } from '../music-source/lx-script-store'
 import type { LxInitedData } from '../../shared/lx-music-source'
 import type { LxMusicSourceScriptDraft } from '../../shared/lx-music-source'
+import { requestLxHttpWithElectronNet } from '../music-source/lx-http-request'
 
 const { ipcMain } = electron
 
@@ -36,21 +37,7 @@ export function registerMusicSourceIpc() {
   ipcMain.handle(
     IPC_CHANNELS.MUSIC_SOURCE.LX_HTTP_REQUEST,
     async (_event, url: string, options: RequestInit = {}) => {
-      const response = await fetch(url, options)
-      const rawBody = await response.text()
-      let body: unknown = rawBody
-
-      try {
-        body = JSON.parse(rawBody)
-      } catch {
-        // keep raw response text
-      }
-
-      return {
-        statusCode: response.status,
-        headers: Object.fromEntries(response.headers.entries()),
-        body,
-      }
+      return requestLxHttpWithElectronNet(electron.net, url, options)
     }
   )
 

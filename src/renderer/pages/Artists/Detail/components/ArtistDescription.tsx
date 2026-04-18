@@ -8,11 +8,11 @@ const ArtistDescription = ({ description }: ArtistDescriptionProps) => {
   return (
     <section className='space-y-5'>
       <h2 className='text-foreground text-3xl font-bold tracking-tight'>
-        �������
+        歌手介绍
       </h2>
       <div className='border-border/60 bg-card/68 space-y-6 rounded-[30px] border p-6 shadow-[0_18px_44px_rgba(15,23,42,0.08)]'>
         {!hasContent ? (
-          <p className='text-muted-foreground text-sm'>���޸��ּ��</p>
+          <p className='text-muted-foreground text-sm'>暂无歌手介绍</p>
         ) : (
           <>
             {description.summary ? (

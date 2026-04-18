@@ -24,6 +24,14 @@ const AUDIO_QUALITY_TO_LX: Record<AudioQualityLevel, LxQuality> = {
   jymaster: 'flac',
 }
 
+const LX_PLAYBACK_SOURCE_PRIORITY: LxSourceKey[] = [
+  'wy',
+  'kw',
+  'kg',
+  'tx',
+  'mg',
+]
+
 export function formatLxInterval(durationMs: number) {
   const totalSeconds = Math.max(0, Math.floor(durationMs / 1000))
   const minutes = Math.floor(totalSeconds / 60)
@@ -46,9 +54,17 @@ export function toLxMusicInfo(track: PlaybackTrack): LxMusicInfo {
 
 export function selectBestLxSource(
   sources: LxInitedData['sources'],
-  preferred: LxSourceKey[] = ['wy', 'kw', 'mg', 'kg', 'tx']
+  preferred: LxSourceKey[] = LX_PLAYBACK_SOURCE_PRIORITY
 ) {
-  const available = new Set(Object.keys(sources))
+  const available = new Set(
+    Object.entries(sources)
+      .filter(([, source]) => {
+        return (
+          source?.actions.includes('musicUrl') && source.qualitys.length > 0
+        )
+      })
+      .map(([source]) => source)
+  )
 
   for (const source of preferred) {
     if (available.has(source)) {
@@ -110,7 +126,11 @@ export async function resolveTrackWithLxMusicSource(options: {
     }
   }
 
-  const source = selectBestLxSource(runner.getSources())
+  const musicInfo = toLxMusicInfo(track)
+  const source = selectBestLxSource(runner.getSources(), [
+    musicInfo.source,
+    ...LX_PLAYBACK_SOURCE_PRIORITY,
+  ])
   if (!source) {
     return null
   }
@@ -118,7 +138,7 @@ export async function resolveTrackWithLxMusicSource(options: {
   try {
     const url = await runner.getMusicUrl(
       source,
-      toLxMusicInfo(track),
+      musicInfo,
       mapAudioQualityLevelToLxQuality(quality)
     )
 

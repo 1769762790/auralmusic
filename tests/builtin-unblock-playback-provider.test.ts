@@ -124,3 +124,24 @@ test('builtin unblock playback provider uses configured enhanced source order fr
   })
   assert.deepEqual(calls, ['bikonoo', 'gdmusic'])
 })
+
+test('builtin unblock playback provider does not fall back to defaults when all enhanced modules are disabled', async () => {
+  const calls: string[] = []
+  const provider = createBuiltinUnblockPlaybackProvider({
+    getSongUrlMatch: async params => {
+      calls.push(params.source)
+      throw new Error(`unexpected source: ${params.source}`)
+    },
+  })
+
+  const result = await provider.resolve({
+    ...createOptions(),
+    config: {
+      ...createOptions().config,
+      enhancedSourceModules: [],
+    },
+  })
+
+  assert.equal(result, null)
+  assert.deepEqual(calls, [])
+})

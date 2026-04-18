@@ -80,19 +80,29 @@ function createConfig(overrides: Partial<AppConfig> = {}): AppConfig {
 
 test('resolveTrackWithLxMusicSource does not depend on deprecated musicSourceProviders', async () => {
   const originalWindow = globalThis.window
+  let requestedSource: string | null = null
   const fakeRunner = {
     dispose: () => undefined,
     isInitialized: () => true,
     matchesScript: (script: string) => script === 'mock lx script',
     getSources: () => ({
-      mg: {
-        name: 'Migu',
+      wy: {
+        name: 'NetEase',
+        type: 'music' as const,
+        actions: ['musicUrl'] as const,
+        qualitys: ['320k'] as const,
+      },
+      kw: {
+        name: 'Kuwo',
         type: 'music' as const,
         actions: ['musicUrl'] as const,
         qualitys: ['320k'] as const,
       },
     }),
-    getMusicUrl: async () => 'https://cdn.example.com/from-lx.mp3',
+    getMusicUrl: async (source: string) => {
+      requestedSource = source
+      return 'https://cdn.example.com/from-lx.mp3'
+    },
   }
 
   globalThis.window = {
@@ -116,6 +126,7 @@ test('resolveTrackWithLxMusicSource does not depend on deprecated musicSourcePro
       time: 180000,
       br: 0,
     })
+    assert.equal(requestedSource, 'wy')
   } finally {
     setLxMusicRunner(null)
     globalThis.window = originalWindow

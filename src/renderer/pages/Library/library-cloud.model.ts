@@ -51,7 +51,7 @@ function resolveArtistNames(item: RawCloudItem) {
     simpleSongArtists ||
     item.artist?.trim() ||
     item.artistName?.trim() ||
-    '鏈煡姝屾墜'
+    '未知歌手'
   )
 }
 
@@ -75,13 +75,13 @@ function normalizeLibraryCloudList(items?: RawCloudItem[]): DailySongRowItem[] {
           item.songName ||
           item.name ||
           item.fileName ||
-          '鏈煡姝屾洸',
+          '未知歌曲',
         artistNames: resolveArtistNames(item),
         albumName:
           item.simpleSong?.al?.name ||
           item.album?.trim() ||
           item.albumName?.trim() ||
-          '鏈煡涓撹緫',
+          '未知专辑',
         coverUrl:
           item.simpleSong?.al?.picUrl ||
           item.simpleSong?.al?.coverUrl ||

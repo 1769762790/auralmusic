@@ -59,7 +59,7 @@ function normalizeArtistList(artists?: RawArtistItem[]): ArtistListItem[] {
     return [
       {
         id: artist.id,
-        name: artist.name || '鏈煡姝屾墜',
+        name: artist.name || '未知歌手',
         picUrl: artist.picUrl || artist.img1v1Url || '',
         alias: artist.alias,
         albumSize: artist.albumSize,

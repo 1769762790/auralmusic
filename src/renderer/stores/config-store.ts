@@ -213,7 +213,7 @@ export const useConfigStore = create<ConfigStoreState>((set, get) => ({
 
       set({ config: normalizedConfig })
     } catch (err) {
-      console.error('鉂?閰嶇疆鍒濆鍖栧け璐?', err)
+      console.error('配置初始化失败', err)
     } finally {
       set({ isLoading: false })
     }
@@ -228,7 +228,7 @@ export const useConfigStore = create<ConfigStoreState>((set, get) => ({
     try {
       await window.electronConfig.setConfig(key, value)
     } catch (err) {
-      console.error('鉂?閰嶇疆淇濆瓨澶辫触:', err)
+      console.error('配置保存失败', err)
       set({ config: currentConfig })
     }
   },
@@ -238,7 +238,7 @@ export const useConfigStore = create<ConfigStoreState>((set, get) => ({
     try {
       await window.electronConfig.resetConfig()
     } catch (err) {
-      console.error('鉂?閰嶇疆閲嶇疆澶辫触:', err)
+      console.error('配置重置失败', err)
     } finally {
       set({ isLoading: false })
     }

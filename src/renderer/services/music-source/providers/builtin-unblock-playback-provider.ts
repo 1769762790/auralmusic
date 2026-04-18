@@ -23,13 +23,11 @@ export function createBuiltinUnblockPlaybackProvider(
 
   return {
     resolve: async options => {
-      const configuredMatchSources =
-        Array.isArray(
-          (options.config as Partial<AppConfig>).enhancedSourceModules
-        ) &&
-        (options.config as Partial<AppConfig>).enhancedSourceModules!.length
-          ? (options.config as Partial<AppConfig>).enhancedSourceModules!
-          : matchSources
+      const configuredModules = (options.config as Partial<AppConfig>)
+        .enhancedSourceModules
+      const configuredMatchSources = Array.isArray(configuredModules)
+        ? configuredModules
+        : matchSources
 
       for (const source of configuredMatchSources) {
         try {

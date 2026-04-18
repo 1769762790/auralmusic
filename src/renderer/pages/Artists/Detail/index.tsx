@@ -25,8 +25,8 @@ import {
   normalizeArtistDescription,
   normalizeArtistMvs,
   normalizeArtistProfile,
-  normalizeSimilarArtists,
   normalizeArtistTopSongs,
+  normalizeSimilarArtists,
   resolveArtistAlbumImages,
   resolveArtistMvImages,
   resolveArtistProfileImage,
@@ -314,7 +314,7 @@ const ArtistDetail = () => {
     return (
       <section className='pb-8'>
         <div className='border-border/60 bg-card/70 text-muted-foreground rounded-[28px] border px-6 py-10 text-center text-sm'>
-          閺嗗倹妫ゅ灞惧鐠囷附鍎忛弫鐗堝祦
+          暂未获取到歌手信息
         </div>
       </section>
     )

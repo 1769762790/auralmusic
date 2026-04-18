@@ -21,6 +21,7 @@ export type ResolveContext = {
     | 'customMusicApiEnabled'
     | 'customMusicApiUrl'
   > & {
+    enhancedSourceModules?: AppConfig['enhancedSourceModules']
     quality?: AppConfig['quality']
   }
 }

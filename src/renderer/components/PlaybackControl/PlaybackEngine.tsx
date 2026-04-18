@@ -28,6 +28,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
   const seekRequestId = usePlaybackStore(state => state.seekRequestId)
   const seekPosition = usePlaybackStore(state => state.seekPosition)
   const config = useConfigStore(state => state.config)
+  const configLoading = useConfigStore(state => state.isLoading)
   const quality = useConfigStore(state => state.config.quality)
   const playbackSpeed = useConfigStore(state => state.config.playbackSpeed)
   const equalizer = useConfigStore(state => state.config.equalizer)
@@ -75,6 +76,7 @@ const PlaybackEngine = forwardRef<PlaybackEngineRef>((_, ref) => {
     audioOutputDeviceIdRef,
     currentTrack,
     requestId,
+    configLoading,
   })
 
   usePlaybackEngineTransportEffects({

@@ -289,9 +289,7 @@ export function normalizeEnhancedSourceModules(
     )
   })
 
-  return modules.length
-    ? [...new Set(modules)]
-    : defaultConfig.enhancedSourceModules
+  return [...new Set(modules)]
 }
 
 export function normalizeDownloadFileNamePattern(value: unknown) {

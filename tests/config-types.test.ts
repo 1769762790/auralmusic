@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { defaultConfig } from '../src/main/config/types.ts'
+import {
+  defaultConfig,
+  normalizeEnhancedSourceModules,
+} from '../src/main/config/types.ts'
 
 test('defaultConfig does not seed deprecated music source providers', () => {
   assert.deepEqual(defaultConfig.musicSourceProviders, [])
@@ -15,4 +18,8 @@ test('defaultConfig seeds enhanced playback source modules in a stable order', (
     'msls',
     'qijieya',
   ])
+})
+
+test('normalizeEnhancedSourceModules preserves an explicit empty selection', () => {
+  assert.deepEqual(normalizeEnhancedSourceModules([]), [])
 })

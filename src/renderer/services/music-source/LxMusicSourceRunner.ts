@@ -48,6 +48,73 @@ export function normalizeLxScriptRequestResultToUrl(result: unknown) {
   return null
 }
 
+export function resolveLxMusicUrlResult(
+  result: unknown,
+  fallbackUrl?: string | null
+) {
+  return (
+    normalizeLxScriptRequestResultToUrl(result) || fallbackUrl?.trim() || null
+  )
+}
+
+export function readLxResponseBodyUrl(body: unknown) {
+  return isRecord(body) && typeof body.url === 'string'
+    ? body.url.trim() || null
+    : null
+}
+
+export function createLxFetchRequestOptions(
+  options: RequestInit = {},
+  signal: AbortSignal
+): RequestInit {
+  return {
+    method: options.method || 'GET',
+    headers: {
+      'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      ...(isRecord(options.headers) ? options.headers : {}),
+    },
+    signal,
+    mode: 'cors',
+    credentials: 'omit',
+    ...(options.body ? { body: options.body } : {}),
+  }
+}
+
+async function requestLxHttpWithRendererFetch(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs = 30000
+) {
+  const controller = new AbortController()
+  const timeoutId = window.setTimeout(() => {
+    controller.abort()
+  }, timeoutMs)
+
+  try {
+    const response = await fetch(
+      url,
+      createLxFetchRequestOptions(options, controller.signal)
+    )
+    const rawBody = await response.text()
+    let body: unknown = rawBody
+
+    try {
+      body = JSON.parse(rawBody)
+    } catch {
+      // keep raw response text
+    }
+
+    return {
+      statusCode: response.status,
+      headers: Object.fromEntries(response.headers.entries()),
+      body,
+    }
+  } finally {
+    window.clearTimeout(timeoutId)
+  }
+}
+
 export function selectSupportedLxQuality(
   supportedQualities: LxQuality[],
   requestedQuality?: LxQuality
@@ -80,6 +147,7 @@ export class LxMusicSourceRunner {
   private initRejecter: ((error: Error) => void) | null = null
   private initTimeoutId: number | null = null
   private callCounter = 0
+  private lastMusicUrl: string | null = null
   private pendingInvocations = new Map<
     string,
     {
@@ -215,10 +283,28 @@ export class LxMusicSourceRunner {
 
   private async handleWorkerHttpRequest(message: WorkerHttpRequestMessage) {
     try {
-      const response = await window.electronMusicSource.lxHttpRequest(
-        message.url,
-        message.options
-      )
+      let response
+
+      try {
+        response = await window.electronMusicSource.lxHttpRequest(
+          message.url,
+          message.options
+        )
+      } catch (mainProcessError) {
+        console.warn(
+          '[LxMusicRunner] main process HTTP request failed, trying renderer fetch fallback',
+          mainProcessError
+        )
+        response = await requestLxHttpWithRendererFetch(
+          message.url,
+          message.options
+        )
+      }
+
+      const url = readLxResponseBodyUrl(response.body)
+      if (url) {
+        this.lastMusicUrl = url
+      }
 
       this.postToWorker({
         type: 'http-response',
@@ -321,7 +407,8 @@ export class LxMusicSourceRunner {
       },
     })
 
-    const url = normalizeLxScriptRequestResultToUrl(result)
+    const url = resolveLxMusicUrlResult(result, this.lastMusicUrl)
+    this.lastMusicUrl = null
     if (!url) {
       throw new Error('LX script did not return a playable URL')
     }
@@ -338,6 +425,7 @@ export class LxMusicSourceRunner {
     this.initialized = false
     this.sources = {}
     this.callCounter = 0
+    this.lastMusicUrl = null
   }
 }
 

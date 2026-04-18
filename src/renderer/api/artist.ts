@@ -55,15 +55,6 @@ export function getArtistDesc(params: ArtistDetailParams) {
   })
 }
 
-/**
- * 鏀惰棌姝屾墜
- * 璇存槑 : 璋冪敤姝ゆ帴鍙?, 浼犲叆姝屾墜 id, 鍙敹钘忔瓕鎵?
- * - id: 姝屾墜 id
- * - t: 鎿嶄綔,1 涓烘敹钘?鍏朵粬涓哄彇娑堟敹钘?
- * @param {Object} params
- * @param {number} params.id
- * @param {number} params.t
- */
 export function followArtist(params: ToggleArtistSubscriptionParams) {
   return request.get('/artist/sub', {
     params,

@@ -8,6 +8,7 @@ import {
   PLAYBACK_UNAVAILABLE_MESSAGE,
   STALE_PLAYBACK_REQUEST,
   applyPersistedProgress,
+  canStartPlaybackSourceLoad,
   isPlaybackRequestStale,
   throwIfPlaybackRequestStale,
 } from './model'
@@ -32,9 +33,16 @@ export function usePlaybackEngineTrackLoader({
   audioOutputDeviceIdRef,
   currentTrack,
   requestId,
+  configLoading,
 }: PlaybackEngineTrackLoaderOptions) {
   useEffect(() => {
-    if (!currentTrack || requestId <= 0) {
+    if (
+      !canStartPlaybackSourceLoad({
+        hasCurrentTrack: Boolean(currentTrack),
+        requestId,
+        configLoading,
+      })
+    ) {
       return
     }
 
@@ -250,6 +258,7 @@ export function usePlaybackEngineTrackLoader({
     }
   }, [
     audioOutputDeviceIdRef,
+    configLoading,
     configRef,
     currentPlaybackSourceRef,
     currentTrack,

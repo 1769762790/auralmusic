@@ -67,6 +67,7 @@ export type PlaybackEngineRuntimeSyncOptions = PlaybackEngineRuntimeRefs & {
 export type PlaybackEngineTrackLoaderOptions = PlaybackEngineRuntimeRefs & {
   currentTrack: PlaybackStoreState['currentTrack']
   requestId: number
+  configLoading: boolean
 }
 
 export interface PlaybackEngineTransportEffectsOptions {

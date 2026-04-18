@@ -96,11 +96,7 @@ test('buildResolverPolicy uses unauthenticated resolver order and trims custom a
     })
   )
 
-  assert.deepEqual(policy.resolverOrder, [
-    'builtinUnblock',
-    'lxMusic',
-    'official',
-  ])
+  assert.deepEqual(policy.resolverOrder, ['builtinUnblock', 'lxMusic'])
 })
 
 test('buildResolverPolicy keeps only official when music source is disabled', () => {

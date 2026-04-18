@@ -3,6 +3,7 @@ import test from 'node:test'
 
 import {
   advancePlaybackAfterTrackEnd,
+  canStartPlaybackSourceLoad,
   isPlaybackRequestStale,
   prepareAudioForPendingTrack,
 } from '../src/renderer/components/PlaybackControl/model/playback-engine.model.ts'
@@ -75,4 +76,24 @@ test('advancePlaybackAfterTrackEnd advances queue with automatic reason', () => 
   })
 
   assert.deepEqual(calls, ['playNext:auto'])
+})
+
+test('canStartPlaybackSourceLoad waits until renderer config has loaded', () => {
+  assert.equal(
+    canStartPlaybackSourceLoad({
+      hasCurrentTrack: true,
+      requestId: 1,
+      configLoading: true,
+    }),
+    false
+  )
+
+  assert.equal(
+    canStartPlaybackSourceLoad({
+      hasCurrentTrack: true,
+      requestId: 1,
+      configLoading: false,
+    }),
+    true
+  )
 })
