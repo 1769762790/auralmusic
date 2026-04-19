@@ -5,7 +5,7 @@ import PlaybackEngine from '@/components/PlaybackControl/PlaybackEngine'
 import PlaybackSessionBridge from '@/components/PlaybackSessionBridge'
 import PlaybackShortcutBridge from '@/components/PlaybackShortcutBridge'
 import TrayCommandBridge from '@/components/TrayCommandBridge'
-import LazyPlayerScene from '@/components/PlayerScene/LazyPlayerScene'
+import PlayerScene from '@/components/PlayerScene'
 import ScrollToTopButton from '@/components/ScrollToTopButton'
 import KeepAliveRouteOutlet from 'keepalive-for-react-router'
 import { Toaster } from '@/components/ui/sonner'
@@ -35,7 +35,7 @@ const AppLayout = () => {
       <PlaybackShortcutBridge />
       <TrayCommandBridge />
       <PlaybackControl />
-      <LazyPlayerScene />
+      <PlayerScene />
       <LazyCollectToPlaylistDrawer />
       <Toaster />
       <ScrollToTopButton />
