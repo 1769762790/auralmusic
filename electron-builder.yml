@@ -37,7 +37,7 @@ nsis:
   uninstallerIcon: build/icons/icon.ico
 
 mac:
-  icon: build/icon.icns
+  icon: build/icons/icon.icns
   target:
     - target: dmg
       arch:
@@ -46,7 +46,7 @@ mac:
 
 dmg:
   title: AuralMusic
-  icon: build/icon.icns
+  icon: build/icons/icon.icns
   iconSize: 100
   window:
     width: 600
@@ -60,4 +60,7 @@ dmg:
       path: /Applications
 
 linux:
-  icon: build/icons/png
+  icon: build/icons
+  target:
+    - AppImage
+    - deb
