@@ -1,10 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import {
-  createDownloadSourceResolver,
-  type DownloadSourceResolverDeps,
-} from '../src/renderer/services/download/download-source-resolver.ts'
+import { createDownloadSourceResolver } from '../src/renderer/services/download/model/download-source-resolver.model.ts'
+import type { DownloadSourceResolverDeps } from '../src/renderer/types/core/download-source.types.ts'
 
 function createConfig(overrides: Record<string, unknown> = {}) {
   return {
@@ -405,7 +403,7 @@ test('createDownloadSourceResolver still tries builtin unblock when legacy built
   assert.deepEqual(calls, ['song-url:true'])
 })
 
-test('createDownloadSourceResolver falls through to official when third-party families fail', async () => {
+test('createDownloadSourceResolver does not fall through to official when music source remains enabled for unauthenticated users', async () => {
   const calls: string[] = []
 
   const resolveDownloadSource = createDownloadSourceResolver({
@@ -436,6 +434,6 @@ test('createDownloadSourceResolver falls through to official when third-party fa
     policy: 'strict',
   })
 
-  assert.equal(result?.provider, 'official-download')
-  assert.deepEqual(calls, ['song-url:true', 'lx', 'official-download'])
+  assert.equal(result, null)
+  assert.deepEqual(calls, ['song-url:true', 'lx'])
 })

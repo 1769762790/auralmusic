@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { createLxPlaybackProvider } from '../src/renderer/services/music-source/providers/lx-playback-provider.ts'
+import { createPlaybackSourceResolver } from '../src/renderer/services/music-source/model/playback-source-resolver.model.ts'
 import type { SongUrlV1Result } from '../src/shared/playback.ts'
-import { createPlaybackSourceResolver } from '../src/renderer/services/music-source/playback-source-resolver.ts'
 
 type ProviderResult = SongUrlV1Result | null
 

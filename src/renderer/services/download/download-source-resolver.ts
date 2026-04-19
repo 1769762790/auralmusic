@@ -1,49 +1,23 @@
-import { createDownloadQualityFallbackChain } from '../../../shared/download.ts'
-import type {
-  MusicResolverId,
-  ResolveContext,
-} from '../../../shared/music-source/index.ts'
-import {
-  buildResolverPolicy,
-  isAuthenticatedForMusicResolution,
-} from '../../../shared/music-source/index.ts'
-import { createBuiltinUnblockDownloadProvider } from './providers/builtin-unblock-download-provider.ts'
-import { createCustomApiDownloadProvider } from './providers/custom-api-download-provider.ts'
-import { createLxDownloadProvider } from './providers/lx-download-provider.ts'
-import { createOfficialDownloadProvider } from './providers/official-download-provider.ts'
+import { isAuthenticatedForMusicResolution } from '../../../shared/music-source/index.ts'
 import type {
   DownloadResolverConfig,
-  DownloadResolverProvider,
   DownloadSourceMaybePromise,
   DownloadSourceResolverDeps,
-  ResolveDownloadSourceOptions,
-  ResolvedDownloadSource,
 } from '@/types/core'
+import { createDownloadSourceResolver as createDownloadSourceResolverBase } from './model/download-source-resolver.model.ts'
+import { useAuthStore } from '../../stores/auth-store.ts'
+import { useConfigStore } from '../../stores/config-store.ts'
 
 export type {
   DownloadResolutionPolicy,
   ResolvedDownloadSource,
 } from '@/types/core'
 
-function createDefaultProviders(): Record<
-  MusicResolverId,
-  DownloadResolverProvider
-> {
-  return {
-    official: createOfficialDownloadProvider(),
-    builtinUnblock: createBuiltinUnblockDownloadProvider(),
-    lxMusic: createLxDownloadProvider(),
-    customApi: createCustomApiDownloadProvider(),
-  }
-}
-
 async function getDefaultConfig(): Promise<DownloadResolverConfig> {
-  const { useConfigStore } = await import('../../stores/config-store.ts')
   return useConfigStore.getState().config
 }
 
 async function getDefaultIsAuthenticated(): Promise<boolean> {
-  const { useAuthStore } = await import('../../stores/auth-store.ts')
   const authState = useAuthStore.getState()
   return isAuthenticatedForMusicResolution({
     loginStatus: authState.loginStatus,
@@ -52,67 +26,14 @@ async function getDefaultIsAuthenticated(): Promise<boolean> {
   })
 }
 
-function toResolveContext(
-  isAuthenticated: boolean,
-  config: DownloadResolverConfig
-): ResolveContext {
-  return {
-    scene: 'download',
-    isAuthenticated,
-    config: {
-      musicSourceEnabled: config.musicSourceEnabled,
-      musicSourceProviders: config.musicSourceProviders,
-      luoxueSourceEnabled: config.luoxueSourceEnabled,
-      customMusicApiEnabled: config.customMusicApiEnabled,
-      customMusicApiUrl: config.customMusicApiUrl,
-    },
-  }
-}
-
 export function createDownloadSourceResolver(
   deps: DownloadSourceResolverDeps = {}
 ) {
-  const getConfig = deps.getConfig ?? getDefaultConfig
-  const getIsAuthenticated =
-    deps.getIsAuthenticated ?? getDefaultIsAuthenticated
-  const providers = createDefaultProviders()
-
-  return async function resolveDownloadSource(
-    options: ResolveDownloadSourceOptions
-  ): Promise<ResolvedDownloadSource | null> {
-    if (options.policy !== 'strict' && options.policy !== 'fallback') {
-      return null
-    }
-
-    const config = await getConfig()
-    const isAuthenticated = await (
-      getIsAuthenticated as () => DownloadSourceMaybePromise<boolean>
-    )()
-    const context = toResolveContext(isAuthenticated, config)
-    const resolverPolicy = buildResolverPolicy(context)
-    const levels =
-      options.policy === 'strict'
-        ? [options.requestedQuality]
-        : createDownloadQualityFallbackChain(options.requestedQuality)
-
-    for (const level of levels) {
-      for (const resolverId of resolverPolicy.resolverOrder) {
-        const provider = providers[resolverId]
-        const result = await provider.resolve({
-          track: options.track,
-          quality: level,
-          context,
-          policy: resolverPolicy,
-          config,
-          deps,
-        })
-
-        if (result?.url) {
-          return result
-        }
-      }
-    }
-
-    return null
-  }
+  return createDownloadSourceResolverBase({
+    ...deps,
+    getConfig: deps.getConfig ?? getDefaultConfig,
+    getIsAuthenticated:
+      deps.getIsAuthenticated ??
+      (getDefaultIsAuthenticated as () => DownloadSourceMaybePromise<boolean>),
+  })
 }
