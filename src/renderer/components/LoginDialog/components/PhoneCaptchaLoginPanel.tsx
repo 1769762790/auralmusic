@@ -5,7 +5,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 import { PHONE_CAPTCHA_LOGIN_FIELD_NAMES } from '../login-form.schema'
-import type { PhoneCaptchaLoginPanelProps } from '../login-dialog.model'
+import type { PhoneCaptchaLoginPanelProps } from '../types'
 
 const [phoneField, captchaField] = PHONE_CAPTCHA_LOGIN_FIELD_NAMES
 

@@ -20,6 +20,11 @@ import type {
   ResolvedDownloadSource,
 } from '@/types/core'
 
+export type {
+  DownloadResolutionPolicy,
+  ResolvedDownloadSource,
+} from '@/types/core'
+
 function createDefaultProviders(): Record<
   MusicResolverId,
   DownloadResolverProvider

@@ -5,6 +5,13 @@ import type {
   LyricLine,
 } from './types'
 
+export type {
+  BuildLyricLinesInput,
+  KaraokeLine,
+  KaraokeSegment,
+  LyricLine,
+} from './types'
+
 const LRC_TIMESTAMP_PATTERN = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g
 const YRC_LINE_PATTERN = /^\[(\d+),(\d+)\]/
 const YRC_SEGMENT_PATTERN = /\((\d+),(\d+),[^)]*\)/g

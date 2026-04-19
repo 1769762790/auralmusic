@@ -1,6 +1,8 @@
 import type { CloseBehavior } from '../../../shared/config.ts'
 import type { CloseWindowAction } from './types'
 
+export type { CloseWindowAction } from './types'
+
 export function shouldShowCloseWindowDialog(closeBehavior: CloseBehavior) {
   return closeBehavior === 'ask'
 }

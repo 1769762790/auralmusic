@@ -9,6 +9,12 @@ import type {
 } from './types'
 
 export { applyAudioOutputDevice, DEFAULT_AUDIO_OUTPUT_DEVICE_ID }
+export type {
+  AudioOutputDeviceOption,
+  AudioOutputDeviceQueryResult,
+  AudioOutputDeviceQueryStatus,
+  WindowWithAudioContext,
+} from './types'
 
 function getDeviceFallbackLabel(device: MediaDeviceInfo, index: number) {
   if (device.deviceId === DEFAULT_AUDIO_OUTPUT_DEVICE_ID) {

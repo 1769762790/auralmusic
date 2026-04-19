@@ -1,5 +1,7 @@
 import type { SystemFontQueryResult } from './types'
 
+export type { SystemFontQueryResult, SystemFontQueryStatus } from './types'
+
 const BUILT_IN_FONT_FAMILIES = [
   'Inter Variable',
   'Geist Variable',

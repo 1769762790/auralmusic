@@ -5,7 +5,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
 import { PHONE_PASSWORD_LOGIN_FIELD_NAMES } from '../login-form.schema'
-import type { CredentialLoginPanelProps } from '../login-dialog.model'
+import type { CredentialLoginPanelProps } from '../types'
 
 const [phoneField, passwordField] = PHONE_PASSWORD_LOGIN_FIELD_NAMES
 

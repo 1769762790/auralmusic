@@ -17,6 +17,6 @@ export interface ElectronRuntimeWindow {
   electronWindow?: WindowApi
 }
 
-export interface SinkIdMediaElement extends HTMLMediaElement {
+export type SinkIdMediaElement = HTMLMediaElement & {
   setSinkId?: (sinkId: string) => Promise<void>
 }

@@ -1,11 +1,11 @@
-import type { AuthSession, AuthUser } from '../../../../shared/auth'
+import type { AuthSession, AuthUser } from '../../../shared/auth.ts'
 import type {
   PlaybackAdvanceReason,
   PlaybackMode,
   PlaybackStatus,
   PlaybackTrack,
-} from '../../../../shared/playback.ts'
-import type { AppConfig } from '../../../../shared/config.ts'
+} from '../../../shared/playback.ts'
+import type { AppConfig } from '../../../shared/config.ts'
 import type { LoginMode } from '@/types/api'
 import type { AlbumListItem } from '@/pages/Albums/types'
 import type { ArtistListItem } from '@/pages/Artists/types'

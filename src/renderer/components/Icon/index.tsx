@@ -1,4 +1,3 @@
-import React from 'react'
 import type { LucideIcon, LucideProps } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 

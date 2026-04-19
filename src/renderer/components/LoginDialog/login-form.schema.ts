@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import type { LoginFormMode, LoginFormValues } from './types'
 
+export type { LoginFormValues } from './types'
+
 export const LOGIN_FORM_DEFAULT_VALUES = {
   email: '',
   password: '',

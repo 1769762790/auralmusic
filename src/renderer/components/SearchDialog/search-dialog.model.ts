@@ -6,6 +6,8 @@ import type {
   SearchType,
 } from './types'
 
+export type { SearchResultRowItem, SearchType } from './types'
+
 export const SEARCH_TYPE_CODE_MAP: Record<SearchType, number> = {
   song: 1,
   album: 10,

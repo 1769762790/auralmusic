@@ -8,6 +8,8 @@ import type {
   PlaybackSessionStorageLike,
 } from '@/types/core'
 
+export type { PlaybackSessionSnapshot } from '@/types/core'
+
 export const PLAYBACK_SESSION_STORAGE_KEY = 'auralmusic:playback-session'
 
 function isRecord(value: unknown): value is Record<string, unknown> {

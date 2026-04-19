@@ -5,6 +5,8 @@ import type {
   PlaylistUpdatePayload,
 } from './types'
 
+export type { PlaylistUpdatePayload } from './types'
+
 export function resolvePlaylistDetailMoreActions(
   isOwnPlaylist: boolean
 ): PlaylistDetailMoreAction[] {

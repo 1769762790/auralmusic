@@ -5,3 +5,13 @@ export * from '../player-lyrics.data'
 export * from '../player-lyrics.model'
 export * from '../player-lyrics.service'
 export * from '../player-scene-chrome.model'
+export type {
+  AmllBackgroundState,
+  BuildLyricLinesInput,
+  KaraokeLine,
+  KaraokeSegment,
+  LyricLine,
+  PlayerBackgroundMode,
+  PlayerSceneChromeEvent,
+  PlayerSceneChromeState,
+} from '../types'

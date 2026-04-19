@@ -219,7 +219,7 @@ export const useConfigStore = create<ConfigStoreState>((set, get) => ({
     }
   },
 
-  setConfig: async (key, value) => {
+  setConfig: async <K extends keyof AppConfig>(key: K, value: AppConfig[K]) => {
     const currentConfig = get().config
     const newConfig = { ...currentConfig, [key]: value }
 

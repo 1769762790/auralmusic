@@ -13,10 +13,8 @@ import {
   DialogTitle,
 } from '../ui/dialog'
 import { Field, FieldGroup, FieldLabel } from '../ui/field'
-import {
-  resolveCloseWindowDialogConfig,
-  type CloseWindowAction,
-} from './close-window.model'
+import { resolveCloseWindowDialogConfig } from './close-window.model'
+import type { CloseWindowAction } from './types'
 import type { CloseWindowDialogProps } from './types'
 
 const CloseWindowDialog = ({

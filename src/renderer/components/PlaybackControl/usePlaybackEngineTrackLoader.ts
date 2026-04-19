@@ -46,9 +46,14 @@ export function usePlaybackEngineTrackLoader({
       return
     }
 
+    if (!currentTrack) {
+      return
+    }
+
     let cancelled = false
     const expectedRequestId = requestId
-    const expectedTrackId = currentTrack.id
+    const track = currentTrack
+    const expectedTrackId = track.id
 
     const loadAndPlay = async () => {
       if (usePlaybackStore.getState().shouldAutoPlayOnLoad) {
@@ -59,11 +64,11 @@ export function usePlaybackEngineTrackLoader({
 
       try {
         let result = null
-        const localSourceUrl = currentTrack.sourceUrl?.trim()
+        const localSourceUrl = track.sourceUrl?.trim()
 
         if (localSourceUrl) {
           result = {
-            id: currentTrack.id,
+            id: track.id,
             url: localSourceUrl,
             time: 0,
             br: 0,
@@ -72,7 +77,7 @@ export function usePlaybackEngineTrackLoader({
 
         if (!result) {
           result = await resolvePlaybackSource({
-            track: currentTrack,
+            track,
             config: {
               ...configRef.current,
               quality: qualityRef.current,
@@ -105,7 +110,7 @@ export function usePlaybackEngineTrackLoader({
         let resolvedAudioCacheKey: string | null = null
         if (!localSourceUrl) {
           try {
-            const cacheKey = `audio:${currentTrack.id}:${qualityRef.current}:${result.url}`
+            const cacheKey = `audio:${track.id}:${qualityRef.current}:${result.url}`
             resolvedAudioCacheKey = cacheKey
             const cachedResult = await window.electronCache.resolveAudioSource(
               cacheKey,
@@ -139,7 +144,7 @@ export function usePlaybackEngineTrackLoader({
         )
         await playbackRuntime.loadSource(resolvedAudioUrl)
         currentPlaybackSourceRef.current = {
-          trackId: currentTrack.id,
+          trackId: track.id,
           sourceUrl: result.url,
           loadedUrl: resolvedAudioUrl,
           cacheKey: resolvedAudioCacheKey,
@@ -147,7 +152,7 @@ export function usePlaybackEngineTrackLoader({
         const audio = playbackRuntime.getAudioElement()
         playbackRuntime.setVolume(volumeRef.current / 100)
         playbackRuntime.setPlaybackRate(playbackSpeedRef.current)
-        latestState.setDuration(result.time || currentTrack.duration)
+        latestState.setDuration(result.time || track.duration)
 
         const restoreProgress = latestState.pendingRestoreProgress
         if (restoreProgress > 0) {

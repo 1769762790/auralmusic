@@ -15,6 +15,8 @@ import {
   createLxRuntimeMd5,
   lxRuntimeBufferToString,
 } from '../model/lx-runtime-utils.ts'
+import { installLxScriptCompatGlobals } from '../model/lx-script-compat.ts'
+import { executeLxScript } from '../model/lx-script-executor.ts'
 
 let requestCounter = 0
 let requestHandler:
@@ -173,23 +175,12 @@ async function initializeScript(script: string, scriptInfo: LxScriptInfo) {
   pendingHttpCallbacks.clear()
   requestCounter = 0
   hardenGlobalScope()
+  installLxScriptCompatGlobals(globalThis as Record<string, unknown>)
   ;(globalThis as { lx?: unknown }).lx = createLxApi(scriptInfo, script)
-
-  const sandboxScript = `
-    const globalThisRef = globalThis;
-    const lx = globalThis.lx;
-    ${script}
-    export {};
-  `
-  const scriptUrl = URL.createObjectURL(
-    new Blob([sandboxScript], { type: 'text/javascript' })
-  )
-
-  try {
-    await import(/* @vite-ignore */ scriptUrl)
-  } finally {
-    URL.revokeObjectURL(scriptUrl)
+  const workerScope = globalThis as unknown as Record<string, unknown> & {
+    lx: unknown
   }
+  executeLxScript(script, workerScope)
 }
 
 globalThis.onmessage = async (event: MessageEvent<HostMessage>) => {

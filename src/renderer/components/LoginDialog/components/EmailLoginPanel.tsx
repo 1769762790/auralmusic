@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 
-import type { CredentialLoginPanelProps } from '../login-dialog.model'
+import type { CredentialLoginPanelProps } from '../types'
 
 const EmailLoginPanel = ({
   errors,

@@ -5,8 +5,8 @@ import {
   createPlaybackSessionSnapshot,
   readPlaybackSessionSnapshot,
   writePlaybackSessionSnapshot,
-  type PlaybackSessionSnapshot,
 } from '@/stores/playback-session-storage'
+import type { PlaybackSessionSnapshot } from '@/types/core'
 import { usePlaybackStore } from '@/stores/playback-store'
 
 const PLAYBACK_SESSION_PERSIST_INTERVAL = 2000
