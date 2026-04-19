@@ -1,5 +1,6 @@
 import type {
   LxInitedData,
+  LxHttpRequestOptions,
   LxMusicInfo,
   LxQuality,
   LxScriptRequestPayload,
@@ -64,7 +65,7 @@ export function readLxResponseBodyUrl(body: unknown) {
 }
 
 export function createLxFetchRequestOptions(
-  options: RequestInit = {},
+  options: LxHttpRequestOptions = {},
   signal: AbortSignal
 ): RequestInit {
   return {
@@ -83,7 +84,7 @@ export function createLxFetchRequestOptions(
 
 async function requestLxHttpWithRendererFetch(
   url: string,
-  options: RequestInit = {},
+  options: LxHttpRequestOptions = {},
   timeoutMs = 30000
 ) {
   const controller = new AbortController()
@@ -97,6 +98,7 @@ async function requestLxHttpWithRendererFetch(
       createLxFetchRequestOptions(options, controller.signal)
     )
     const rawBody = await response.text()
+    const raw = new TextEncoder().encode(rawBody)
     let body: unknown = rawBody
 
     try {
@@ -107,7 +109,10 @@ async function requestLxHttpWithRendererFetch(
 
     return {
       statusCode: response.status,
+      statusMessage: response.statusText,
       headers: Object.fromEntries(response.headers.entries()),
+      bytes: raw.byteLength,
+      raw,
       body,
     }
   } finally {

@@ -2,6 +2,8 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { IPC_CHANNELS } from '../../shared/ipc/index.ts'
 import type {
   ImportedLxMusicSource,
+  LxHttpRequestOptions,
+  LxHttpRequestResponse,
   LxInitedData,
   LxMusicSourceScriptDraft,
 } from '../../shared/lx-music-source'
@@ -17,12 +19,8 @@ export type MusicSourceApi = {
   removeLxScript: (id: string) => Promise<void>
   lxHttpRequest: (
     url: string,
-    options?: RequestInit
-  ) => Promise<{
-    statusCode: number
-    headers: Record<string, string>
-    body: unknown
-  }>
+    options?: LxHttpRequestOptions
+  ) => Promise<LxHttpRequestResponse>
 }
 
 const musicSourceApi: MusicSourceApi = {

@@ -7,9 +7,15 @@ import {
   saveLxMusicSourceScript,
   selectLxMusicSourceScript,
 } from '../music-source/lx-script-store'
-import type { LxInitedData } from '../../shared/lx-music-source'
-import type { LxMusicSourceScriptDraft } from '../../shared/lx-music-source'
-import { requestLxHttpWithElectronNet } from '../music-source/lx-http-request'
+import type {
+  LxHttpRequestOptions,
+  LxInitedData,
+  LxMusicSourceScriptDraft,
+} from '../../shared/lx-music-source'
+import {
+  requestLxHttpWithElectronNet,
+  requestLxHttpWithNode,
+} from '../music-source/lx-http-request'
 
 const { ipcMain } = electron
 
@@ -36,8 +42,16 @@ export function registerMusicSourceIpc() {
 
   ipcMain.handle(
     IPC_CHANNELS.MUSIC_SOURCE.LX_HTTP_REQUEST,
-    async (_event, url: string, options: RequestInit = {}) => {
-      return requestLxHttpWithElectronNet(electron.net, url, options)
+    async (_event, url: string, options: LxHttpRequestOptions = {}) => {
+      try {
+        return await requestLxHttpWithElectronNet(electron.net, url, options)
+      } catch (error) {
+        console.warn(
+          '[MusicSourceIPC] electron.net LX request failed, trying node http fallback',
+          error
+        )
+        return requestLxHttpWithNode(url, options)
+      }
     }
   )
 

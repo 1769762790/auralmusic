@@ -26,6 +26,9 @@ test('formatLxInterval renders mm:ss from milliseconds', () => {
 test('toLxMusicInfo maps playback tracks into lx music info', () => {
   assert.deepEqual(toLxMusicInfo(track), {
     songmid: 1001,
+    hash: '1001',
+    strMediaMid: '1001',
+    copyrightId: '1001',
     name: 'Example Song',
     singer: 'Artist A / Artist B',
     album: 'Example Album',

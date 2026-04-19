@@ -41,8 +41,13 @@ export function formatLxInterval(durationMs: number) {
 }
 
 export function toLxMusicInfo(track: PlaybackTrack): LxMusicInfo {
+  const trackId = String(track.id)
+
   return {
     songmid: track.id,
+    hash: trackId,
+    strMediaMid: trackId,
+    copyrightId: trackId,
     name: track.name,
     singer: track.artistNames,
     album: track.albumName,

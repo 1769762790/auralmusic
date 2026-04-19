@@ -9,6 +9,12 @@ import type {
   LxRequestCallback,
   WorkerMessage,
 } from '@/types/core'
+import {
+  createLxCurrentScriptInfo,
+  createLxRuntimeBuffer,
+  createLxRuntimeMd5,
+  lxRuntimeBufferToString,
+} from '../model/lx-runtime-utils.ts'
 
 let requestCounter = 0
 let requestHandler:
@@ -44,7 +50,7 @@ function hardenGlobalScope() {
   })
 }
 
-function createLxApi(scriptInfo: LxScriptInfo) {
+function createLxApi(scriptInfo: LxScriptInfo, rawScript: string) {
   const unavailable = (name: string) => {
     return () => {
       throw new Error(`Current worker does not support lx.utils.${name}`)
@@ -59,7 +65,7 @@ function createLxApi(scriptInfo: LxScriptInfo) {
       versionNum: 208,
       locale: 'zh-cn',
     },
-    currentScriptInfo: scriptInfo,
+    currentScriptInfo: createLxCurrentScriptInfo(scriptInfo, rawScript),
     EVENT_NAMES: {
       inited: 'inited',
       request: 'request',
@@ -110,19 +116,11 @@ function createLxApi(scriptInfo: LxScriptInfo) {
     },
     utils: {
       buffer: {
-        from: (data: string | ArrayBuffer | ArrayLike<number>) => {
-          if (typeof data === 'string') {
-            return new TextEncoder().encode(data)
-          }
-
-          return new Uint8Array(data)
-        },
-        bufToString: (buffer: Uint8Array, encoding?: string) => {
-          return new TextDecoder(encoding || 'utf-8').decode(buffer)
-        },
+        from: createLxRuntimeBuffer,
+        bufToString: lxRuntimeBufferToString,
       },
       crypto: {
-        md5: unavailable('crypto.md5'),
+        md5: createLxRuntimeMd5,
         sha1: unavailable('crypto.sha1'),
         sha256: unavailable('crypto.sha256'),
         randomBytes: unavailable('crypto.randomBytes'),
@@ -175,7 +173,7 @@ async function initializeScript(script: string, scriptInfo: LxScriptInfo) {
   pendingHttpCallbacks.clear()
   requestCounter = 0
   hardenGlobalScope()
-  ;(globalThis as { lx?: unknown }).lx = createLxApi(scriptInfo)
+  ;(globalThis as { lx?: unknown }).lx = createLxApi(scriptInfo, script)
 
   const sandboxScript = `
     const globalThisRef = globalThis;

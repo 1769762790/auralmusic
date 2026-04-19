@@ -4,6 +4,7 @@ export type LxScriptInfo = {
   version?: string
   author?: string
   homepage?: string
+  rawScript?: string
 }
 
 export type LxQuality = '128k' | '320k' | 'flac' | 'flac24bit'
@@ -21,6 +22,9 @@ export type LxSourceConfig = {
 
 export type LxMusicInfo = {
   songmid: string | number
+  hash?: string
+  strMediaMid?: string
+  copyrightId?: string
   name: string
   singer: string
   album: string
@@ -67,6 +71,21 @@ export type ImportedLxMusicSource = LxScriptInfo & {
   sources?: string[]
   createdAt: number
   updatedAt: number
+}
+
+export type LxHttpRequestOptions = RequestInit & {
+  timeout?: number
+  form?: Record<string, string | number | boolean | null | undefined>
+  formData?: Record<string, string | Blob>
+}
+
+export type LxHttpRequestResponse = {
+  statusCode: number
+  statusMessage: string
+  headers: Record<string, string>
+  bytes: number
+  raw: Uint8Array
+  body: unknown
 }
 
 const UNKNOWN_SOURCE_NAME = '未知音源'
