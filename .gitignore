@@ -10,6 +10,6 @@ out
 
 coverage
 .worktrees/
-.docs/superpowers/
+docs/
 .codex/
 .trae/
