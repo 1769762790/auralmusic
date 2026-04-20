@@ -1,234 +1,248 @@
-# AuralMusic
+# Aural Music
 
-AuralMusic is an Electron desktop app built with Vite, React, TypeScript, and Tailwind CSS. It uses Netease Cloud Music APIs to render charts and playlists, with a modern component-driven architecture and a strong focus on developer workflow.
+<p align="center">
+  <img src="./build/icons/256x256.png" alt="Aural Music Logo" width="128" height="128">
+</p>
 
-## 🚀 Features
+<p align="center">
+  <a href="https://github.com/auralmusic/auralmusic"><img src="https://img.shields.io/github/stars/auralmusic/auralmusic?style=for-the-badge" alt="GitHub Stars"></a>
+  <a href="https://github.com/auralmusic/auralmusic/releases"><img src="https://img.shields.io/github/v/release/auralmusic/auralmusic?style=for-the-badge" alt="Latest Release"></a>
+  <a href="https://github.com/auralmusic/auralmusic/blob/main/LICENSE"><img src="https://img.shields.io/github/license/auralmusic/auralmusic?style=for-the-badge" alt="License"></a>
+</p>
 
-- Electron + Vite for fast desktop development
-- React 19 + TypeScript
-- Tailwind CSS + shadcn/ui style utilities
-- Conventional commits with Commitizen and Commitlint
-- Git hooks via Husky and lint-staged
-- Cross-platform packaging support via electron-builder
+<p align="center">
+  <strong>A modern, cross-platform music player built with Electron, React, and TypeScript</strong>
+</p>
 
-## 🧰 Tech Stack
+## 🎵 功能特点
 
-- `electron-vite` for Electron + Vite integration
-- `react` / `react-dom`
-- `typescript`
-- `tailwindcss` / `@tailwindcss/vite`
-- `eslint` / `prettier`
-- `axios` for request handling
-- `electron-builder` for native builds
-- `commitizen` + `cz-git` + `commitlint`
-- `release-it` for changelog and release automation
+### 界面预览
 
-## 📦 Getting Started
+<p align="center">
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; max-width: 1200px; margin: 0 auto;">
+    <img src="./docs/screenshots/home.png" alt="Home Page" width="23%" style="border-radius: 8px; object-fit: cover;">
+    <img src="./docs/screenshots/rank.png" alt="Rank Page" width="23%" style="border-radius: 8px; object-fit: cover;">
+    <img src="./docs/screenshots/artist.png" alt="Artist Page" width="23%" style="border-radius: 8px; object-fit: cover;">
+    <img src="./docs/screenshots/player.png" alt="Player Page" width="23%" style="border-radius: 8px; object-fit: cover;">
+  </div>
+</p>
+
+### 核心功能
+
+- 🎧 高品质音乐播放
+- 📱 优雅的用户界面
+- 🌙 深色/浅色主题
+- 🔍 智能搜索
+- 📋 播放列表管理
+- 💾 音乐下载
+- 🎨 3D 视觉效果
+- 🎤 歌词显示
+- ⚡ 全局快捷键
+- 📦 多音乐源支持
+
+### 高级功能
+
+- 🎚️ 均衡器设置
+- 🌐 网络音乐源
+- 📁 本地音乐库
+- 🔄 播放历史记录
+- 🎯 个性化推荐
+- 📱 响应式设计
+- 🛠️ 丰富的设置选项
+- 📄 歌曲详情页
+- 🎵 专辑和艺术家浏览
+- 🏆 音乐排行榜
+
+## 🛠️ 技术栈
+
+### 前端
+
+- **框架**: React 19.1.0
+- **路由**: React Router 7.14.0
+- **状态管理**: Zustand 5.0.12
+- **样式**: Tailwind CSS 4.2.2
+- **UI组件**: Shadcn UI 4.1.2
+- **构建工具**: Vite 6.0.0
+
+### 桌面应用
+
+- **框架**: Electron 41.1.1
+- **构建工具**: Electron Vite 5.0.0
+- **打包工具**: Electron Builder
+
+### 音频处理
+
+- **播放器**: Plyr React 6.0.0
+- **音频分析**: Web Audio API
+- **3D效果**: Three.js 0.183.2 + React Three Fiber 9.5.0
+
+### 网络请求
+
+- **HTTP客户端**: Axios 1.14.0
+- **音乐API**: Netease Cloud Music API 4.31.0
+
+### 开发工具
+
+- **语言**: TypeScript 5.8.3
+- **代码质量**: ESLint + Prettier
+- **测试**: 单元测试
+- **CI/CD**: GitHub Actions
+
+## 📦 安装和运行
+
+### 前提条件
+
+- Node.js 18.0.0 或更高版本
+- pnpm 8.0.0 或更高版本
+
+### 安装
 
 ```bash
+# 克隆仓库
+git clone https://github.com/auralmusic/auralmusic.git
+
+# 进入目录
+cd auralmusic
+
+# 安装依赖
 pnpm install
-pnpm dev
 ```
 
-Then open the app from the running Electron process.
+### 开发模式
 
-## 🧪 Common Scripts
+```bash
+# 启动开发服务器
+pnpm run dev
+```
 
-| Command            | Description                                            |
-| ------------------ | ------------------------------------------------------ |
-| `pnpm dev`         | Run Electron + Vite in development mode                |
-| `pnpm dev:web`     | Run Vite web-only development server                   |
-| `pnpm build`       | Compile TypeScript and build the Electron app          |
-| `pnpm build:win`   | Build Windows installer                                |
-| `pnpm build:mac`   | Build macOS app                                        |
-| `pnpm build:linux` | Build Linux app                                        |
-| `pnpm preview`     | Preview the production build locally                   |
-| `pnpm lint`        | Run ESLint across the repository                       |
-| `pnpm lint:fix`    | Fix lint issues automatically                          |
-| `pnpm format`      | Format code with Prettier                              |
-| `pnpm check`       | Run lint and build checks                              |
-| `pnpm commit`      | Create a conventional commit using Commitizen          |
-| `pnpm release`     | Run `release-it` to generate changelog and tag release |
+### 构建
 
-## 📁 Project Structure
+```bash
+# 构建所有平台
+pnpm run build
 
-```text
+# 构建特定平台
+pnpm run build:win    # Windows
+pnpm run build:mac    # macOS
+pnpm run build:linux  # Linux
+```
+
+## 📁 项目结构
+
+```
 src/
-  main/             # Electron main process code
-  preload/          # Preload scripts exposed to renderer
-  renderer/         # React renderer app
-    api/            # API service layer
-    app/            # UI application shell and layout
-    components/     # Shared UI components and feature blocks
-    layout/         # Page and layout wrappers
-    pages/          # Route pages and feature pages
-    router/         # React Router configuration
-    styles/         # Global styles and Tailwind entry
+├── main/          # 主进程代码
+│   ├── app/       # 应用核心逻辑
+│   ├── auth/      # 认证管理
+│   ├── cache/     # 缓存服务
+│   ├── config/    # 配置管理
+│   ├── download/  # 下载服务
+│   ├── ipc/       # 进程间通信
+│   ├── music-source/ # 音乐源管理
+│   ├── window/    # 窗口管理
+│   └── index.ts   # 主入口
+├── preload/       # 预加载脚本
+│   ├── api/       # API 暴露
+│   └── index.ts   # 预加载入口
+├── renderer/      # 渲染进程代码
+│   ├── api/       # API 调用
+│   ├── components/ # UI 组件
+│   ├── pages/     # 页面
+│   ├── router/    # 路由
+│   ├── services/  # 业务服务
+│   ├── stores/    # 状态管理
+│   └── main.tsx   # 渲染入口
+└── shared/        # 共享代码
+    ├── ipc/       # IPC 类型定义
+    └── music-source/ # 音乐源相关
 ```
 
-### Key directories
+## 🎯 核心功能
 
-- `src/main/` — Electron entry and native window logic
-- `src/preload/` — Secure bridge between Electron and renderer
-- `src/renderer/main.tsx` — React app bootstrap
-- `src/renderer/pages/Charts/` — Charts page and ranking components
-- `src/renderer/components/ui/` — reusable UI helpers and primitives
+### 音乐播放
 
-## 🧩 Engineering Conventions
+- 支持多种音频格式
+- 高品质音频播放
+- 播放控制（播放/暂停/上一首/下一首）
+- 播放队列管理
+- 音量控制和静音
 
-### Coding style
+### 音乐源
 
-- Use TypeScript for all React components and services
-- Prefer `const` / `let` over `var`
-- Keep component props typed with interfaces or type aliases
-- Keep JSX clean by extracting reusable fragments into small components
-- Favor `useEffect` + `async/await` for data fetching
+- 网易云音乐 API
+- LX 音乐源
 
-### Formatting & linting
+### 下载管理
 
-- Run `pnpm format` before commits
-- Run `pnpm lint` to catch issues early
-- `lint-staged` and Husky are configured to format and lint changed files automatically
+- 多品质下载
+- 下载队列管理
+- 下载历史记录
+- 自定义下载目录
 
-### Commit workflow
+### 用户界面
 
-- Use `pnpm commit` to create commits following Conventional Commits
-- Commit message format should be:
-  - `feat: ...`
-  - `fix: ...`
-  - `chore: ...`
-  - `docs: ...`
-  - `refactor: ...`
+- 响应式设计
+- 3D 视觉效果
+- 动态歌词显示
+- 主题切换
+- 播放状态显示
 
-### Branching / Pull Requests
+### 设置选项
 
-- Use feature branches named like `feat/<name>` or `fix/<name>`
-- Keep PRs small and focused on a single feature or bug fix
-- Include a short description and testing notes in PR description
+- 音频设置
+- 下载设置
+- 快捷键设置
+- 系统设置
+- 音乐源设置
 
-## 🧪 Development Notes
+## ⚙️ 配置说明
 
-### UI and component styling
+### 主要配置项
 
-- Tailwind classes are used throughout the renderer UI
-- Shared UI primitives live under `src/renderer/components/ui`
-- Page-specific components are organized inside `src/renderer/pages`
+- **audioOutputDeviceId**: 音频输出设备 ID
+- **autoStartEnabled**: 开机自启
+- **closeBehavior**: 关闭行为（询问/最小化到托盘/直接退出）
+- **downloadDir**: 下载目录
+- **downloadQuality**: 下载音质
+- **eqEnabled**: 均衡器启用状态
+- **musicSourceEnabled**: 音乐源启用状态
+- **quality**: 播放音质
+- **theme**: 主题设置
 
-### API layer
+### 配置文件位置
 
-- Requests are centralized in `src/renderer/api`
-- Keep API calls thin and return typed responses where possible
-- Avoid leaking UI concerns into service functions
+- Windows: `%APPDATA%\auralmusic\config.json`
+- macOS: `~/Library/Application Support/auralmusic/config.json`
+- Linux: `~/.config/auralmusic/config.json`
 
-### Electron considerations
+## 🤝 贡献指南
 
-- Keep main process code isolated in `src/main`
-- Use preload scripts for safe renderer access if needed
-- Avoid importing React or renderer-only modules in main/preload files
+### 开发流程
 
-## 🚧 Packaging
+1. Fork 仓库
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开 Pull Request
 
-To build the production Electron app:
+### 代码规范
 
-```bash
-pnpm build
-```
+- 使用 TypeScript
+- 遵循 ESLint 规则
+- 使用 Prettier 格式化代码
+- 提交信息使用语义化格式
 
-To build platform-specific installers:
+## 📄 许可证
 
-```bash
-pnpm build:win
-pnpm build:mac
-pnpm build:linux
-```
+本项目使用 [MIT 许可证](LICENSE)。
 
-## ✅ Recommended Workflow
+## 📞 联系方式
 
-1. `pnpm install`
-2. `pnpm dev`
-3. Work on one feature or fix at a time
-4. `pnpm lint` and `pnpm format`
-5. `pnpm commit`
-
-## 📌 Notes
-
-- This repo uses `pnpm` as the package manager
-- The project is private by default (`private: true`)
-- `electron-builder` handles native app packaging
+- **GitHub**: [auralmusic/auralmusic](https://github.com/auralmusic/auralmusic)
+- **Issues**: [Bug 报告和功能请求](https://github.com/auralmusic/auralmusic/issues)
 
 ---
 
-If you want, I can also add a short `CONTRIBUTING.md` for team collaboration rules.
-
-## Playback / Download Source Resolution
-
-### Runtime rules
-
-- Local file playback always uses `sourceUrl` directly and does not enter online resolver dispatch.
-- If `musicSourceEnabled = false`, online playback and download only use the `official` family.
-- If `musicSourceEnabled = true`, resolver order is decided by login state:
-  - Authenticated: `official -> builtinUnblock -> lxMusic -> customApi`
-  - Unauthenticated: `builtinUnblock -> lxMusic -> customApi -> official`
-- `builtinUnblock` is the enhanced API auto-unlock family. It participates whenever `musicSourceEnabled = true`.
-- `lxMusic` only participates when `luoxueSourceEnabled = true`.
-- `customApi` only enters the order when `customMusicApiEnabled = true` and `customMusicApiUrl` is non-empty.
-- `musicSourceProviders` is now a deprecated compatibility field. It no longer controls resolver behavior and is cleared when source settings are saved.
-
-### Playback / Download Comparison
-
-| Scene           | Login           | `musicSourceEnabled` | `luoxueSourceEnabled` | `customApi` enabled + URL | Resolver family order                                | Actual family behavior                                                                |
-| --------------- | --------------- | -------------------- | --------------------- | ------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Local playback  | Any             | Any                  | Any                   | Any                       | No resolver dispatch                                 | `sourceUrl` direct playback                                                           |
-| Online playback | Any             | `false`              | Any                   | Any                       | `official`                                           | `/song/url/v1?unblock=false`                                                          |
-| Online playback | Authenticated   | `true`               | `false`               | Off / empty               | `official -> builtinUnblock`                         | `official: /song/url/v1?unblock=false`; `builtinUnblock: /song/url/v1?unblock=true`   |
-| Online playback | Authenticated   | `true`               | `true`                | Off / empty               | `official -> builtinUnblock -> lxMusic`              | `lxMusic` uses the active LX script                                                   |
-| Online playback | Authenticated   | `true`               | `false`               | On + non-empty            | `official -> builtinUnblock -> customApi`            | `customApi` currently returns `null`                                                  |
-| Online playback | Authenticated   | `true`               | `true`                | On + non-empty            | `official -> builtinUnblock -> lxMusic -> customApi` | Same as above                                                                         |
-| Online playback | Unauthenticated | `true`               | `false`               | Off / empty               | `builtinUnblock -> official`                         | `builtinUnblock` runs before official                                                 |
-| Online playback | Unauthenticated | `true`               | `true`                | Off / empty               | `builtinUnblock -> lxMusic -> official`              | Same as above                                                                         |
-| Online playback | Unauthenticated | `true`               | `false`               | On + non-empty            | `builtinUnblock -> customApi -> official`            | `customApi` currently returns `null`                                                  |
-| Online playback | Unauthenticated | `true`               | `true`                | On + non-empty            | `builtinUnblock -> lxMusic -> customApi -> official` | Same as above                                                                         |
-| Online download | Any             | `false`              | Any                   | Any                       | `official`                                           | `/song/download/url/v1`, then `/song/url/v1?unblock=false`                            |
-| Online download | Authenticated   | `true`               | `false`               | Off / empty               | `official -> builtinUnblock`                         | `official: download url -> playback url(false)`; `builtinUnblock: playback url(true)` |
-| Online download | Authenticated   | `true`               | `true`                | Off / empty               | `official -> builtinUnblock -> lxMusic`              | `lxMusic` uses LX resolution                                                          |
-| Online download | Authenticated   | `true`               | `false`               | On + non-empty            | `official -> builtinUnblock -> customApi`            | `customApi` currently returns `null`                                                  |
-| Online download | Authenticated   | `true`               | `true`                | On + non-empty            | `official -> builtinUnblock -> lxMusic -> customApi` | Same as above                                                                         |
-| Online download | Unauthenticated | `true`               | `false`               | Off / empty               | `builtinUnblock -> official`                         | `builtinUnblock` runs before official family                                          |
-| Online download | Unauthenticated | `true`               | `true`                | Off / empty               | `builtinUnblock -> lxMusic -> official`              | Same as above                                                                         |
-| Online download | Unauthenticated | `true`               | `false`               | On + non-empty            | `builtinUnblock -> customApi -> official`            | `customApi` currently returns `null`                                                  |
-| Online download | Unauthenticated | `true`               | `true`                | On + non-empty            | `builtinUnblock -> lxMusic -> customApi -> official` | Same as above                                                                         |
-
-### Current source meanings
-
-- `official`
-  - Playback: `/song/url/v1?unblock=false`
-  - Download: `/song/download/url/v1`, then `/song/url/v1?unblock=false`
-- `builtinUnblock`
-  - Playback and download both use `/song/url/v1?unblock=true`
-  - This family is backed by the enhanced API auto-unlock flow rather than per-provider selection
-- `lxMusic`
-  - Separate resolver family
-  - Internal source selection is still handled by the LX script runtime
-- `customApi`
-  - Participates in ordering when enabled
-  - Current phase-1 implementation always returns `null`
-
-接口地址 : /register/anonimous
-
-播放私人fm时，底部控制栏切歌和私人FM卡片切哥逻辑不一致
-
-MV 播放器全屏按钮失效
-
-基础设置
-
-语言设置（切换中/英/日）默认中文
-
-系统设置
-开机自启：开机自动启动播放器 ---- 待测试
-
-bug: 歌曲播放到结尾，播放器整体会上移动
-
-F:\code-demo\AuralMusic\aural-music-downloads.json
-F:\code-demo\AuralMusic\aural-music-config.json
-F:\code-demo\AuralMusic\aural-music-auth.json
-当前系统中，这三块信息存储的方式还是项目中的json文件，梳理使用better-sqlite3 + zustand 方案
+<p align="center">
+  享受音乐，享受生活 🎵
+</p>
