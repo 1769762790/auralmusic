@@ -30,7 +30,6 @@ import {
   normalizeArtistProfile,
   normalizeArtistTopSongs,
   normalizeSimilarArtists,
-  resolveArtistAlbumImages,
   resolveArtistMvImages,
   resolveArtistProfileImage,
   resolveSimilarArtistImages,
@@ -96,13 +95,9 @@ const ArtistDetail = () => {
 
       const response = await getArtistAlbums({ id: artistId, limit, offset })
       const albums = normalizeArtistAlbums(response)
-      const resolvedAlbums = await resolveArtistAlbumImages(
-        window.electronCache,
-        albums
-      )
 
       return {
-        list: resolvedAlbums,
+        list: albums,
         hasMore: albums.length >= limit,
       }
     },

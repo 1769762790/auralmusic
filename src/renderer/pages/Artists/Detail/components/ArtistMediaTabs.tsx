@@ -1,10 +1,12 @@
 import { Play } from 'lucide-react'
 import ArtistCover from '@/components/ArtistCover'
+import DeferredCachedImage from '@/components/DeferredCachedImage'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatArtistPublishDate } from '@/pages/Artists/artist-detail.model'
 import { imageSizes, resizeImageUrl } from '@/lib/image-url'
 import { formatPlayCount } from '@/lib/utils'
 import type { ArtistMediaTabsProps } from '../types'
+import { buildArtistAlbumImageCacheKey } from '../artist-image-cache'
 
 const ArtistMediaTabs = ({
   albums,
@@ -62,7 +64,8 @@ const ArtistMediaTabs = ({
                     onClick={() => onToAlbumDetail(album.id)}
                   >
                     <div className='relative overflow-hidden rounded-[20px]'>
-                      <img
+                      <DeferredCachedImage
+                        cacheKey={buildArtistAlbumImageCacheKey(album.id)}
                         src={resizeImageUrl(
                           album.picUrl,
                           imageSizes.cardCover.width,
@@ -70,8 +73,6 @@ const ArtistMediaTabs = ({
                         )}
                         alt={album.name}
                         className='aspect-square size-full object-cover'
-                        loading='lazy'
-                        decoding='async'
                         draggable={false}
                       />
                     </div>
