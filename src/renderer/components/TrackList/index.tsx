@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Virtuoso } from 'react-virtuoso'
 
 import { usePlaybackStore } from '@/stores/playback-store'
@@ -18,17 +18,30 @@ const TrackList = ({
   hasMore = false,
   loading = false,
   loadingText = '正在加载更多...',
+  playbackQueueKey,
   onLikeChangeSuccess,
   onEndReached,
 }: TrackListProps) => {
   const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
   const appendToQueue = usePlaybackStore(state => state.appendToQueue)
+  const syncQueueFromSource = usePlaybackStore(
+    state => state.syncQueueFromSource
+  )
   const currentTrackId = usePlaybackStore(state => state.currentTrack?.id)
   const playbackStatus = usePlaybackStore(state => state.status)
   const playbackQueue = useMemo(
     () => data.map(item => toPlaybackTrack(item, coverUrl)),
     [coverUrl, data]
   )
+
+  useEffect(() => {
+    if (!playbackQueueKey || playbackQueue.length === 0) {
+      return
+    }
+
+    syncQueueFromSource(playbackQueueKey, playbackQueue)
+  }, [playbackQueue, playbackQueueKey, syncQueueFromSource])
+
   const footerText = getTrackListFooterText({
     itemCount: data.length,
     loading,
@@ -78,7 +91,9 @@ const TrackList = ({
           coverUrl={coverUrl}
           isActive={item.id === currentTrackId}
           isPlaying={item.id === currentTrackId && playbackStatus === 'playing'}
-          onPlay={() => playQueueFromIndex(playbackQueue, index)}
+          onPlay={() =>
+            playQueueFromIndex(playbackQueue, index, playbackQueueKey)
+          }
           onAddToQueue={() => appendToQueue([playbackQueue[index]])}
           onLikeChangeSuccess={onLikeChangeSuccess}
         />

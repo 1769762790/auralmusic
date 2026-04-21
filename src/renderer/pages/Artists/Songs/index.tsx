@@ -42,6 +42,7 @@ const ArtistSongs = () => {
 
   const { id } = useParams()
   const artistId = Number(id)
+  const playbackQueueKey = artistId ? `artist-songs:${artistId}:hot` : ''
   const [error, setError] = useState('')
   const [isInitialLoading, setIsInitialLoading] = useState(true)
 
@@ -149,6 +150,7 @@ const ArtistSongs = () => {
 
       <TrackList
         data={songs}
+        playbackQueueKey={playbackQueueKey}
         onEndReached={() => void loadMore()}
         hasMore={hasMore}
         loading={loading && !isInitialLoading}

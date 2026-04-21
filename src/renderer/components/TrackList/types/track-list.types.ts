@@ -23,6 +23,7 @@ export interface TrackListProps {
   hasMore?: boolean
   loading?: boolean
   loadingText?: string
+  playbackQueueKey?: string
   onLikeChangeSuccess?: (songId: number, nextLiked: boolean) => void
   onEndReached?: () => void
 }

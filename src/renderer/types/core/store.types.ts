@@ -172,6 +172,7 @@ export type PlaybackSessionStorageLike = Pick<
 
 export interface PlaybackStoreState {
   queue: PlaybackTrack[]
+  queueSourceKey: string | null
   currentIndex: number
   currentTrack: PlaybackTrack | null
   playbackMode: PlaybackMode
@@ -189,8 +190,13 @@ export interface PlaybackStoreState {
   seekRequestId: number
   seekPosition: number
   isPlayerSceneOpen: boolean
-  playQueueFromIndex: (tracks: PlaybackTrack[], startIndex: number) => void
+  playQueueFromIndex: (
+    tracks: PlaybackTrack[],
+    startIndex: number,
+    sourceKey?: string | null
+  ) => void
   appendToQueue: (tracks: PlaybackTrack[]) => void
+  syncQueueFromSource: (sourceKey: string, tracks: PlaybackTrack[]) => void
   togglePlay: () => void
   setPlaybackMode: (mode: PlaybackMode) => void
   playNext: (reason?: PlaybackAdvanceReason) => boolean
