@@ -1,15 +1,5 @@
 # Changelog
 
-## [1.1.0](https://github.com/1769762790/auralmusic/compare/v1.0.0...v1.1.0) (2026-04-21)
-
-### Features
-
-- add app updater flow ([19ab25c](https://github.com/1769762790/auralmusic/commit/19ab25cb9e38af156515af9ffa8590e35538ed4b))
-
-### Bug Fixes
-
-- fix gh script ([914b7fb](https://github.com/1769762790/auralmusic/commit/914b7fb8543d5abe6793ff23e3c106861d9951ec))
-
 All notable changes to this project will be documented in this file.
 
 ## [1.0.0] - 2026-04-20
