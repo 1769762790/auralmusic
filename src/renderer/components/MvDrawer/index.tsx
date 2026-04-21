@@ -9,6 +9,7 @@ import {
   normalizeMvPlayback,
 } from '@/pages/Mv/mv-detail.model'
 import { useMvDrawerStore } from '@/stores/mv-drawer-store'
+import { usePlaybackStore } from '@/stores/playback-store'
 import { cn } from '@/lib/utils'
 import {
   MV_DRAWER_INITIAL_PLAYBACK_STATE,
@@ -23,6 +24,8 @@ const MvDrawer = () => {
   const mvId = useMvDrawerStore(state => state.mvId)
   const setOpen = useMvDrawerStore(state => state.setOpen)
   const closeDrawer = useMvDrawerStore(state => state.closeDrawer)
+  const playbackStatus = usePlaybackStore(state => state.status)
+  const pausePlayback = usePlaybackStore(state => state.markPlaybackPaused)
   const [state, setState] = useState(MV_DRAWER_INITIAL_STATE)
   const [playbackState, setPlaybackState] = useState(
     MV_DRAWER_INITIAL_PLAYBACK_STATE
@@ -40,6 +43,10 @@ const MvDrawer = () => {
       setDragProgress(null)
       lastVolumeRef.current = MV_DRAWER_INITIAL_PLAYBACK_STATE.volume
       return
+    }
+
+    if (playbackStatus === 'playing' || playbackStatus === 'loading') {
+      pausePlayback()
     }
 
     let isActive = true
@@ -100,7 +107,7 @@ const MvDrawer = () => {
     return () => {
       isActive = false
     }
-  }, [mvId, open])
+  }, [mvId, open, pausePlayback, playbackStatus])
 
   const videoUrl = state.playback?.url || ''
   const canPlay = Boolean(state.hero && videoUrl)

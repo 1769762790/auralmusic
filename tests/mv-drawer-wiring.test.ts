@@ -18,6 +18,17 @@ const mvRouteSource = readFileSync(
   new URL('../src/renderer/pages/Mv/Detail/index.tsx', import.meta.url),
   'utf8'
 )
+const searchDialogSource = readFileSync(
+  new URL('../src/renderer/components/SearchDialog/index.tsx', import.meta.url),
+  'utf8'
+)
+const searchModelSource = readFileSync(
+  new URL(
+    '../src/renderer/components/SearchDialog/search-dialog.model.ts',
+    import.meta.url
+  ),
+  'utf8'
+)
 
 test('AppLayout mounts the shared mv drawer shell', () => {
   assert.match(
@@ -72,4 +83,10 @@ test('mv entry points open the shared drawer instead of navigating to mv detail 
   )
 
   assert.match(mvRouteSource, /openMvDrawer|openDrawer/)
+  assert.match(searchDialogSource, /openMvDrawer|openDrawer/)
+  assert.doesNotMatch(
+    searchDialogSource,
+    /navigate\(`\/mv\/|navigate\('\/mv\/|navigate\(\"\/mv\//
+  )
+  assert.doesNotMatch(searchModelSource, /type:\s*'mv'[\s\S]*disabled:\s*true/)
 })
