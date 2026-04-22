@@ -6,4 +6,5 @@ export const useSearchDialogStore = create<SearchDialogStoreState>(set => ({
   setOpen: open => set({ open }),
   openDialog: () => set({ open: true }),
   closeDialog: () => set({ open: false }),
+  toggleDialog: () => set(state => ({ open: !state.open })),
 }))
