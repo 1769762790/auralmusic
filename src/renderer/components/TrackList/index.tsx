@@ -8,7 +8,7 @@ import {
   shouldTriggerTrackListEndReached,
   toPlaybackTrack,
 } from './model'
-import TrackListItem from './TrackListItem'
+import TrackListPlaybackItem from './TrackListPlaybackItem'
 
 const TrackList = ({
   data = [],
@@ -22,13 +22,9 @@ const TrackList = ({
   onLikeChangeSuccess,
   onEndReached,
 }: TrackListProps) => {
-  const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
-  const appendToQueue = usePlaybackStore(state => state.appendToQueue)
   const syncQueueFromSource = usePlaybackStore(
     state => state.syncQueueFromSource
   )
-  const currentTrackId = usePlaybackStore(state => state.currentTrack?.id)
-  const playbackStatus = usePlaybackStore(state => state.status)
   const playbackQueue = useMemo(
     () => data.map(item => toPlaybackTrack(item, coverUrl)),
     [coverUrl, data]
@@ -85,16 +81,13 @@ const TrackList = ({
           ) : null,
       }}
       itemContent={(index, item) => (
-        <TrackListItem
+        <TrackListPlaybackItem
           key={item.id}
           item={item}
+          index={index}
           coverUrl={coverUrl}
-          isActive={item.id === currentTrackId}
-          isPlaying={item.id === currentTrackId && playbackStatus === 'playing'}
-          onPlay={() =>
-            playQueueFromIndex(playbackQueue, index, playbackQueueKey)
-          }
-          onAddToQueue={() => appendToQueue([playbackQueue[index]])}
+          playbackQueue={playbackQueue}
+          playbackQueueKey={playbackQueueKey}
           onLikeChangeSuccess={onLikeChangeSuccess}
         />
       )}

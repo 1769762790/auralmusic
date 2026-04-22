@@ -45,6 +45,8 @@ const Library = () => {
   const [data, setData] = useState<LibraryPageData>(EMPTY_LIBRARY_PAGE_DATA)
   const [isLoading, setIsLoading] = useState(true)
   const [playlistLoading, setPlaylistLoading] = useState(false)
+  const [likedSongsPreviewRefreshing, setLikedSongsPreviewRefreshing] =
+    useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [playlistSource, setPlaylistSource] =
     useState<PlaylistSourceValue>('my')
@@ -94,6 +96,64 @@ const Library = () => {
     [fetchPlaylistCollection]
   )
 
+  const resolveLikedSongsPreview = useCallback(
+    async (playlistResponseData: unknown, bustCache = false) => {
+      const likedPlaylist = resolveLibraryLikedPlaylist(playlistResponseData)
+
+      let likedSongs = EMPTY_LIBRARY_PAGE_DATA.likedSongs
+      let likedSongCount = 0
+      let likedPlaylistCoverUrl = ''
+
+      if (likedPlaylist?.id) {
+        likedSongCount = likedPlaylist.trackCount
+        likedPlaylistCoverUrl = likedPlaylist.coverImgUrl
+
+        try {
+          const detailResponse = await getPlaylistTrackAll(
+            likedPlaylist.id,
+            9,
+            0,
+            bustCache ? Date.now() : undefined
+          )
+          likedSongs = normalizeLibrarySongs(detailResponse.data).slice(0, 9)
+        } catch (fetchError) {
+          console.error('library liked songs fetch failed', fetchError)
+        }
+      }
+
+      return {
+        likedSongs,
+        likedSongCount,
+        likedPlaylistCoverUrl,
+      }
+    },
+    []
+  )
+
+  const refreshLikedSongsPreview = useCallback(
+    async (uid: number, bustCache = false) => {
+      if (!uid) {
+        return
+      }
+
+      try {
+        const playlistResponse = await fetchPlaylistCollection(uid, bustCache)
+        const previewData = await resolveLikedSongsPreview(
+          playlistResponse.data,
+          bustCache
+        )
+
+        setData(current => ({
+          ...current,
+          ...previewData,
+        }))
+      } catch (fetchError) {
+        console.error('library liked songs preview refresh failed', fetchError)
+      }
+    },
+    [fetchPlaylistCollection, resolveLikedSongsPreview]
+  )
+
   const loadBaseData = useCallback(
     async (uid: number, source: PlaylistSourceValue) => {
       setIsLoading(true)
@@ -103,36 +163,17 @@ const Library = () => {
       try {
         const playlistResponse = await fetchPlaylistCollection(uid, true)
 
-        const likedPlaylist = resolveLibraryLikedPlaylist(playlistResponse.data)
         const playlists = normalizeLibraryUserPlaylists(
           playlistResponse.data,
           source
         )
-
-        let likedSongs = EMPTY_LIBRARY_PAGE_DATA.likedSongs
-        let likedSongCount = 0
-        let likedPlaylistCoverUrl = ''
-
-        if (likedPlaylist?.id) {
-          likedSongCount = likedPlaylist.trackCount
-          likedPlaylistCoverUrl = likedPlaylist.coverImgUrl
-
-          try {
-            const detailResponse = await getPlaylistTrackAll(
-              likedPlaylist.id,
-              9,
-              0
-            )
-            likedSongs = normalizeLibrarySongs(detailResponse.data)
-          } catch (fetchError) {
-            console.error('library liked songs fetch failed', fetchError)
-          }
-        }
+        const previewData = await resolveLikedSongsPreview(
+          playlistResponse.data,
+          true
+        )
 
         setData({
-          likedSongs,
-          likedSongCount,
-          likedPlaylistCoverUrl,
+          ...previewData,
           playlists,
         })
 
@@ -146,7 +187,7 @@ const Library = () => {
         setPlaylistLoading(false)
       }
     },
-    [fetchPlaylistCollection]
+    [fetchPlaylistCollection, resolveLikedSongsPreview]
   )
 
   useEffect(() => {
@@ -154,6 +195,7 @@ const Library = () => {
       setData(EMPTY_LIBRARY_PAGE_DATA)
       setIsLoading(false)
       setPlaylistLoading(false)
+      setLikedSongsPreviewRefreshing(false)
       setErrorMessage('')
       setCreateDialogOpen(false)
       setCreatePlaylistSubmitting(false)
@@ -179,27 +221,50 @@ const Library = () => {
     void refreshPlaylists(user.userId, playlistSource)
   }, [isAuthenticated, playlistSource, refreshPlaylists, user?.userId])
 
-  const handlePlaylistSourceChange = (value: PlaylistSourceValue) => {
+  const handlePlaylistSourceChange = useCallback((value: PlaylistSourceValue) => {
     startTransition(() => {
       setPlaylistSource(value)
     })
-  }
+  }, [])
 
-  const handleOpenLikedSongs = () => {
+  const handleOpenLikedSongs = useCallback(() => {
     navigate('/library/liked-songs')
-  }
+  }, [navigate])
 
-  const handleOpenPlaylist = (playlistId: number) => {
+  const handleOpenPlaylist = useCallback((playlistId: number) => {
     if (!isDef(playlistId)) return
     navigate(`/playlist/${playlistId}`)
-  }
+  }, [navigate])
 
-  const handleOpenMv = (mvId: number) => {
+  const handleOpenMv = useCallback((mvId: number) => {
     if (!isDef(mvId)) return
     openMvDrawer(mvId)
-  }
+  }, [openMvDrawer])
 
-  const handleCreatePlaylist = async (payload: CreatePlaylistPayload) => {
+  const handleOpenCreatePlaylist = useCallback(() => {
+    setCreateDialogOpen(true)
+  }, [])
+
+  const handleRefreshLikedSongsPreview = useCallback(
+    (songId: number, _nextLiked: boolean) => {
+      if (!songId || !user?.userId) {
+        return
+      }
+
+      void (async () => {
+        setLikedSongsPreviewRefreshing(true)
+
+        try {
+          await refreshLikedSongsPreview(user.userId, true)
+        } finally {
+          setLikedSongsPreviewRefreshing(false)
+        }
+      })()
+    },
+    [refreshLikedSongsPreview, user?.userId]
+  )
+
+  const handleCreatePlaylist = useCallback(async (payload: CreatePlaylistPayload) => {
     if (!user?.userId || createPlaylistSubmitting) {
       return
     }
@@ -222,7 +287,11 @@ const Library = () => {
     } finally {
       setCreatePlaylistSubmitting(false)
     }
-  }
+  }, [
+    createPlaylistSubmitting,
+    refreshPlaylists,
+    user?.userId,
+  ])
 
   if (!hasHydrated) {
     return <LibrarySkeleton />
@@ -248,7 +317,9 @@ const Library = () => {
             songs={data.likedSongs}
             songCount={data.likedSongCount}
             coverImgUrl={data.likedPlaylistCoverUrl}
+            likedSongsPreviewRefreshing={likedSongsPreviewRefreshing}
             onOpenLikedSongs={handleOpenLikedSongs}
+            onSongLikeChangeSuccess={handleRefreshLikedSongsPreview}
           />
 
           <LibraryTabsSection
@@ -258,7 +329,7 @@ const Library = () => {
             onOpenMv={handleOpenMv}
             playlistSource={playlistSource}
             onPlaylistSourceChange={handlePlaylistSourceChange}
-            onOpenCreatePlaylist={() => setCreateDialogOpen(true)}
+            onOpenCreatePlaylist={handleOpenCreatePlaylist}
           />
         </div>
       ) : null}

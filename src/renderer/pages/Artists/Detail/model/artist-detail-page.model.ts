@@ -157,5 +157,6 @@ export function getArtistHeroSummary(description: ArtistDescPayload) {
     return ''
   }
 
-  return source.length > 180 ? `${source.slice(0, 180)}...` : source
+  return source
+  // return source.length > 180 ? `${source.slice(0, 180)}...` : source
 }

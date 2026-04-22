@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
-import TrackListItem from '@/components/TrackList/TrackListItem'
-import { usePlaybackStore } from '@/stores/playback-store'
+import TrackListPlaybackItem from '@/components/TrackList/TrackListPlaybackItem'
 import { createArtistTopSongPlaybackQueue } from '../model'
 import type { ArtistTopSongsProps } from '../types'
 
@@ -9,10 +8,6 @@ const ArtistTopSongs = ({
   songs,
   onViewAll,
 }: ArtistTopSongsProps) => {
-  const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
-  const appendToQueue = usePlaybackStore(state => state.appendToQueue)
-  const currentTrackId = usePlaybackStore(state => state.currentTrack?.id)
-  const playbackStatus = usePlaybackStore(state => state.status)
   const playbackQueue = useMemo(
     () => createArtistTopSongPlaybackQueue(songs),
     [songs]
@@ -32,16 +27,12 @@ const ArtistTopSongs = ({
           <div>
             <div className='grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4'>
               {songs.map((song, index) => (
-                <TrackListItem
+                <TrackListPlaybackItem
                   key={song.id}
                   item={song}
+                  index={index}
                   type='hot'
-                  isActive={song.id === currentTrackId}
-                  isPlaying={
-                    song.id === currentTrackId && playbackStatus === 'playing'
-                  }
-                  onPlay={() => playQueueFromIndex(playbackQueue, index)}
-                  onAddToQueue={() => appendToQueue([playbackQueue[index]])}
+                  playbackQueue={playbackQueue}
                 />
               ))}
             </div>

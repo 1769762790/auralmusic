@@ -74,25 +74,25 @@ const ArtistDetail = () => {
   const openMvDrawer = useMvDrawerStore(state => state.openDrawer)
   const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
 
-  const navigateToAlbumDetail = (albumId: number) => {
+  const navigateToAlbumDetail = useCallback((albumId: number) => {
     if (!albumId) return
     navigate(`/albums/${albumId}`)
-  }
+  }, [navigate])
 
-  const navigateToMvDetail = (mvId: number) => {
+  const navigateToMvDetail = useCallback((mvId: number) => {
     if (!mvId) return
     openMvDrawer(mvId)
-  }
+  }, [openMvDrawer])
 
-  const navigateToArtistDetail = (nextArtistId: number) => {
+  const navigateToArtistDetail = useCallback((nextArtistId: number) => {
     if (!nextArtistId) return
     navigate(`/artists/${nextArtistId}`)
-  }
+  }, [navigate])
 
-  const navigateToArtistSongs = () => {
+  const navigateToArtistSongs = useCallback(() => {
     if (!artistId) return
     navigate(`/artists/${artistId}/songs`)
-  }
+  }, [artistId, navigate])
 
   const fetchAlbumsPage = useCallback(
     async (offset: number, limit: number) => {
@@ -294,7 +294,7 @@ const ArtistDetail = () => {
     playQueueFromIndex(topSongPlaybackQueue, 0)
   }, [playQueueFromIndex, topSongPlaybackQueue])
 
-  const handleToggleFollowedArtist = async () => {
+  const handleToggleFollowedArtist = useCallback(async () => {
     if (!hasHydrated || !userId) {
       openLoginDialog()
       return
@@ -321,7 +321,17 @@ const ArtistDetail = () => {
     } finally {
       setFollowLoading(false)
     }
-  }
+  }, [
+    artistId,
+    fetchLikedArtists,
+    followLoading,
+    hasHydrated,
+    isFollowed,
+    openLoginDialog,
+    state.profile,
+    toggleFollowed,
+    userId,
+  ])
 
   if (loading && !state.profile) {
     return <ArtistDetailSkeleton />
