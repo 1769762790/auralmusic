@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react'
 
 import { usePlaybackStore } from '@/stores/playback-store'
-import type { PlaybackTrack } from '../../../../shared/playback.ts'
+import type { PlaybackTrack } from '../../../shared/playback.ts'
 import TrackListItem from './TrackListItem'
 import type { TrackListItemData, TrackListVariant } from './types'
 
