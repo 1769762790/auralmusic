@@ -3,6 +3,7 @@ import LazyCollectToPlaylistDrawer from '@/components/CollectToPlaylistDrawer/La
 import MvDrawer from '@/components/MvDrawer'
 import PlaybackControl from '@/components/PlaybackControl'
 import PlaybackEngine from '@/components/PlaybackControl/PlaybackEngine'
+import PlaybackQueueDrawer from '@/components/PlaybackQueueDrawer'
 import PlaybackSessionBridge from '@/components/PlaybackSessionBridge'
 import PlaybackShortcutBridge from '@/components/PlaybackShortcutBridge'
 import TrayCommandBridge from '@/components/TrayCommandBridge'
@@ -13,10 +14,13 @@ import { isWindowsPlatform } from '@/lib/electron-runtime'
 import { useAnimationEffect } from '@/hooks/useAnimationEffect'
 import { useSystemFont } from '@/hooks/useSystemFont'
 import PlayerScene from '@/components/PlayerScene'
+import { usePlaybackQueueDrawerStore } from '@/stores/playback-queue-drawer-store'
 import UpdateProvider from '@/components/UpdateProvider'
 
 const AppLayout = () => {
   const isWindows = isWindowsPlatform()
+  const isQueueDrawerOpen = usePlaybackQueueDrawerStore(state => state.open)
+  const setQueueDrawerOpen = usePlaybackQueueDrawerStore(state => state.setOpen)
   useAnimationEffect()
   useSystemFont()
 
@@ -37,6 +41,10 @@ const AppLayout = () => {
       <PlaybackShortcutBridge />
       <TrayCommandBridge />
       <PlaybackControl />
+      <PlaybackQueueDrawer
+        open={isQueueDrawerOpen}
+        onOpenChange={setQueueDrawerOpen}
+      />
       <PlayerScene />
       <UpdateProvider />
       <LazyCollectToPlaylistDrawer />

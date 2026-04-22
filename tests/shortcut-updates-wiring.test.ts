@@ -34,27 +34,34 @@ test('settings labels expose the renamed and new shortcut actions', async () => 
   assert.match(settingsSource, /togglePlaylist: '显示\/隐藏播放列表'/)
 })
 
-test('search dialog and playback control consume shared visibility stores', async () => {
-  const [searchDialogSource, playbackControlSource] = await Promise.all([
-    readFile(
-      new URL(
-        '../src/renderer/components/SearchDialog/index.tsx',
-        import.meta.url
+test('search dialog, app layout, and playback control consume shared visibility stores', async () => {
+  const [searchDialogSource, appLayoutSource, playbackControlSource] =
+    await Promise.all([
+      readFile(
+        new URL(
+          '../src/renderer/components/SearchDialog/index.tsx',
+          import.meta.url
+        ),
+        'utf8'
       ),
-      'utf8'
-    ),
-    readFile(
-      new URL(
-        '../src/renderer/components/PlaybackControl/index.tsx',
-        import.meta.url
+      readFile(
+        new URL('../src/renderer/layout/AppLayout.tsx', import.meta.url),
+        'utf8'
       ),
-      'utf8'
-    ),
-  ])
+      readFile(
+        new URL(
+          '../src/renderer/components/PlaybackControl/index.tsx',
+          import.meta.url
+        ),
+        'utf8'
+      ),
+    ])
 
   assert.match(searchDialogSource, /useSearchDialogStore/)
   assert.match(searchDialogSource, /toggleDialog/)
+  assert.match(appLayoutSource, /PlaybackQueueDrawer/)
   assert.match(playbackControlSource, /usePlaybackQueueDrawerStore/)
   assert.match(playbackControlSource, /openDrawer/)
-  assert.match(playbackControlSource, /setOpen/)
+  assert.doesNotMatch(playbackControlSource, /import PlaybackQueueDrawer/)
+  assert.doesNotMatch(playbackControlSource, /<PlaybackQueueDrawer/)
 })
