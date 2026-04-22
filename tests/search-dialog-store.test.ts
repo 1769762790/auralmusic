@@ -15,3 +15,13 @@ test('search dialog store exposes explicit open and close actions', () => {
   useSearchDialogStore.getState().setOpen(true)
   assert.equal(useSearchDialogStore.getState().open, true)
 })
+
+test('search dialog store toggles dialog visibility', () => {
+  useSearchDialogStore.setState({ open: false })
+
+  useSearchDialogStore.getState().toggleDialog()
+  assert.equal(useSearchDialogStore.getState().open, true)
+
+  useSearchDialogStore.getState().toggleDialog()
+  assert.equal(useSearchDialogStore.getState().open, false)
+})

@@ -3,6 +3,10 @@ import assert from 'node:assert/strict'
 
 import {
   PLAYBACK_MODE_SEQUENCE,
+  createAlbumQueueSourceKey,
+  createCloudQueueSourceKey,
+  createLikedSongsQueueSourceKey,
+  createPlaylistQueueSourceKey,
   createShuffleOrder,
   createPlaybackQueueSnapshot,
   createSongUrlRequestAttempts,
@@ -13,6 +17,8 @@ import {
   normalizeSongUrlV1Response,
   normalizePlaybackMode,
   normalizePlaybackVolume,
+  resolveQueueSourceDescriptor,
+  resolvePlaylistIdFromQueueSourceKey,
   resolvePlaybackQueueStep,
   type PlaybackTrack,
 } from '../src/shared/playback.ts'
@@ -25,6 +31,7 @@ const tracks: PlaybackTrack[] = [
     albumName: 'Album 1',
     coverUrl: 'cover-1',
     duration: 180000,
+    sourceUrl: undefined,
   },
   {
     id: 2,
@@ -33,6 +40,7 @@ const tracks: PlaybackTrack[] = [
     albumName: 'Album 2',
     coverUrl: 'cover-2',
     duration: 200000,
+    sourceUrl: undefined,
   },
 ]
 
@@ -92,6 +100,34 @@ test('createPlaybackQueueSnapshot filters invalid tracks and clamps the index', 
       currentTrack: tracks[0],
     }
   )
+})
+
+test('playlist queue source helpers encode and decode playlist ids safely', () => {
+  assert.equal(createPlaylistQueueSourceKey(9527), 'playlist:9527')
+  assert.equal(createLikedSongsQueueSourceKey(9527), 'liked-songs:9527')
+  assert.equal(createAlbumQueueSourceKey(9527), 'album:9527')
+  assert.equal(createCloudQueueSourceKey(9527), 'cloud:9527')
+  assert.equal(resolvePlaylistIdFromQueueSourceKey('playlist:9527'), 9527)
+  assert.equal(resolvePlaylistIdFromQueueSourceKey('playlist:0'), null)
+  assert.equal(resolvePlaylistIdFromQueueSourceKey('album:9527'), null)
+  assert.equal(resolvePlaylistIdFromQueueSourceKey(null), null)
+  assert.deepEqual(resolveQueueSourceDescriptor('playlist:9527'), {
+    type: 'playlist',
+    id: 9527,
+  })
+  assert.deepEqual(resolveQueueSourceDescriptor('liked-songs:9527'), {
+    type: 'liked-songs',
+    id: 9527,
+  })
+  assert.deepEqual(resolveQueueSourceDescriptor('album:9527'), {
+    type: 'album',
+    id: 9527,
+  })
+  assert.deepEqual(resolveQueueSourceDescriptor('cloud:9527'), {
+    type: 'cloud',
+    id: 9527,
+  })
+  assert.equal(resolveQueueSourceDescriptor('search'), null)
 })
 
 test('queue index helpers respect playlist boundaries', () => {

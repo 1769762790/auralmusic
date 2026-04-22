@@ -147,6 +147,7 @@ export interface SearchDialogStoreState {
   setOpen: (open: boolean) => void
   openDialog: () => void
   closeDialog: () => void
+  toggleDialog: () => void
 }
 
 export interface CollectToPlaylistStoreState {
@@ -163,6 +164,14 @@ export interface MvDrawerStoreState {
   setOpen: (open: boolean) => void
   openDrawer: (mvId: number) => void
   closeDrawer: () => void
+}
+
+export interface PlaybackQueueDrawerStoreState {
+  open: boolean
+  setOpen: (open: boolean) => void
+  openDrawer: () => void
+  closeDrawer: () => void
+  toggleDrawer: () => void
 }
 
 export interface PlaybackSessionSnapshot {
@@ -203,6 +212,7 @@ export interface PlaybackStoreState {
     startIndex: number,
     sourceKey?: string | null
   ) => void
+  playCurrentQueueIndex: (index: number) => void
   appendToQueue: (tracks: PlaybackTrack[]) => void
   syncQueueFromSource: (sourceKey: string, tracks: PlaybackTrack[]) => void
   togglePlay: () => void
