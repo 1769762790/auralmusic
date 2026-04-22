@@ -28,8 +28,7 @@ const TrackListPlaybackItem = ({
   const appendToQueue = usePlaybackStore(state => state.appendToQueue)
   const isActive = usePlaybackStore(state => state.currentTrack?.id === item.id)
   const isPlaying = usePlaybackStore(
-    state =>
-      state.currentTrack?.id === item.id && state.status === 'playing'
+    state => state.currentTrack?.id === item.id && state.status === 'playing'
   )
 
   const handlePlay = useCallback(() => {

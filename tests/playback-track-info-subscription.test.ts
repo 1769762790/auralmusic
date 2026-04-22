@@ -3,7 +3,10 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
 const playbackControlSource = readFileSync(
-  new URL('../src/renderer/components/PlaybackControl/index.tsx', import.meta.url),
+  new URL(
+    '../src/renderer/components/PlaybackControl/index.tsx',
+    import.meta.url
+  ),
   'utf8'
 )
 
@@ -32,7 +35,10 @@ test('playback control and track info avoid broad currentTrack subscriptions', (
     playbackControlSource,
     /const\s+track\s*=\s*usePlaybackStore\(state\s*=>\s*state\.currentTrack\)/
   )
-  assert.match(playbackControlSource, /<PlaybackTrackInfo hasTrack=\{hasTrack\} \/>/)
+  assert.match(
+    playbackControlSource,
+    /<PlaybackTrackInfo hasTrack=\{hasTrack\} \/>/
+  )
 
   assert.match(
     playbackTrackInfoSource,
@@ -50,10 +56,7 @@ test('playback control and track info avoid broad currentTrack subscriptions', (
     playbackTrackInfoSource,
     /const\s+trackCoverUrl\s*=\s*usePlaybackStore\([\s\S]*state\.currentTrack\?\.coverUrl\s*\?\?\s*DEFAULT_PLAYBACK_CONTROL_TRACK\.coverUrl[\s\S]*\)/
   )
-  assert.match(
-    playbackTrackInfoSource,
-    /useCurrentTrackLike\(trackId\)/
-  )
+  assert.match(playbackTrackInfoSource, /useCurrentTrackLike\(trackId\)/)
   assert.doesNotMatch(
     playbackTrackInfoSource,
     /const\s+track\s*=\s*usePlaybackStore\(state\s*=>\s*state\.currentTrack\)/
@@ -63,8 +66,5 @@ test('playback control and track info avoid broad currentTrack subscriptions', (
     useCurrentTrackLikeSource,
     /export function useCurrentTrackLike\(trackId: number \| null\)/
   )
-  assert.doesNotMatch(
-    useCurrentTrackLikeSource,
-    /PlaybackTrack/
-  )
+  assert.doesNotMatch(useCurrentTrackLikeSource, /PlaybackTrack/)
 })

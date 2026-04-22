@@ -9,10 +9,7 @@ interface HomeFmFeatureCardProps {
   isLoading?: boolean
   actionLoading?: boolean
   onMoveToNext?: (autoPlay: boolean) => Promise<void> | void
-  onTrashCurrent?: (
-    trackId: number,
-    autoPlay: boolean
-  ) => Promise<void> | void
+  onTrashCurrent?: (trackId: number, autoPlay: boolean) => Promise<void> | void
 }
 
 const HomeFmFeatureCard = ({
@@ -22,7 +19,9 @@ const HomeFmFeatureCard = ({
   onMoveToNext,
   onTrashCurrent,
 }: HomeFmFeatureCardProps) => {
-  const currentTrackId = usePlaybackStore(state => state.currentTrack?.id ?? null)
+  const currentTrackId = usePlaybackStore(
+    state => state.currentTrack?.id ?? null
+  )
   const isPlaying = usePlaybackStore(
     state => state.status === 'playing' || state.status === 'loading'
   )

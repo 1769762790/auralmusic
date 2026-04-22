@@ -221,25 +221,34 @@ const Library = () => {
     void refreshPlaylists(user.userId, playlistSource)
   }, [isAuthenticated, playlistSource, refreshPlaylists, user?.userId])
 
-  const handlePlaylistSourceChange = useCallback((value: PlaylistSourceValue) => {
-    startTransition(() => {
-      setPlaylistSource(value)
-    })
-  }, [])
+  const handlePlaylistSourceChange = useCallback(
+    (value: PlaylistSourceValue) => {
+      startTransition(() => {
+        setPlaylistSource(value)
+      })
+    },
+    []
+  )
 
   const handleOpenLikedSongs = useCallback(() => {
     navigate('/library/liked-songs')
   }, [navigate])
 
-  const handleOpenPlaylist = useCallback((playlistId: number) => {
-    if (!isDef(playlistId)) return
-    navigate(`/playlist/${playlistId}`)
-  }, [navigate])
+  const handleOpenPlaylist = useCallback(
+    (playlistId: number) => {
+      if (!isDef(playlistId)) return
+      navigate(`/playlist/${playlistId}`)
+    },
+    [navigate]
+  )
 
-  const handleOpenMv = useCallback((mvId: number) => {
-    if (!isDef(mvId)) return
-    openMvDrawer(mvId)
-  }, [openMvDrawer])
+  const handleOpenMv = useCallback(
+    (mvId: number) => {
+      if (!isDef(mvId)) return
+      openMvDrawer(mvId)
+    },
+    [openMvDrawer]
+  )
 
   const handleOpenCreatePlaylist = useCallback(() => {
     setCreateDialogOpen(true)
@@ -264,34 +273,33 @@ const Library = () => {
     [refreshLikedSongsPreview, user?.userId]
   )
 
-  const handleCreatePlaylist = useCallback(async (payload: CreatePlaylistPayload) => {
-    if (!user?.userId || createPlaylistSubmitting) {
-      return
-    }
+  const handleCreatePlaylist = useCallback(
+    async (payload: CreatePlaylistPayload) => {
+      if (!user?.userId || createPlaylistSubmitting) {
+        return
+      }
 
-    setCreatePlaylistSubmitting(true)
+      setCreatePlaylistSubmitting(true)
 
-    try {
-      await createPlaylist(payload)
+      try {
+        await createPlaylist(payload)
 
-      previousPlaylistSourceRef.current = 'my'
-      setPlaylistSource('my')
-      setCreateDialogOpen(false)
-      toast.success('歌单创建成功')
+        previousPlaylistSourceRef.current = 'my'
+        setPlaylistSource('my')
+        setCreateDialogOpen(false)
+        toast.success('歌单创建成功')
 
-      await refreshPlaylists(user.userId, 'my', true)
-    } catch (createError) {
-      console.error('playlist create failed', createError)
-      toast.error('歌单创建失败，请稍后重试')
-      throw createError
-    } finally {
-      setCreatePlaylistSubmitting(false)
-    }
-  }, [
-    createPlaylistSubmitting,
-    refreshPlaylists,
-    user?.userId,
-  ])
+        await refreshPlaylists(user.userId, 'my', true)
+      } catch (createError) {
+        console.error('playlist create failed', createError)
+        toast.error('歌单创建失败，请稍后重试')
+        throw createError
+      } finally {
+        setCreatePlaylistSubmitting(false)
+      }
+    },
+    [createPlaylistSubmitting, refreshPlaylists, user?.userId]
+  )
 
   if (!hasHydrated) {
     return <LibrarySkeleton />

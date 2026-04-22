@@ -22,11 +22,7 @@ const ArtistMvsPanel = ({
     <>
       <div className='grid grid-cols-2 gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3'>
         {mvs.map(mv => (
-          <ArtistMvCard
-            key={mv.id}
-            mv={mv}
-            onClick={onToMvDetail}
-          />
+          <ArtistMvCard key={mv.id} mv={mv} onClick={onToMvDetail} />
         ))}
       </div>
       <div

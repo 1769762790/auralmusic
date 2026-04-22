@@ -3,7 +3,10 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
 const topArtistsSource = readFileSync(
-  new URL('../src/renderer/pages/Home/components/TopArtists.tsx', import.meta.url),
+  new URL(
+    '../src/renderer/pages/Home/components/TopArtists.tsx',
+    import.meta.url
+  ),
   'utf8'
 )
 const homeFmFeatureCardSource = readFileSync(
@@ -14,7 +17,10 @@ const homeFmFeatureCardSource = readFileSync(
   'utf8'
 )
 const fmFeatureCardSource = readFileSync(
-  new URL('../src/renderer/pages/Home/components/FmFeatureCard.tsx', import.meta.url),
+  new URL(
+    '../src/renderer/pages/Home/components/FmFeatureCard.tsx',
+    import.meta.url
+  ),
   'utf8'
 )
 
@@ -27,8 +33,5 @@ test('home top artists autoplay keeps a memo boundary around personal fm', () =>
     homeFmFeatureCardSource,
     /export\s+default\s+memo\(HomeFmFeatureCard\)/
   )
-  assert.match(
-    fmFeatureCardSource,
-    /export\s+default\s+memo\(FmFeatureCard\)/
-  )
+  assert.match(fmFeatureCardSource, /export\s+default\s+memo\(FmFeatureCard\)/)
 })

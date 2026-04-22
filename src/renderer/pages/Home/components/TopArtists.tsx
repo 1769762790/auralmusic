@@ -30,10 +30,13 @@ const ArtistCard = memo(({ artist, onToArtistDetail }: ArtistCardProps) => (
 
 const TopArtists = ({ list = [], isLoading = false }: TopArtistsProps) => {
   const navigate = useNavigate()
-  const handleOpenArtistDetail = useCallback((artistId: number) => {
-    if (!artistId) return
-    navigate(`/artists/${artistId}`)
-  }, [navigate])
+  const handleOpenArtistDetail = useCallback(
+    (artistId: number) => {
+      if (!artistId) return
+      navigate(`/artists/${artistId}`)
+    },
+    [navigate]
+  )
   return (
     <div className='mt-10'>
       <h3 className='mb-10 text-2xl font-semibold'>热门歌手</h3>

@@ -34,10 +34,7 @@ test('home page isolates personal fm playback subscriptions from the main page t
     homeSource,
     /const\s+togglePlay\s*=\s*usePlaybackStore\(state\s*=>\s*state\.togglePlay\)/
   )
-  assert.match(
-    homeSource,
-    /const\s+handlePlayNewSong\s*=\s*useCallback\(/
-  )
+  assert.match(homeSource, /const\s+handlePlayNewSong\s*=\s*useCallback\(/)
   assert.match(
     homeSource,
     /<HomeFmFeatureCard[\s\S]*track=\{fmTrack\}[\s\S]*isLoading=\{featureLoading\}[\s\S]*actionLoading=\{fmActionLoading\}[\s\S]*onMoveToNext=\{handleMoveToNextFm\}[\s\S]*onTrashCurrent=\{handleTrashCurrentFm\}[\s\S]*\/>/

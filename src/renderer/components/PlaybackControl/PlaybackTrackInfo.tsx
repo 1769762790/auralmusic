@@ -23,7 +23,8 @@ const PlaybackTrackInfo = ({ hasTrack }: PlaybackTrackInfoProps) => {
       DEFAULT_PLAYBACK_CONTROL_TRACK.artistName
   )
   const trackCoverUrl = usePlaybackStore(
-    state => state.currentTrack?.coverUrl ?? DEFAULT_PLAYBACK_CONTROL_TRACK.coverUrl
+    state =>
+      state.currentTrack?.coverUrl ?? DEFAULT_PLAYBACK_CONTROL_TRACK.coverUrl
   )
   const openPlayerScene = usePlaybackStore(state => state.openPlayerScene)
   const { isLiked, isLikePending, handleToggleLike } =

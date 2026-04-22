@@ -28,15 +28,15 @@ test('TrackList isolates playback subscriptions to per-row playback items', () =
   )
   assert.match(trackListSource, /<TrackListPlaybackItem/)
 
-  const playbackItemSource = readFileSync(trackListPlaybackItemSourcePath, 'utf8')
+  const playbackItemSource = readFileSync(
+    trackListPlaybackItemSourcePath,
+    'utf8'
+  )
   assert.match(
     playbackItemSource,
     /const\s+isActive\s*=\s*usePlaybackStore\(state\s*=>\s*state\.currentTrack\?\.id\s*===\s*item\.id\)/
   )
-  assert.match(
-    playbackItemSource,
-    /const\s+isPlaying\s*=\s*usePlaybackStore\(/
-  )
+  assert.match(playbackItemSource, /const\s+isPlaying\s*=\s*usePlaybackStore\(/)
   assert.match(
     playbackItemSource,
     /export\s+default\s+memo\(TrackListPlaybackItem\)/

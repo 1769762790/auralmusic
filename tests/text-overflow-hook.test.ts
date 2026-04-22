@@ -57,7 +57,10 @@ test('artist hero wires summary overflow into a dialog trigger flow', () => {
     artistHeroSource,
     /import\s+OverflowContentDialog\s+from\s+'@\/components\/OverflowContentDialog'/
   )
-  assert.match(artistHeroSource, /const\s+\{\s*targetRef,\s*isOverflowing\s*\}\s*=\s*useTextOverflow\(/)
+  assert.match(
+    artistHeroSource,
+    /const\s+\{\s*targetRef,\s*isOverflowing\s*\}\s*=\s*useTextOverflow\(/
+  )
   assert.match(artistHeroSource, /onClick=\{handleSummaryClick\}/)
   assert.match(
     artistHeroSource,

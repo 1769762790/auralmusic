@@ -7,7 +7,10 @@ const librarySource = readFileSync(
   'utf8'
 )
 const libraryHeroSource = readFileSync(
-  new URL('../src/renderer/pages/Library/components/LibraryHero.tsx', import.meta.url),
+  new URL(
+    '../src/renderer/pages/Library/components/LibraryHero.tsx',
+    import.meta.url
+  ),
   'utf8'
 )
 const libraryQuickSongListSource = readFileSync(
@@ -66,32 +69,17 @@ test('library liked songs preview refreshes after a like state change succeeds',
     libraryQuickSongListSource,
     /import\s+\{\s*Spinner\s*\}\s+from\s+'@\/components\/ui\/spinner'/
   )
-  assert.match(
-    libraryComponentTypesSource,
-    /refreshing\?:\s*boolean/
-  )
+  assert.match(libraryComponentTypesSource, /refreshing\?:\s*boolean/)
   assert.match(
     libraryQuickSongListSource,
     /onLikeChangeSuccess=\{onSongLikeChangeSuccess\}/
   )
-  assert.match(
-    libraryQuickSongListSource,
-    /<Spinner/
-  )
+  assert.match(libraryQuickSongListSource, /<Spinner/)
   assert.match(
     libraryQuickSongListSource,
     /refreshing \? 'pointer-events-none opacity-50' : ''/
   )
-  assert.doesNotMatch(
-    librarySource,
-    /fetchLikedSongs/
-  )
-  assert.doesNotMatch(
-    librarySource,
-    /buildLibraryLikedSongsPreview/
-  )
-  assert.doesNotMatch(
-    libraryQuickSongListSource,
-    /hiddenSongIds/
-  )
+  assert.doesNotMatch(librarySource, /fetchLikedSongs/)
+  assert.doesNotMatch(librarySource, /buildLibraryLikedSongsPreview/)
+  assert.doesNotMatch(libraryQuickSongListSource, /hiddenSongIds/)
 })

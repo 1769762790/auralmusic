@@ -39,7 +39,7 @@ const LibraryQuickSongList = ({
       </div>
 
       {refreshing ? (
-        <div className='absolute inset-0 z-10 flex items-center justify-center rounded-[24px] bg-background/72 backdrop-blur-[2px]'>
+        <div className='bg-background/72 absolute inset-0 z-10 flex items-center justify-center rounded-[24px] backdrop-blur-[2px]'>
           <Spinner className='text-primary size-7' />
         </div>
       ) : null}

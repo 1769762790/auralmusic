@@ -74,20 +74,29 @@ const ArtistDetail = () => {
   const openMvDrawer = useMvDrawerStore(state => state.openDrawer)
   const playQueueFromIndex = usePlaybackStore(state => state.playQueueFromIndex)
 
-  const navigateToAlbumDetail = useCallback((albumId: number) => {
-    if (!albumId) return
-    navigate(`/albums/${albumId}`)
-  }, [navigate])
+  const navigateToAlbumDetail = useCallback(
+    (albumId: number) => {
+      if (!albumId) return
+      navigate(`/albums/${albumId}`)
+    },
+    [navigate]
+  )
 
-  const navigateToMvDetail = useCallback((mvId: number) => {
-    if (!mvId) return
-    openMvDrawer(mvId)
-  }, [openMvDrawer])
+  const navigateToMvDetail = useCallback(
+    (mvId: number) => {
+      if (!mvId) return
+      openMvDrawer(mvId)
+    },
+    [openMvDrawer]
+  )
 
-  const navigateToArtistDetail = useCallback((nextArtistId: number) => {
-    if (!nextArtistId) return
-    navigate(`/artists/${nextArtistId}`)
-  }, [navigate])
+  const navigateToArtistDetail = useCallback(
+    (nextArtistId: number) => {
+      if (!nextArtistId) return
+      navigate(`/artists/${nextArtistId}`)
+    },
+    [navigate]
+  )
 
   const navigateToArtistSongs = useCallback(() => {
     if (!artistId) return

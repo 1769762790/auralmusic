@@ -40,10 +40,13 @@ const LibraryTabsSection = ({
   const handleOpenPlaylistsTab = useCallback(() => {
     setActiveTab('playlists')
   }, [])
-  const handlePlaylistSourceValueChange = useCallback((value: string) => {
-    setActiveTab('playlists')
-    onPlaylistSourceChange(value as PlaylistSourceValue)
-  }, [onPlaylistSourceChange])
+  const handlePlaylistSourceValueChange = useCallback(
+    (value: string) => {
+      setActiveTab('playlists')
+      onPlaylistSourceChange(value as PlaylistSourceValue)
+    },
+    [onPlaylistSourceChange]
+  )
 
   const currentPlaylistLabel =
     PLAYLIST_FILTER_OPTIONS.find(option => option.value === playlistSource)

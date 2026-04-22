@@ -55,10 +55,7 @@ test('artist media tabs only renders the active panel and keeps panel components
     artistMediaTabsSource,
     /activeTab === 'mvs' \? \(\s*<ArtistMvsPanel/
   )
-  assert.match(
-    artistMediaTabsSource,
-    /<ArtistSimilarArtistsPanel/
-  )
+  assert.match(artistMediaTabsSource, /<ArtistSimilarArtistsPanel/)
   assert.match(
     artistMediaTabsSource,
     /export\s+default\s+memo\(ArtistMediaTabs\)/

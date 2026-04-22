@@ -23,7 +23,10 @@ test('overflow content dialog renders shared dialog shell with scrollable text b
     overflowContentDialogSource,
     /<Dialog open=\{open\} onOpenChange=\{onOpenChange\}>/
   )
-  assert.match(overflowContentDialogSource, /<DialogTitle>\{title\}<\/DialogTitle>/)
+  assert.match(
+    overflowContentDialogSource,
+    /<DialogTitle>\{title\}<\/DialogTitle>/
+  )
   assert.match(
     overflowContentDialogSource,
     /<ScrollArea className='h-\[50vh\] w-full pr-2'>/

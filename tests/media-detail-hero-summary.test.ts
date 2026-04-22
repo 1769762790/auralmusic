@@ -3,7 +3,10 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
 const mediaDetailHeroSource = readFileSync(
-  new URL('../src/renderer/components/MediaDetailHero/index.tsx', import.meta.url),
+  new URL(
+    '../src/renderer/components/MediaDetailHero/index.tsx',
+    import.meta.url
+  ),
   'utf8'
 )
 
@@ -20,7 +23,10 @@ test('media detail hero wires clamped description overflow into dialog expansion
     mediaDetailHeroSource,
     /const\s+\{\s*targetRef,\s*isOverflowing\s*\}\s*=\s*useTextOverflow\(resolvedDescription\)/
   )
-  assert.match(mediaDetailHeroSource, /const\s+canExpandDescription\s*=\s*Boolean\(resolvedDescription\.trim\(\)\)\s*&&\s*isOverflowing/)
+  assert.match(
+    mediaDetailHeroSource,
+    /const\s+canExpandDescription\s*=\s*Boolean\(resolvedDescription\.trim\(\)\)\s*&&\s*isOverflowing/
+  )
   assert.match(mediaDetailHeroSource, /onClick=\{handleDescriptionClick\}/)
   assert.match(
     mediaDetailHeroSource,
