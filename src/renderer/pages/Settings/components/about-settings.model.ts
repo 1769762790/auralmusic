@@ -37,6 +37,25 @@ export function resolveAboutVersionLabel(version: string | undefined | null) {
   return normalizedVersion ? `v${normalizedVersion}` : '版本未知'
 }
 
+export function resolveAboutVersionSummary({
+  appVersion,
+  latestVersion,
+}: {
+  appVersion: string | undefined | null
+  latestVersion: string | undefined | null
+}) {
+  const currentLabel = resolveAboutVersionLabel(appVersion)
+  const latestLabel =
+    latestVersion && latestVersion.trim()
+      ? resolveAboutVersionLabel(latestVersion)
+      : null
+
+  return {
+    currentLabel,
+    latestLabel,
+  }
+}
+
 export function resolveCheckUpdateButtonLabel(snapshot: AppUpdateSnapshot) {
   switch (snapshot.status) {
     case 'checking':

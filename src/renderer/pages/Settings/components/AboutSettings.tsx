@@ -11,7 +11,7 @@ import {
   createAboutUpdatePreviewSnapshot,
   handleAboutCheckForUpdates,
   resolveCheckUpdateButtonLabel,
-  resolveAboutVersionLabel,
+  resolveAboutVersionSummary,
 } from './about-settings.model'
 
 const AboutSettings = () => {
@@ -21,6 +21,10 @@ const AboutSettings = () => {
   const openUpdateModal = useUpdateStore(state => state.openModal)
   const buttonLabel = resolveCheckUpdateButtonLabel(updateSnapshot)
   const isDevelopment = import.meta.env.DEV
+  const versionSummary = resolveAboutVersionSummary({
+    appVersion,
+    latestVersion: updateSnapshot.latestVersion,
+  })
 
   return (
     <div className='space-y-1'>
@@ -30,8 +34,13 @@ const AboutSettings = () => {
             当前版本
           </div>
           <p className='text-foreground text-sm font-semibold tabular-nums'>
-            {resolveAboutVersionLabel(appVersion)}
+            {versionSummary.currentLabel}
           </p>
+          {versionSummary.latestLabel && (
+            <p className='text-muted-foreground text-xs tabular-nums'>
+              最新版本 {versionSummary.latestLabel}
+            </p>
+          )}
         </div>
         <div className='space-y-2 justify-self-end'>
           <Button

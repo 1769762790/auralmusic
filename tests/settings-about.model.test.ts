@@ -7,12 +7,39 @@ import {
   ABOUT_USAGE_NOTICE_LINES,
   createAboutUpdatePreviewSnapshot,
   resolveAboutVersionLabel,
+  resolveAboutVersionSummary,
 } from '../src/renderer/pages/Settings/components/about-settings.model.ts'
 
 test('resolveAboutVersionLabel formats app version safely', () => {
   assert.equal(resolveAboutVersionLabel('1.2.3'), 'v1.2.3')
   assert.equal(resolveAboutVersionLabel('  2.0.0-beta.1  '), 'v2.0.0-beta.1')
   assert.equal(resolveAboutVersionLabel(''), '版本未知')
+})
+
+test('resolveAboutVersionSummary shows only current version before update metadata exists', () => {
+  assert.deepEqual(
+    resolveAboutVersionSummary({
+      appVersion: '1.2.0',
+      latestVersion: null,
+    }),
+    {
+      currentLabel: 'v1.2.0',
+      latestLabel: null,
+    }
+  )
+})
+
+test('resolveAboutVersionSummary exposes latest version when update metadata exists', () => {
+  assert.deepEqual(
+    resolveAboutVersionSummary({
+      appVersion: '1.2.0',
+      latestVersion: '1.2.1',
+    }),
+    {
+      currentLabel: 'v1.2.0',
+      latestLabel: 'v1.2.1',
+    }
+  )
 })
 
 test('about update message explains the current update state', () => {
