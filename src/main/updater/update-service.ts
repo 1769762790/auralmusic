@@ -11,6 +11,7 @@ import type {
   UpdateActionMode,
   UpdateTrigger,
 } from '../../shared/update.ts'
+import { resolveQuitAndInstallOptions } from './update-service.model.ts'
 
 const DEFAULT_AUTO_CHECK_DELAY_MS = 3000
 
@@ -335,7 +336,11 @@ export function createUpdateService(options: UpdateServiceOptions) {
       return
     }
 
-    autoUpdater.quitAndInstall(false, true)
+    const { isSilent, isForceRunAfter } = resolveQuitAndInstallOptions(
+      options.platform
+    )
+
+    autoUpdater.quitAndInstall(isSilent, isForceRunAfter)
   }
 
   const openDownloadPage = async () => {

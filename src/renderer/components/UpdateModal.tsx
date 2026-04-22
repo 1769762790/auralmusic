@@ -12,6 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import type { UpdateModalProps } from '@/types/update'
+import { sanitizeUpdateReleaseNotesHtml } from './update-modal.model'
 
 export function UpdateModal({
   open,
@@ -26,6 +27,7 @@ export function UpdateModal({
   const isLinux = status === 'update-available' && !!onGoToDownload
   const isDownloading = status === 'downloading'
   const canShowVersionInfo = status !== 'checking' && status !== 'error'
+  const releaseNotesHtml = sanitizeUpdateReleaseNotesHtml(info.releaseNotes)
 
   return (
     <Dialog
@@ -72,8 +74,11 @@ export function UpdateModal({
         {(status === 'update-available' || status === 'update-downloaded') && (
           <Card>
             <CardContent className='p-3'>
-              <ScrollArea className='h-[120px] w-full text-sm whitespace-pre-wrap'>
-                {info.releaseNotes || '暂无更新说明'}
+              <ScrollArea className='h-[120px] w-full text-sm'>
+                <div
+                  className='[&_a]:text-foreground [&_blockquote]:border-border [&_code]:bg-muted [&_pre]:bg-muted space-y-2 leading-6 [&_a]:underline [&_blockquote]:border-l [&_blockquote]:pl-4 [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_h1]:text-base [&_h1]:font-semibold [&_h2]:text-base [&_h2]:font-semibold [&_h3]:font-semibold [&_li]:mb-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-2 [&_pre]:overflow-x-auto [&_pre]:rounded [&_pre]:p-2 [&_ul]:list-disc [&_ul]:pl-5'
+                  dangerouslySetInnerHTML={{ __html: releaseNotesHtml }}
+                />
               </ScrollArea>
             </CardContent>
           </Card>
