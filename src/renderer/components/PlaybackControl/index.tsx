@@ -8,7 +8,7 @@ import { usePlaybackQueueDrawerStore } from '@/stores/playback-queue-drawer-stor
 import { usePlaybackStore } from '@/stores/playback-store'
 
 const PlaybackControl = () => {
-  const track = usePlaybackStore(state => state.currentTrack)
+  const hasTrack = usePlaybackStore(state => Boolean(state.currentTrack))
   const isOpen = usePlaybackStore(state => state.isPlayerSceneOpen)
   const openQueueDrawer = usePlaybackQueueDrawerStore(state => state.openDrawer)
 
@@ -21,7 +21,7 @@ const PlaybackControl = () => {
       <PlaybackProgressBar />
 
       <div className='grid h-18 grid-cols-[minmax(220px,1fr)_minmax(260px,420px)_minmax(220px,1fr)] items-center gap-6 px-12 xl:px-25 2xl:px-50'>
-        <PlaybackTrackInfo hasTrack={Boolean(track)} />
+        <PlaybackTrackInfo hasTrack={hasTrack} />
         <PlaybackTransportControls />
         <PlaybackPreferenceControls onOpenQueueDrawer={openQueueDrawer} />
       </div>

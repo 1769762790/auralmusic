@@ -37,10 +37,11 @@ const TrackListItem = ({
   const openCollectToPlaylistDrawer = useCollectToPlaylistStore(
     state => state.openDrawer
   )
-  const downloadConfig = useConfigStore(state => state.config)
-  const downloadEnabled = downloadConfig.downloadEnabled
-  const downloadQuality = downloadConfig.downloadQuality
-  const downloadQualityPolicy = downloadConfig.downloadQualityPolicy
+  const downloadEnabled = useConfigStore(state => state.config.downloadEnabled)
+  const downloadQuality = useConfigStore(state => state.config.downloadQuality)
+  const downloadQualityPolicy = useConfigStore(
+    state => state.config.downloadQualityPolicy
+  )
   const isLiked = useUserStore(state =>
     item.id ? state.likedSongIds.has(item.id) : false
   )
