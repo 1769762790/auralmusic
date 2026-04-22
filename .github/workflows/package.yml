@@ -3,14 +3,57 @@ name: Package
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to package and publish, e.g. v1.2.0'
+        required: true
+        type: string
 
 permissions:
   contents: write
 
 jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.resolve-tag.outputs.release_tag }}
+    steps:
+      - name: Resolve release tag
+        id: resolve-tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "release_tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "release_tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create draft release shell
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="${{ steps.resolve-tag.outputs.release_tag }}"
+
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --draft \
+              --title "Release ${TAG#v}"
+          else
+            gh release create "$TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --draft \
+              --latest=false \
+              --generate-notes \
+              --title "Release ${TAG#v}"
+          fi
+
   build-and-publish:
+    needs: prepare-release
     strategy:
       fail-fast: false
       matrix:
@@ -30,6 +73,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ needs.prepare-release.outputs.release_tag }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -51,3 +95,20 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
         run: ${{ matrix.build_cmd }}
+
+  finalize-release:
+    needs:
+      - prepare-release
+      - build-and-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release after all assets upload
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          TAG="${{ needs.prepare-release.outputs.release_tag }}"
+          gh release edit "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --draft=false \
+            --latest

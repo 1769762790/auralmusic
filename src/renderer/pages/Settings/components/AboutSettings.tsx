@@ -6,17 +6,21 @@ import { useUpdateStore } from '@/stores/update-store'
 
 import {
   ABOUT_UP_TO_DATE_MESSAGE,
+  ABOUT_UPDATE_PREVIEW_BUTTON_LABEL,
   ABOUT_USAGE_NOTICE_LINES,
+  createAboutUpdatePreviewSnapshot,
+  handleAboutCheckForUpdates,
   resolveCheckUpdateButtonLabel,
-  resolveUpdateFailureMessage,
   resolveAboutVersionLabel,
 } from './about-settings.model'
 
 const AboutSettings = () => {
   const appVersion = window.appRuntime.getAppVersion()
   const updateSnapshot = useUpdateStore(state => state.snapshot)
+  const syncUpdateSnapshot = useUpdateStore(state => state.syncSnapshot)
   const openUpdateModal = useUpdateStore(state => state.openModal)
   const buttonLabel = resolveCheckUpdateButtonLabel(updateSnapshot)
+  const isDevelopment = import.meta.env.DEV
 
   return (
     <div className='space-y-1'>
@@ -29,35 +33,47 @@ const AboutSettings = () => {
             {resolveAboutVersionLabel(appVersion)}
           </p>
         </div>
-        <Button
-          type='button'
-          variant='outline'
-          className='h-9 justify-self-end'
-          disabled={updateSnapshot.status === 'checking'}
-          onClick={async () => {
-            if (
-              updateSnapshot.status === 'update-available' ||
-              updateSnapshot.status === 'downloading' ||
-              updateSnapshot.status === 'update-downloaded'
-            ) {
-              openUpdateModal()
-              return
-            }
-
-            const nextSnapshot = await window.electronUpdate.checkForUpdates()
-
-            if (nextSnapshot.status === 'up-to-date') {
-              toast.success(ABOUT_UP_TO_DATE_MESSAGE)
-              return
-            }
-
-            if (nextSnapshot.status === 'error') {
-              toast.error(resolveUpdateFailureMessage(nextSnapshot))
-            }
-          }}
-        >
-          {buttonLabel}
-        </Button>
+        <div className='space-y-2 justify-self-end'>
+          <Button
+            type='button'
+            variant='outline'
+            className='h-9 w-full'
+            disabled={updateSnapshot.status === 'checking'}
+            onClick={async () => {
+              await handleAboutCheckForUpdates({
+                snapshot: updateSnapshot,
+                checkForUpdates: window.electronUpdate.checkForUpdates,
+                openUpdateModal,
+                showUpToDateMessage: () => {
+                  toast.success(ABOUT_UP_TO_DATE_MESSAGE)
+                },
+                showErrorMessage: message => {
+                  toast.error(message)
+                },
+              })
+            }}
+          >
+            {buttonLabel}
+          </Button>
+          {isDevelopment && (
+            <Button
+              type='button'
+              variant='secondary'
+              className='h-8 w-full'
+              onClick={() => {
+                syncUpdateSnapshot(
+                  createAboutUpdatePreviewSnapshot({
+                    currentVersion: appVersion,
+                    platform: window.appRuntime.getPlatform(),
+                  })
+                )
+                openUpdateModal()
+              }}
+            >
+              {ABOUT_UPDATE_PREVIEW_BUTTON_LABEL}
+            </Button>
+          )}
+        </div>
       </div>
       <Separator />
       <div className='space-y-3 py-3'>
