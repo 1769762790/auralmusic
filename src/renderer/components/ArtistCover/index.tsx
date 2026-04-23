@@ -37,7 +37,7 @@ const ArtistCover = ({
       </div>
       <div className='mt-2 truncate text-center text-[16px]'>{artistName}</div>
       {subTitle && (
-        <div className='text-primary/50 mt-1 truncate text-center text-[14px]'>
+        <div className='text-foreground/70 mt-1 truncate text-center text-[14px]'>
           {subTitle}
         </div>
       )}

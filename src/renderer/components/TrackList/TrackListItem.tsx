@@ -167,7 +167,7 @@ const TrackListItem = ({
       <div
         onDoubleClick={() => onPlay?.()}
         className={cn(
-          'hover:bg-primary/5 grid cursor-pointer items-center rounded-[15px] px-4 py-4 transition-colors',
+          'hover:bg-foreground/8 grid cursor-pointer items-center rounded-[15px] px-4 py-4 transition-colors',
           isActive && 'bg-primary/8',
           type === 'default'
             ? 'grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_120px] gap-4'
@@ -195,7 +195,7 @@ const TrackListItem = ({
             >
               {item.name}
             </div>
-            <div className='text-primary/50 truncate text-xs md:text-sm'>
+            <div className='text-foreground/70 truncate text-xs md:text-sm'>
               {type === 'hot'
                 ? formatTrackListArtistNames(item.artists)
                 : artistName}
@@ -204,12 +204,12 @@ const TrackListItem = ({
         </div>
 
         {type === 'default' && (
-          <div className='text-primary/50 hidden truncate text-[15px] md:block'>
+          <div className='text-foreground/70 hidden truncate text-[15px] md:block'>
             {item.albumName}
           </div>
         )}
 
-        <div className='text-primary/50 flex items-center justify-end gap-5 text-[15px]'>
+        <div className='text-foreground/70 flex items-center justify-end gap-5 text-[15px]'>
           <button
             type='button'
             disabled={!item.id || isLikePending}
