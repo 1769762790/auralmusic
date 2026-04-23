@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/auralstorm/auralmusic/compare/v1.0.1...v1.1.0) (2026-04-23)
+
+### Features
+
+- add pixi retro cover effects ([9fc4e44](https://github.com/auralstorm/auralmusic/commit/9fc4e44a11a0004cb4d200ec85048ba75c4b682d))
+- polish tray, mv drawer, shortcuts and downloads UX ([511058a](https://github.com/auralstorm/auralmusic/commit/511058acfa98ab65faea38de590bc2c11f1b85b8))
+
 ## [1.0.1](https://github.com/auralstorm/auralmusic/compare/v1.0.0...v1.0.1) (2026-04-23)
 
 ### Features
