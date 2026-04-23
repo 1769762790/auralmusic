@@ -19,6 +19,8 @@ import {
 import MvDrawerControlBar from './components/MvDrawerControlBar'
 import type { MvDrawerPlayerRef } from './types'
 
+const MV_DRAWER_CLOSE_TEARDOWN_DELAY_MS = 240
+
 const MvDrawer = () => {
   const open = useMvDrawerStore(state => state.open)
   const mvId = useMvDrawerStore(state => state.mvId)
@@ -34,14 +36,32 @@ const MvDrawer = () => {
   const playerRef = useRef<MvDrawerPlayerRef | null>(null)
   const lastVolumeRef = useRef(MV_DRAWER_INITIAL_PLAYBACK_STATE.volume)
   const suppressDrawerCloseRef = useRef(false)
+  const teardownTimerRef = useRef<number | null>(null)
   const { isExpanded, canExpand, toggleExpanded } = useWindowExpandedState()
 
+  const resetDrawerState = () => {
+    setState(MV_DRAWER_INITIAL_STATE)
+    setPlaybackState(MV_DRAWER_INITIAL_PLAYBACK_STATE)
+    setDragProgress(null)
+    lastVolumeRef.current = MV_DRAWER_INITIAL_PLAYBACK_STATE.volume
+  }
+
   useEffect(() => {
-    if (!open || !mvId) {
-      setState(MV_DRAWER_INITIAL_STATE)
-      setPlaybackState(MV_DRAWER_INITIAL_PLAYBACK_STATE)
-      setDragProgress(null)
-      lastVolumeRef.current = MV_DRAWER_INITIAL_PLAYBACK_STATE.volume
+    if (teardownTimerRef.current !== null) {
+      window.clearTimeout(teardownTimerRef.current)
+      teardownTimerRef.current = null
+    }
+
+    if (!open) {
+      // 延迟销毁视图状态，避免抽屉关闭动画期间回退到空态造成闪烁。
+      teardownTimerRef.current = window.setTimeout(() => {
+        resetDrawerState()
+        teardownTimerRef.current = null
+      }, MV_DRAWER_CLOSE_TEARDOWN_DELAY_MS)
+      return
+    }
+
+    if (!mvId) {
       return
     }
 
@@ -108,6 +128,14 @@ const MvDrawer = () => {
       isActive = false
     }
   }, [mvId, open, pausePlayback, playbackStatus])
+
+  useEffect(() => {
+    return () => {
+      if (teardownTimerRef.current !== null) {
+        window.clearTimeout(teardownTimerRef.current)
+      }
+    }
+  }, [])
 
   const videoUrl = state.playback?.url || ''
   const canPlay = Boolean(state.hero && videoUrl)
@@ -226,17 +254,10 @@ const MvDrawer = () => {
     }
   }
 
-  const handleClose = async () => {
+  const handleClose = () => {
     playerRef.current?.pause()
 
-    if (isExpanded && canExpand) {
-      try {
-        await toggleExpanded()
-      } catch (error) {
-        console.error('exit mv drawer fullscreen failed', error)
-      }
-    }
-
+    // 关闭按钮只负责关闭 MV 抽屉，避免隐式变更窗口尺寸导致页面抖动。
     closeDrawer()
   }
 
@@ -253,7 +274,7 @@ const MvDrawer = () => {
           return
         }
 
-        void handleClose()
+        handleClose()
       }}
       direction='bottom'
     >
@@ -272,7 +293,7 @@ const MvDrawer = () => {
           <button
             type='button'
             aria-label='关闭 MV 播放器'
-            onClick={() => void handleClose()}
+            onClick={handleClose}
             className={cn(
               'app-intel-dark-surface inline-flex size-10 items-center justify-center rounded-full border border-white/12 bg-black/38 text-white shadow-[0_8px_24px_rgba(0,0,0,0.32)] backdrop-blur-md transition-colors hover:bg-black/56 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none',
               'pointer-events-auto cursor-pointer'
@@ -285,7 +306,8 @@ const MvDrawer = () => {
         <div className='relative flex h-full w-full items-center justify-center overflow-hidden'>
           {canPlay ? (
             <video
-              key={`${mvId}-${videoUrl}`}
+              // 使用已加载 MV 数据生成 key，避免关闭时 mvId 置空触发视频节点重建闪烁。
+              key={`${state.hero?.id ?? 'mv'}-${videoUrl}`}
               ref={playerRef}
               src={videoUrl}
               // poster={state.hero?.coverUrl}

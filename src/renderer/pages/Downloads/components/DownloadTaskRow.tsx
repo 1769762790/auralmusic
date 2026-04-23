@@ -4,6 +4,7 @@ import {
   canOpenDownloadTaskFile,
   canOpenDownloadTaskFolder,
   formatDownloadTaskProgress,
+  getDownloadTaskQualityLabel,
   getDownloadTaskStatusLabel,
 } from '../downloads.model'
 import type { DownloadTaskRowProps } from '../types'
@@ -45,7 +46,7 @@ const DownloadTaskRow = ({
       <div>
         <p className='text-muted-foreground text-xs'>最终音质</p>
         <p className='text-foreground mt-1 text-sm font-medium'>
-          {task.quality || '-'}
+          {getDownloadTaskQualityLabel(task.quality)}
         </p>
       </div>
 

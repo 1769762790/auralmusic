@@ -8,15 +8,19 @@
   <strong>A modern, cross-platform music player built with Electron, React, and TypeScript</strong>
 </p>
 
-## 🎵 功能特点
-
 ### 界面预览
 
 <p align="center">
-  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; max-width: 1200px; margin: 0 auto;">
-    <img src="./docs/screenshots/player.png" alt="Player Page" width="100%" style="border-radius: 8px; object-fit: cover;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 16px; max-width: 1200px; margin: 0 auto;">
+    <img src="./docs/screenshots/home.png" alt="Player Page" width="100%" style="border-radius: 8px; object-fit: cover;">
+    <img src="./docs/screenshots/artist.png" alt="Player Page" width="100%" style="border-radius: 8px; object-fit: cover;">
+    <img src="./docs/screenshots/rank.png" alt="Player Page" width="100%" style="border-radius: 8px; object-fit: cover;">
+    <img src="./docs/screenshots/dark-player2.jpg" alt="Player Page" width="100%" style="border-radius: 8px; object-fit: cover;">
+    <img src="./docs/screenshots/dark-player.jpg" alt="Player Page" width="100%" style="border-radius: 8px; object-fit: cover;">
   </div>
 </p>
+
+## 🎵 功能特点
 
 ### 核心功能
 

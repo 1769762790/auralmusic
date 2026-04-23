@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/stores/config-store'
+import { useShortcutRegistrationStore } from '@/stores/shortcut-registration-store'
 import {
   DEFAULT_SHORTCUT_BINDINGS,
-  resolveGlobalShortcutRegistrationStatuses,
   SHORTCUT_ACTIONS,
   canEditShortcutBinding,
   formatShortcutAccelerator,
@@ -19,11 +19,7 @@ import {
   type ShortcutBindings,
   type ShortcutScope,
 } from '../../../../shared/shortcut-keys'
-import type {
-  RecordingTarget,
-  ShortcutRecorderProps,
-  ShortcutRegistrationStatuses,
-} from '../types'
+import type { RecordingTarget, ShortcutRecorderProps } from '../types'
 
 const SHORTCUT_ACTION_LABELS = {
   playPause: '播放/暂停',
@@ -119,16 +115,6 @@ function updateShortcutBinding(
   }
 }
 
-function createInitialGlobalRegistrationStatuses(
-  bindings: ShortcutBindings
-): ShortcutRegistrationStatuses {
-  return resolveGlobalShortcutRegistrationStatuses({
-    enabled: false,
-    bindings,
-    isRegistered: () => false,
-  })
-}
-
 const ShortcutKeySettings = () => {
   const globalShortcutEnabled = useConfigStore(
     state => state.config.globalShortcutEnabled
@@ -143,10 +129,9 @@ const ShortcutKeySettings = () => {
   const isConfigLoading = useConfigStore(state => state.isLoading)
   const initConfig = useConfigStore(state => state.initConfig)
   const setConfig = useConfigStore(state => state.setConfig)
-  const [globalRegistrationStatuses, setGlobalRegistrationStatuses] =
-    useState<ShortcutRegistrationStatuses>(() =>
-      createInitialGlobalRegistrationStatuses(shortcutBindings)
-    )
+  const globalRegistrationStatuses = useShortcutRegistrationStore(
+    state => state.globalRegistrationStatuses
+  )
   const [recordingTarget, setRecordingTarget] =
     useState<RecordingTarget | null>(null)
 
@@ -165,31 +150,6 @@ const ShortcutKeySettings = () => {
 
     setRecordingTarget(null)
   }, [globalShortcutEnabled, recordingTarget])
-
-  useEffect(() => {
-    let cancelled = false
-
-    void window.electronShortcut
-      .getGlobalRegistrationStatuses()
-      .then(statuses => {
-        if (!cancelled) {
-          setGlobalRegistrationStatuses(statuses)
-        }
-      })
-      .catch(error => {
-        console.error('读取全局快捷键注册状态失败', error)
-      })
-
-    const unsubscribe =
-      window.electronShortcut.onGlobalRegistrationStatusesChanged(statuses => {
-        setGlobalRegistrationStatuses(statuses)
-      })
-
-    return () => {
-      cancelled = true
-      unsubscribe()
-    }
-  }, [])
 
   const isRecording = (actionId: ShortcutActionId, scope: ShortcutScope) => {
     return (
