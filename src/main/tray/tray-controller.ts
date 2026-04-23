@@ -47,12 +47,61 @@ const DEFAULT_TRAY_STATE: TrayState = {
   hasCurrentTrack: false,
 }
 
+const TRAY_NOW_PLAYING_MAX_DISPLAY_UNITS = 30
+const TRAY_LABEL_ELLIPSIS = '...'
+
 function getTrayIconFilename(platform: NodeJS.Platform) {
   if (platform === 'win32') {
     return path.join('build', 'icons', 'icon.ico')
   }
 
   return path.join('build', 'icons', 'png', '32x32.png')
+}
+
+function getCharacterDisplayUnits(character: string) {
+  return (character.codePointAt(0) ?? 0) > 0xff ? 2 : 1
+}
+
+function getTextDisplayUnits(text: string) {
+  let total = 0
+
+  for (const character of text) {
+    total += getCharacterDisplayUnits(character)
+  }
+
+  return total
+}
+
+function truncateTrayLabel(
+  text: string,
+  maxDisplayUnits = TRAY_NOW_PLAYING_MAX_DISPLAY_UNITS
+) {
+  if (!text || maxDisplayUnits <= 0) {
+    return ''
+  }
+
+  if (getTextDisplayUnits(text) <= maxDisplayUnits) {
+    return text
+  }
+
+  const availableUnits = Math.max(
+    maxDisplayUnits - TRAY_LABEL_ELLIPSIS.length,
+    1
+  )
+  let usedUnits = 0
+  let output = ''
+
+  for (const character of text) {
+    const units = getCharacterDisplayUnits(character)
+    if (usedUnits + units > availableUnits) {
+      break
+    }
+
+    output += character
+    usedUnits += units
+  }
+
+  return `${output}${TRAY_LABEL_ELLIPSIS}`
 }
 
 export function resolveTrayIconPath(options: {
@@ -129,7 +178,7 @@ function formatNowPlayingLabel(state: TrayState) {
     return 'AuralMusic'
   }
 
-  return artist ? `${title} - ${artist}` : title
+  return truncateTrayLabel(artist ? `${title} - ${artist}` : title)
 }
 
 function createPlaybackModeItem(

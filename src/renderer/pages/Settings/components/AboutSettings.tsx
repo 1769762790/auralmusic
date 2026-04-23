@@ -15,12 +15,13 @@ import {
 } from './about-settings.model'
 
 const AboutSettings = () => {
-  const appVersion = window.appRuntime.getAppVersion()
   const updateSnapshot = useUpdateStore(state => state.snapshot)
   const syncUpdateSnapshot = useUpdateStore(state => state.syncSnapshot)
   const openUpdateModal = useUpdateStore(state => state.openModal)
   const buttonLabel = resolveCheckUpdateButtonLabel(updateSnapshot)
   const isDevelopment = import.meta.env.DEV
+  const appVersion =
+    updateSnapshot.currentVersion || window.appRuntime.getAppVersion()
   const versionSummary = resolveAboutVersionSummary({
     appVersion,
     latestVersion: updateSnapshot.latestVersion,

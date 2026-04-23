@@ -110,3 +110,62 @@ test('createTrayController builds playback menu and dispatches tray commands', (
   assert.equal(showWindowCalls, 3)
   assert.equal(quitCalls, 1)
 })
+
+test('createTrayController truncates long now playing label to keep tray menu compact', () => {
+  const contextMenus: any[] = []
+
+  const controller = createTrayController({
+    Tray: class {
+      constructor() {
+        return {
+          setToolTip: () => undefined,
+          setContextMenu: (menu: unknown) => {
+            contextMenus.push(menu)
+          },
+          on: () => undefined,
+          destroy: () => undefined,
+        }
+      }
+    } as never,
+    Menu: {
+      buildFromTemplate: template => ({ template }),
+    } as never,
+    nativeImage: {
+      createFromPath: () => ({
+        isEmpty: () => false,
+      }),
+      createFromDataURL: () => ({
+        isEmpty: () => false,
+      }),
+    } as never,
+    appPath: 'F:\\code-demo\\AuralMusic',
+    resourcesPath: 'F:\\code-demo\\AuralMusic',
+    pathExists: () => true,
+    platform: 'win32',
+    showMainWindow: () => undefined,
+    quitApp: () => undefined,
+    sendCommand: () => undefined,
+  })
+
+  controller.initialize()
+
+  const longTrackName =
+    'BACK TO SCHOOL（返校日）- 功夫胖KUNGFU-PEN / 吴忌仑 Hush!@SBMS Beijing'
+  const longArtistNames = 'Very Long Artist Name For Tray Menu Width Regression'
+  const rawLabel = `${longTrackName} - ${longArtistNames}`
+
+  controller.setState({
+    currentTrackName: longTrackName,
+    currentArtistNames: longArtistNames,
+    status: 'playing',
+    playbackMode: 'repeat-all',
+    hasCurrentTrack: true,
+  })
+
+  const latestTemplate = contextMenus.at(-1)?.template ?? []
+  const nowPlayingLabel = latestTemplate[0]?.label
+
+  assert.equal(typeof nowPlayingLabel, 'string')
+  assert.notEqual(nowPlayingLabel, rawLabel)
+  assert.equal(nowPlayingLabel.endsWith('...'), true)
+})

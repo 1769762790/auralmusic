@@ -22,6 +22,22 @@ export const DOWNLOAD_TASK_STATUS_LABELS: Record<DownloadTaskStatus, string> = {
   completed: '下载完成',
 }
 
+const DOWNLOAD_TASK_QUALITY_LABELS: Record<string, string> = {
+  standard: '标准',
+  higher: '较高',
+  exhigh: '极高',
+  lossless: '无损',
+  hires: 'Hi-Res',
+  jyeffect: '高清环绕声',
+  sky: '沉浸环绕声',
+  dolby: '杜比全景声',
+  jymaster: '超清母带',
+  '128k': '标准',
+  '320k': '较高',
+  flac: '无损',
+  flac24bit: 'Hi-Res',
+}
+
 export const DOWNLOAD_TASK_FILTERS: DownloadTaskFilterOption[] = [
   { value: 'all', label: DOWNLOAD_TASK_FILTER_LABELS.all },
   { value: 'active', label: DOWNLOAD_TASK_FILTER_LABELS.active },
@@ -32,6 +48,18 @@ export const DOWNLOAD_TASK_FILTERS: DownloadTaskFilterOption[] = [
 
 export function getDownloadTaskStatusLabel(status: DownloadTaskStatus) {
   return DOWNLOAD_TASK_STATUS_LABELS[status]
+}
+
+export function getDownloadTaskQualityLabel(
+  quality: string | null | undefined
+) {
+  const normalizedQuality = quality?.trim()
+  if (!normalizedQuality) {
+    return '-'
+  }
+
+  // 兼容历史任务记录中的旧音质值，避免升级后文案回退成内部编码。
+  return DOWNLOAD_TASK_QUALITY_LABELS[normalizedQuality] || normalizedQuality
 }
 
 export function filterDownloadTasks(
@@ -87,7 +115,7 @@ export function buildDownloadTaskViewModels(
     songName: task.songName,
     statusLabel: getDownloadTaskStatusLabel(task.status),
     progressLabel: formatDownloadTaskProgress(task),
-    qualityLabel: task.quality || '-',
+    qualityLabel: getDownloadTaskQualityLabel(task.quality),
     canOpenFile: canOpenDownloadTaskFile(task),
     canOpenFolder: canOpenDownloadTaskFolder(task),
     canRemove: true,
