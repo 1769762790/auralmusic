@@ -5,6 +5,7 @@ import {
   Home,
   DailySongs,
   Library,
+  LocalLibrary,
   LikedSongs,
   Settings,
   Downloads,
@@ -39,6 +40,11 @@ export const routeMenuConfig: RouteMenuConfig[] = [
         path: '/library',
         element: <Library />,
         meta: { title: '音乐库', icon: '', authOnly: true },
+      },
+      {
+        path: '/local-library',
+        element: <LocalLibrary />,
+        meta: { title: '本地乐库', icon: '' },
       },
       {
         path: '/library/liked-songs',
