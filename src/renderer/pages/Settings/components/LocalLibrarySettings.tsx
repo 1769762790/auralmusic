@@ -217,10 +217,10 @@ const LocalLibrarySettings = () => {
       <div className='grid grid-cols-[minmax(0,1fr)_minmax(240px,280px)] items-center gap-6 py-3'>
         <div className='space-y-1'>
           <div className='text-muted-foreground text-sm font-medium'>
-            在线匹配本地歌词
+            在线补齐本地歌词与封面
           </div>
           <p className='text-muted-foreground text-xs'>
-            本地歌曲缺歌词时，播放中会按内置网易云接口自动补词并写回本地文件。
+            本地歌曲缺歌词或缺封面时，播放中会按内置网易云接口自动补齐并写回本地。
           </p>
         </div>
         <ToggleSetting

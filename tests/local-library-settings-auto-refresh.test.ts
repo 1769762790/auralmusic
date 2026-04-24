@@ -35,7 +35,7 @@ test('local library settings exposes selectable scan formats', () => {
 
 test('local library settings exposes online lyric match toggle', () => {
   assert.match(settingsSource, /localLibraryOnlineLyricMatchEnabled/)
-  assert.match(settingsSource, /在线匹配本地歌词/)
+  assert.match(settingsSource, /在线补齐本地歌词与封面/)
   assert.match(
     settingsSource,
     /setConfig\(\s*'localLibraryOnlineLyricMatchEnabled'/

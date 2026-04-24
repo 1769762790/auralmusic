@@ -60,7 +60,7 @@ async function fetchMusicApiJson(fetcher: typeof fetch, requestUrl: string) {
 }
 
 /**
- * 本地歌曲补词只在缺词时按需联网，避免把扫描阶段变成高频网络任务。
+ * 本地歌曲补充元数据只在缺词/缺封面时按需联网，避免把扫描阶段变成高频网络任务。
  * @param input 当前本地播放歌曲的基础信息
  * @param options 主进程依赖
  * @returns 写回后的歌词与封面结果
@@ -106,11 +106,15 @@ export async function matchLocalLibraryTrackOnlineLyrics(
   ])
 
   const lyricBundle = readOnlineLyricPayload(lyricPayload)
-  if (!lyricBundle.lyricText && !lyricBundle.translatedLyricText) {
+  const remoteCoverUrl = detailPayload ? readOnlineCoverUrl(detailPayload) : ''
+  if (
+    !lyricBundle.lyricText &&
+    !lyricBundle.translatedLyricText &&
+    !remoteCoverUrl.trim()
+  ) {
     return null
   }
 
-  const remoteCoverUrl = detailPayload ? readOnlineCoverUrl(detailPayload) : ''
   const writebackResult = await writeLocalTrackSupplementalMetadata({
     filePath: input.filePath,
     title: input.title,

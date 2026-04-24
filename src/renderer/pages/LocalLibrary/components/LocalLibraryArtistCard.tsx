@@ -1,7 +1,6 @@
-import { MicVocal, Play } from 'lucide-react'
+import { MicVocal } from 'lucide-react'
 
 import AvatarCover from '@/components/AvatarCover'
-import { Button } from '@/components/ui/button'
 import type { LocalLibraryArtistRecord } from '../../../../shared/local-library.ts'
 
 interface LocalLibraryArtistCardProps {

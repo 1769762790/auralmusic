@@ -1,7 +1,6 @@
-import { Music2, Play } from 'lucide-react'
+import { Music2 } from 'lucide-react'
 
 import AvatarCover from '@/components/AvatarCover'
-import { Button } from '@/components/ui/button'
 import type { LocalLibraryAlbumRecord } from '../../../../shared/local-library.ts'
 
 interface LocalLibraryAlbumCardProps {
