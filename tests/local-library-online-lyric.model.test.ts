@@ -3,7 +3,7 @@ import test from 'node:test'
 
 import {
   buildLocalLyricSearchKeyword,
-  readFirstSearchSongCandidate,
+  readConservativeSearchSongCandidate,
   readOnlineCoverUrl,
   readOnlineLyricPayload,
 } from '../src/main/local-library/local-library-online-lyric.model.ts'
@@ -15,14 +15,144 @@ test('buildLocalLyricSearchKeyword flattens artist separators for search request
   )
 })
 
-test('readFirstSearchSongCandidate returns the first valid song id', () => {
+test('readConservativeSearchSongCandidate only accepts candidates with matching title artist and duration', () => {
   assert.deepEqual(
-    readFirstSearchSongCandidate({
-      result: {
-        songs: [{ id: 'x' }, { id: 12345 }],
+    readConservativeSearchSongCandidate(
+      {
+        title: '七里香',
+        artistName: '周杰伦',
+        durationMs: 269000,
       },
-    }),
+      {
+        result: {
+          songs: [
+            {
+              id: 1,
+              name: '七里香',
+              artists: [{ name: '路人甲' }],
+              dt: 269000,
+            },
+            {
+              id: 2,
+              name: '七里香',
+              artists: [{ name: '周杰伦' }],
+              dt: 269000,
+            },
+          ],
+        },
+      }
+    ),
+    { id: 2 }
+  )
+})
+
+test('readConservativeSearchSongCandidate rejects candidates when duration is too far away', () => {
+  assert.equal(
+    readConservativeSearchSongCandidate(
+      {
+        title: '晴天',
+        artistName: '周杰伦',
+        durationMs: 269000,
+      },
+      {
+        result: {
+          songs: [
+            {
+              id: 1,
+              name: '晴天',
+              artists: [{ name: '周杰伦' }],
+              dt: 289000,
+            },
+          ],
+        },
+      }
+    ),
+    null
+  )
+})
+
+test('readConservativeSearchSongCandidate can fall back when local duration is missing', () => {
+  assert.deepEqual(
+    readConservativeSearchSongCandidate(
+      {
+        title: '安静',
+        artistName: '周杰伦',
+        durationMs: 0,
+      },
+      {
+        result: {
+          songs: [{ id: 12345, name: '安静', artists: [{ name: '周杰伦' }] }],
+        },
+      }
+    ),
     { id: 12345 }
+  )
+})
+
+test('readConservativeSearchSongCandidate rejects mismatched title variants', () => {
+  assert.equal(
+    readConservativeSearchSongCandidate(
+      {
+        title: '晴天',
+        artistName: '周杰伦',
+        durationMs: 269000,
+      },
+      {
+        result: {
+          songs: [
+            {
+              id: 1,
+              name: '雨天',
+              artists: [{ name: '周杰伦' }],
+              dt: 269000,
+            },
+          ],
+        },
+      }
+    ),
+    null
+  )
+})
+
+test('readConservativeSearchSongCandidate returns null when no candidate is safe to write back', () => {
+  assert.equal(
+    readConservativeSearchSongCandidate(
+      {
+        title: '稻香',
+        artistName: '周杰伦',
+        durationMs: 223000,
+      },
+      {
+        result: {
+          songs: [{ id: 'x' }, { id: 12345 }],
+        },
+      }
+    ),
+    null
+  )
+})
+
+test('readConservativeSearchSongCandidate normalizes artist separators before matching', () => {
+  assert.deepEqual(
+    readConservativeSearchSongCandidate(
+      {
+        title: '屋顶',
+        artistName: '周杰伦|温岚',
+        durationMs: 0,
+      },
+      {
+        result: {
+          songs: [
+            {
+              id: 321,
+              name: '屋顶',
+              artists: [{ name: '温岚' }, { name: '周杰伦' }],
+            },
+          ],
+        },
+      }
+    ),
+    { id: 321 }
   )
 })
 

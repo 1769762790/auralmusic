@@ -12,7 +12,7 @@ import { createLocalMediaUrl } from '../../shared/local-media.ts'
 import type { LocalLibraryDatabase } from './db.ts'
 import {
   buildLocalLyricSearchKeyword,
-  readFirstSearchSongCandidate,
+  readConservativeSearchSongCandidate,
   readOnlineCoverUrl,
   readOnlineLyricPayload,
 } from './local-library-online-lyric.model.ts'
@@ -83,7 +83,14 @@ export async function matchLocalLibraryTrackOnlineLyrics(
   searchUrl.searchParams.set('type', '1')
 
   const searchPayload = await fetchMusicApiJson(fetcher, searchUrl.toString())
-  const matchedSong = readFirstSearchSongCandidate(searchPayload)
+  const matchedSong = readConservativeSearchSongCandidate(
+    {
+      title: input.title,
+      artistName: input.artistName,
+      durationMs: input.durationMs,
+    },
+    searchPayload
+  )
   if (!matchedSong) {
     return null
   }
