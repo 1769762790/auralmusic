@@ -25,6 +25,7 @@ export interface RawSongAlbum {
 export interface RawSongItem {
   id?: number
   name?: string
+  fee?: number
   dt?: number
   ar?: RawArtist[]
   al?: RawSongAlbum

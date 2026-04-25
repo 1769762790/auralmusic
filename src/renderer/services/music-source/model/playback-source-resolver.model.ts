@@ -29,7 +29,8 @@ function createMissingPlaybackRuntimeStateError(): Error {
 
 function toResolveContext(
   authState: PlaybackResolverAuthState,
-  config: PlaybackResolverConfig
+  config: PlaybackResolverConfig,
+  trackFee: number
 ): ResolveContext {
   return {
     scene: 'playback',
@@ -38,6 +39,8 @@ function toResolveContext(
       userId: authState.user?.userId ?? authState.session?.userId ?? null,
       cookie: authState.session?.cookie ?? null,
     }),
+    isVip: authState.session?.isVip === true,
+    trackFee,
     config: {
       musicSourceEnabled: config.musicSourceEnabled,
       musicSourceProviders: config.musicSourceProviders,
@@ -132,7 +135,11 @@ export function createPlaybackSourceResolver(
         : (() => {
             throw createMissingPlaybackRuntimeStateError()
           })())
-    const context = toResolveContext(authState, config)
+    const context = toResolveContext(
+      authState,
+      config,
+      typeof options.track.fee === 'number' ? options.track.fee : 0
+    )
     const policy = buildResolverPolicy(context)
     const trackId = options.track.id
 

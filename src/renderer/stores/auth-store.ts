@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import {
   createLoginQr,
-  getLoginStatus,
+  getUserAccount,
+  getVipInfoV2,
   logout as logoutRequest,
   loginWithEmail,
   loginWithPhone,
@@ -10,7 +11,7 @@ import {
   sendLoginCaptcha,
 } from '@/api/auth'
 import type { LoginMode } from '@/types/api'
-import { normalizeAuthSession } from '../../shared/auth'
+import { normalizeAuthSession, normalizeVipState } from '../../shared/auth'
 import type { AuthSession, AuthUser } from '../../shared/auth'
 import type {
   AuthStoreState,
@@ -70,10 +71,11 @@ async function requestAuthSession(
   response: unknown,
   fallbackCookie = ''
 ) {
+  const updatedAt = Date.now()
   const session = normalizeAuthSession(
     response as Parameters<typeof normalizeAuthSession>[0],
     mode,
-    Date.now(),
+    updatedAt,
     fallbackCookie
   )
 
@@ -81,8 +83,21 @@ async function requestAuthSession(
     throw new Error('auth session is incomplete')
   }
 
-  await persistSession(session)
-  return session
+  // 会员态只影响音源分流，接口失败时按非 VIP 兜底，避免登录流程被次要能力阻断。
+  const vipState = await getVipInfoV2(session.cookie, session.userId)
+    .then(payload => normalizeVipState(payload, updatedAt))
+    .catch(error => {
+      console.error('fetch vip info failed', error)
+      return normalizeVipState(null, updatedAt)
+    })
+
+  const nextSession = {
+    ...session,
+    ...vipState,
+  }
+
+  await persistSession(nextSession)
+  return nextSession
 }
 
 export const useAuthStore = create<AuthStoreState>(set => ({
@@ -111,22 +126,20 @@ export const useAuthStore = create<AuthStoreState>(set => ({
       }
 
       try {
-        const validationResponse = await getLoginStatus(persistedSession.cookie)
-        const refreshedSession = normalizeAuthSession(
-          validationResponse,
+        const accountResponse = await getUserAccount(persistedSession.cookie)
+        const session = await requestAuthSession(
           persistedSession.loginMethod,
-          Date.now(),
+          accountResponse,
           persistedSession.cookie
         )
 
-        if (!refreshedSession.userId) {
+        if (!session.userId) {
           throw new Error('invalid auth response')
         }
 
-        await persistSession(refreshedSession)
         set({
-          user: toUser(refreshedSession),
-          session: refreshedSession,
+          user: toUser(session),
+          session,
           loginStatus: 'authenticated',
           hasHydrated: true,
         })
@@ -313,8 +326,12 @@ export const useAuthStore = create<AuthStoreState>(set => ({
 
         if (code === 803) {
           const cookie = response?.cookie ?? response?.data?.cookie ?? ''
-          const statusResponse = await getLoginStatus(cookie)
-          const session = await requestAuthSession('qr', statusResponse, cookie)
+          const accountResponse = await getUserAccount(cookie)
+          const session = await requestAuthSession(
+            'qr',
+            accountResponse,
+            cookie
+          )
 
           set({
             user: toUser(session),

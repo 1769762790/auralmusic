@@ -12,6 +12,7 @@ export interface TrackListDownloadSong {
   artistNames?: string
   duration: number
   albumName?: string
+  fee?: number
 }
 
 export interface TrackDownloadSource {
@@ -21,6 +22,7 @@ export interface TrackDownloadSource {
   albumName: string
   coverUrl: string
   duration: number
+  fee?: number
 }
 
 export interface ResolveDownloadSourceInput {

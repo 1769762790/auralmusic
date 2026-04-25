@@ -11,6 +11,7 @@ export interface TrackListItemData {
   artistNames?: string
   duration: number
   albumName?: string
+  fee?: number
 }
 
 export type TrackListVariant = 'default' | 'hot' | 'quick'

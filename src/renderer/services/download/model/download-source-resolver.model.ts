@@ -35,12 +35,15 @@ function createDefaultProviders(): Record<
 }
 
 function toResolveContext(
-  isAuthenticated: boolean,
+  authState: { isAuthenticated: boolean; isVip: boolean },
+  trackFee: number,
   config: DownloadResolverConfig
 ): ResolveContext {
   return {
     scene: 'download',
-    isAuthenticated,
+    isAuthenticated: authState.isAuthenticated,
+    isVip: authState.isVip,
+    trackFee,
     config: {
       musicSourceEnabled: config.musicSourceEnabled,
       musicSourceProviders: config.musicSourceProviders,
@@ -56,7 +59,7 @@ export function createDownloadSourceResolver(
   deps: DownloadSourceResolverDeps = {}
 ) {
   const getConfig = deps.getConfig
-  const getIsAuthenticated = deps.getIsAuthenticated
+  const getAuthState = deps.getAuthState
   const providers = createDefaultProviders()
 
   return async function resolveDownloadSource(
@@ -71,14 +74,18 @@ export function createDownloadSourceResolver(
       : (() => {
           throw createMissingDownloadRuntimeStateError()
         })()
-    const isAuthenticated = await (
-      getIsAuthenticated
-        ? getIsAuthenticated
+    const authState = await (
+      getAuthState
+        ? getAuthState
         : () => {
             throw createMissingDownloadRuntimeStateError()
           }
     )()
-    const context = toResolveContext(isAuthenticated, config)
+    const context = toResolveContext(
+      authState,
+      typeof options.track.fee === 'number' ? options.track.fee : 0,
+      config
+    )
     const resolverPolicy = buildResolverPolicy(context)
     const levels =
       options.policy === 'strict'

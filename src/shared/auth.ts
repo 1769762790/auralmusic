@@ -10,10 +10,17 @@ export interface AuthUser {
   avatarUrl: string
 }
 
+export interface AuthVipState {
+  isVip: boolean
+  vipUpdatedAt: number
+}
+
 export interface AuthSession extends AuthUser {
   cookie: string
   loginMethod: AuthLoginMethod
   updatedAt: number
+  isVip?: boolean
+  vipUpdatedAt?: number
 }
 
 export interface CookiePair {
@@ -39,6 +46,18 @@ export interface RawAuthResponseBody {
   data?: RawAuthResponseBody
 }
 
+export interface RawVipInfoResponseBody {
+  code?: number
+  redVipLevel?: number
+  musicPackage?: {
+    vipLevel?: number
+  }
+  associator?: {
+    vipLevel?: number
+  }
+  data?: RawVipInfoResponseBody
+}
+
 const COOKIE_ATTRIBUTE_NAMES = new Set([
   'domain',
   'expires',
@@ -50,11 +69,9 @@ const COOKIE_ATTRIBUTE_NAMES = new Set([
   'samesite',
 ])
 
-function unwrapResponseBody(
-  response?: RawAuthResponseBody | null
-): RawAuthResponseBody {
+function unwrapResponseBody<T extends { data?: T }>(response?: T | null): T {
   if (!response) {
-    return {}
+    return {} as T
   }
 
   if (response.data && typeof response.data === 'object') {
@@ -115,7 +132,8 @@ export function normalizeAuthSession(
   response?: RawAuthResponseBody | null,
   loginMethod: AuthLoginMethod = 'email',
   updatedAt = Date.now(),
-  fallbackCookie = ''
+  fallbackCookie = '',
+  vipState: Partial<AuthVipState> = {}
 ): AuthSession {
   const body = unwrapResponseBody(response)
   const accountId = body.account?.id ?? 0
@@ -123,10 +141,32 @@ export function normalizeAuthSession(
 
   return {
     cookie: resolveCookieString(body, fallbackCookie),
+    isVip: vipState.isVip === true,
     loginMethod,
     updatedAt,
     userId: accountId,
     nickname: profile?.nickname?.trim() || '',
     avatarUrl: resolveAvatarUrl(profile),
+    vipUpdatedAt: vipState.vipUpdatedAt ?? updatedAt,
+  }
+}
+
+export function normalizeVipState(
+  response?: RawVipInfoResponseBody | null,
+  updatedAt = Date.now()
+): AuthVipState {
+  const body = unwrapResponseBody(response)
+  const redVipLevel =
+    typeof body.redVipLevel === 'number' ? body.redVipLevel : 0
+  const musicPackageLevel =
+    typeof body.musicPackage?.vipLevel === 'number'
+      ? body.musicPackage.vipLevel
+      : 0
+  const associatorLevel =
+    typeof body.associator?.vipLevel === 'number' ? body.associator.vipLevel : 0
+
+  return {
+    isVip: redVipLevel > 0 || musicPackageLevel > 0 || associatorLevel > 0,
+    vipUpdatedAt: updatedAt,
   }
 }

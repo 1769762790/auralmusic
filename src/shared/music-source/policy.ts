@@ -36,9 +36,11 @@ export function buildResolverPolicy(context: ResolveContext): ResolverPolicy {
   const customApiEnabled =
     context.config.customMusicApiEnabled &&
     context.config.customMusicApiUrl.trim().length > 0
+  const shouldBypassOfficial =
+    context.isAuthenticated && !context.isVip && context.trackFee !== 0
   const resolverOrder: MusicResolverId[] = context.config.musicSourceEnabled
     ? compactResolvers(
-        context.isAuthenticated
+        context.isAuthenticated && !shouldBypassOfficial
           ? [
               'official',
               builtinUnblockEnabled ? 'builtinUnblock' : null,

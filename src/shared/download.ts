@@ -44,6 +44,7 @@ export type SongDownloadPayload = {
   songId: number | string
   songName: string
   artistName: string
+  fee?: number
   coverUrl?: string
   albumName?: string
   directory?: string

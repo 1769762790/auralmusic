@@ -40,6 +40,7 @@ function buildTrackDownloadSource(
     albumName: item.albumName || '',
     coverUrl: item.coverUrl || fallbackCoverUrl || '',
     duration: item.duration,
+    fee: typeof item.fee === 'number' ? item.fee : 0,
   }
 }
 
@@ -57,6 +58,7 @@ export function buildTrackDownloadContext(
     songId: trackSource.id,
     songName: trackSource.name,
     artistName: trackSource.artistNames,
+    fee: trackSource.fee,
     coverUrl: trackSource.coverUrl,
     albumName: item.albumName,
     requestedQuality: 'higher',

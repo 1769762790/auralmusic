@@ -19,6 +19,7 @@ export type PlaybackTrack = {
   albumName: string
   coverUrl: string
   duration: number
+  fee?: number
   sourceUrl?: string
   lyricText?: string
   translatedLyricText?: string
@@ -188,6 +189,7 @@ export function normalizePlaybackTrack(track: unknown): PlaybackTrack | null {
         : '未知专辑',
     coverUrl: typeof track.coverUrl === 'string' ? track.coverUrl : '',
     duration: typeof track.duration === 'number' ? track.duration : 0,
+    fee: typeof track.fee === 'number' ? track.fee : 0,
     sourceUrl:
       typeof track.sourceUrl === 'string' && track.sourceUrl.trim()
         ? track.sourceUrl.trim()

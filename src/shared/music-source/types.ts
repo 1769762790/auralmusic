@@ -13,6 +13,8 @@ export type BuiltinPlatformId = 'migu' | 'kugou' | 'pyncmd' | 'bilibili'
 export type ResolveContext = {
   scene: ResolveScene
   isAuthenticated: boolean
+  isVip: boolean
+  trackFee: number
   config: Pick<
     AppConfig,
     | 'musicSourceEnabled'

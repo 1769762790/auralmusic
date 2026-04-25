@@ -95,6 +95,7 @@ export function normalizeSearchResults(
             albumName: song.al?.name || '未知专辑',
             coverUrl,
             duration: song.dt || 0,
+            fee: typeof song.fee === 'number' ? song.fee : 0,
           },
         },
       ]

@@ -37,6 +37,7 @@ export interface DownloadTrack {
   albumName: string
   coverUrl: string
   duration: number
+  fee?: number
 }
 
 export type DownloadResolutionPolicy = 'strict' | 'fallback'
@@ -76,7 +77,10 @@ export interface DownloadSourceResolverDeps {
   getSongUrlMatch?: GetSongUrlMatch
   resolveTrackWithLxMusicSource?: typeof resolveTrackWithLxMusicSource
   getConfig?: () => DownloadSourceMaybePromise<DownloadResolverConfig>
-  getIsAuthenticated?: () => DownloadSourceMaybePromise<boolean>
+  getAuthState?: () => DownloadSourceMaybePromise<{
+    isAuthenticated: boolean
+    isVip: boolean
+  }>
   loadSongApiListModule?: () => Promise<DownloadSourceApiListModule>
 }
 

@@ -15,6 +15,7 @@ function createTrack() {
     albumName: 'Resolver Album',
     coverUrl: 'https://cdn.example.com/cover.jpg',
     duration: 180000,
+    fee: 0,
   }
 }
 
@@ -97,6 +98,8 @@ test('authenticated playback stops after official succeeds', async () => {
         nickname: 'auth',
         avatarUrl: '',
         cookie: 'c',
+        isVip: true,
+        vipUpdatedAt: Date.now(),
         loginMethod: 'email',
         updatedAt: Date.now(),
       },
@@ -152,6 +155,85 @@ test('authenticated playback stops after official succeeds', async () => {
     br: 999000,
   })
   assert.deepEqual(calls, ['official:true'])
+})
+
+test('authenticated non-vip playback bypasses official for paid tracks', async () => {
+  const calls: string[] = []
+  const track = {
+    ...createTrack(),
+    fee: 1,
+  }
+
+  const resolvePlaybackSource = createPlaybackSourceResolver({
+    getAuthState: () => ({
+      user: { userId: 1, nickname: 'auth', avatarUrl: '' },
+      session: {
+        userId: 1,
+        nickname: 'auth',
+        avatarUrl: '',
+        cookie: 'c',
+        isVip: false,
+        vipUpdatedAt: Date.now(),
+        loginMethod: 'email',
+        updatedAt: Date.now(),
+      },
+      loginStatus: 'authenticated',
+    }),
+    getConfig: () => ({
+      quality: 'lossless',
+      musicSourceEnabled: true,
+      musicSourceProviders: ['migu', 'lxMusic'],
+      luoxueSourceEnabled: true,
+      customMusicApiEnabled: false,
+      customMusicApiUrl: '',
+    }),
+    providers: {
+      official: {
+        resolve: async () => {
+          calls.push('official')
+          return {
+            id: track.id,
+            url: 'https://cdn.example.com/official-preview.mp3',
+            time: 60000,
+            br: 128000,
+          }
+        },
+      },
+      builtinUnblock: {
+        resolve: async () => {
+          calls.push('builtin')
+          return {
+            id: track.id,
+            url: 'https://cdn.example.com/builtin.flac',
+            time: track.duration,
+            br: 999000,
+          }
+        },
+      },
+      lxMusic: {
+        resolve: async () => {
+          calls.push('lx')
+          return null
+        },
+      },
+      customApi: {
+        resolve: async () => {
+          calls.push('custom')
+          return null
+        },
+      },
+    },
+  })
+
+  const result = await resolvePlaybackSource({ track })
+
+  assert.deepEqual(result, {
+    id: track.id,
+    url: 'https://cdn.example.com/builtin.flac',
+    time: track.duration,
+    br: 999000,
+  })
+  assert.deepEqual(calls, ['builtin'])
 })
 
 test('unauthenticated playback still tries builtin unblock when legacy builtin platforms normalize to empty', async () => {
@@ -497,6 +579,8 @@ test('lx playback provider returns null instead of crashing on partial config', 
     context: {
       scene: 'playback',
       isAuthenticated: false,
+      isVip: false,
+      trackFee: 0,
       config: {
         musicSourceEnabled: true,
         musicSourceProviders: ['lxMusic'],

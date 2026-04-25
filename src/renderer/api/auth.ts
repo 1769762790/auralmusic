@@ -1,6 +1,9 @@
 import type { AxiosResponse } from 'axios'
 import request from '@/lib/request'
-import type { RawAuthResponseBody } from '../../shared/auth'
+import type {
+  RawAuthResponseBody,
+  RawVipInfoResponseBody,
+} from '../../shared/auth'
 import type {
   CaptchaParams,
   EmailLoginParams,
@@ -94,6 +97,31 @@ export function getLoginStatus(cookie: string) {
         },
       }
     )
+    .then(unwrapResponse)
+}
+
+export function getUserAccount(cookie: string) {
+  return request
+    .get<RawAuthResponseBody>('/user/account', {
+      params: {
+        cookie,
+        timestamp: Date.now(),
+        ua: 'pc',
+      },
+    })
+    .then(unwrapResponse)
+}
+
+export function getVipInfoV2(cookie: string, uid?: number | null) {
+  return request
+    .get<RawVipInfoResponseBody>('/vip/info/v2', {
+      params: {
+        cookie,
+        uid: typeof uid === 'number' && uid > 0 ? uid : undefined,
+        timestamp: Date.now(),
+        ua: 'pc',
+      },
+    })
     .then(unwrapResponse)
 }
 

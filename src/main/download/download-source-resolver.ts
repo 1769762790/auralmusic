@@ -84,7 +84,8 @@ function createRequestHeaders(
 
 function buildResolveContext(
   runtimeConfig: DownloadRuntimeConfig,
-  authSession: AuthSession | null
+  authSession: AuthSession | null,
+  trackFee: number
 ): ResolveContext {
   return {
     scene: 'download',
@@ -92,6 +93,8 @@ function buildResolveContext(
       userId: authSession?.userId ?? null,
       cookie: authSession?.cookie ?? null,
     }),
+    isVip: authSession?.isVip === true,
+    trackFee,
     config: {
       musicSourceEnabled: runtimeConfig.musicSourceEnabled,
       musicSourceProviders: runtimeConfig.musicSourceProviders ?? [],
@@ -128,7 +131,11 @@ export function createDownloadSourceResolver(
 
     const authOrigin = resolveAuthOrigin(baseURL)
     const authSession = getAuthSession()
-    const context = buildResolveContext(runtimeConfig, authSession)
+    const context = buildResolveContext(
+      runtimeConfig,
+      authSession,
+      typeof payload.fee === 'number' ? payload.fee : 0
+    )
     const resolverPolicy = buildResolverPolicy(context)
 
     for (const resolverId of resolverPolicy.resolverOrder) {
