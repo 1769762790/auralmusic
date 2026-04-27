@@ -43,7 +43,28 @@ export function parseIntegerId(value: unknown) {
 }
 
 export function ensureCoverUrl(value: unknown) {
-  return typeof value === 'string' ? value.trim() : ''
+  if (typeof value !== 'string') {
+    return ''
+  }
+
+  const coverUrl = value.trim()
+  if (!coverUrl) {
+    return ''
+  }
+
+  if (/^https?:\/\//i.test(coverUrl)) {
+    return coverUrl
+  }
+
+  if (coverUrl.startsWith('//')) {
+    return `https:${coverUrl}`
+  }
+
+  if (coverUrl.startsWith('/data/oss/')) {
+    return `https://d.musicapp.migu.cn${coverUrl}`
+  }
+
+  return coverUrl
 }
 
 export function hasPositiveNumber(value: unknown) {
