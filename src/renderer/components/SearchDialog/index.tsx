@@ -388,7 +388,7 @@ const SearchDialog = () => {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className='grid h-[60vh] grid-rows-[auto_minmax(0,1fr)] gap-4 overflow-hidden rounded-[28px] p-5 xl:max-w-[50vw] 2xl:max-w-[50vw]'
+          className='sm:max-w-[60vw]: grid h-[60vh] grid-rows-[auto_minmax(0,1fr)] gap-4 overflow-hidden rounded-[28px] p-5 md:max-w-[50vw] xl:max-w-[50vw] 2xl:max-w-[50vw]'
           showCloseButton={false}
         >
           <div className='w-full'>
