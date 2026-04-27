@@ -158,6 +158,7 @@ const SystemSettings = () => {
     bytesToGb(diskCacheMaxBytes)
   )
   const [cacheStatus, setCacheStatus] = useState(EMPTY_CACHE_STATUS)
+  const [openingLogDirectory, setOpeningLogDirectory] = useState(false)
 
   const fontFamilies = mergeFontFamilies(systemFonts, currentFontFamily)
   const resolvedCacheDir =
@@ -325,6 +326,26 @@ const SystemSettings = () => {
       )
     } finally {
       setClearingCache(false)
+    }
+  }
+
+  const handleOpenLogDirectory = async () => {
+    if (openingLogDirectory) {
+      return
+    }
+
+    setOpeningLogDirectory(true)
+    try {
+      const opened = await window.electronLogger.openLogDirectory()
+      if (!opened) {
+        toast.error('打开日志目录失败')
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : '打开日志目录失败，请稍后重试'
+      )
+    } finally {
+      setOpeningLogDirectory(false)
     }
   }
 
@@ -527,6 +548,26 @@ const SystemSettings = () => {
           onClick={handleClearCache}
         >
           {clearingCache ? '清理中...' : '清理缓存'}
+        </Button>
+      </div>
+      <Separator />
+
+      <div className='grid grid-cols-[minmax(0,1fr)_minmax(180px,240px)] items-center gap-6 py-3'>
+        <div className='space-y-1'>
+          <div className='text-muted-foreground text-sm font-medium'>
+            应用日志
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            打开本机日志目录，用于排查播放、下载和音源问题
+          </p>
+        </div>
+        <Button
+          type='button'
+          variant='outline'
+          disabled={openingLogDirectory}
+          onClick={handleOpenLogDirectory}
+        >
+          {openingLogDirectory ? '打开中...' : '打开日志目录'}
         </Button>
       </div>
       <Separator />

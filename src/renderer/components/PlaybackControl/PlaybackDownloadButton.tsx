@@ -10,12 +10,14 @@ import {
   handleTrackDownload,
   TRACK_DOWNLOAD_TOASTS,
 } from '@/components/TrackList/track-list-download.model'
+import { createRendererLogger } from '@/lib/logger'
 import { cn } from '@/lib/utils'
 import { useConfigStore } from '@/stores/config-store'
 import { usePlaybackStore } from '@/stores/playback-store'
 
 const buttonBaseClassName =
   'text-primary/72 hover:text-primary flex size-9 items-center justify-center rounded-full transition-colors hover:bg-primary/10'
+const downloadLogger = createRendererLogger('download')
 
 const PlaybackDownloadButton = () => {
   const currentTrack = usePlaybackStore(state => state.currentTrack)
@@ -62,7 +64,10 @@ const PlaybackDownloadButton = () => {
         toast.success(TRACK_DOWNLOAD_TOASTS.enqueued)
       }
     } catch (error) {
-      console.error('enqueue current playback download failed', error)
+      downloadLogger.error('enqueue current playback download failed', {
+        error,
+        trackId: currentTrack?.id,
+      })
       toast.error(TRACK_DOWNLOAD_TOASTS.enqueueFailed)
     } finally {
       setPending(false)

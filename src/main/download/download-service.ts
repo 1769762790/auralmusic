@@ -3,6 +3,7 @@ import path from 'node:path'
 import NodeID3 from 'node-id3'
 
 import type { AudioQualityLevel } from '../config/types.ts'
+import { createMainLogger } from '../logging/logger.ts'
 import { readMusicApiBaseUrlFromEnv } from '../music-api-runtime.ts'
 import type { AuthSession } from '../../shared/auth.ts'
 import {
@@ -54,6 +55,8 @@ type DownloadServiceOptions = {
   openPath?: (targetPath: string) => Promise<string>
   showItemInFolder?: (targetPath: string) => void
 }
+
+const downloadLogger = createMainLogger('download')
 
 const CONTENT_TYPE_EXTENSION_MAP: Record<string, string> = {
   'audio/mpeg': '.mp3',
@@ -1136,7 +1139,7 @@ export class DownloadService {
           }
         }
       } catch (error) {
-        console.warn('[DownloadService] fetch cover failed', error)
+        downloadLogger.warn('fetch cover failed', { error })
       }
     }
 
@@ -1166,7 +1169,7 @@ export class DownloadService {
           ...(await this.fetchMetadata(payload.songId)),
         }
       } catch (error) {
-        console.warn('[DownloadService] fetch metadata failed', error)
+        downloadLogger.warn('fetch metadata failed', { error })
         return mergedMetadata
       }
     }
@@ -1211,7 +1214,7 @@ export class DownloadService {
           : {}),
       }
     } catch (error) {
-      console.warn('[DownloadService] resolve metadata failed', error)
+      downloadLogger.warn('resolve metadata failed', { error })
       return mergedMetadata
     }
   }

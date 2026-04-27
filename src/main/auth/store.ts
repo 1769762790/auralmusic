@@ -2,6 +2,7 @@ import electron from 'electron'
 import ElectronStore from 'electron-store'
 import { AUTH_STORE_NAME } from './types.ts'
 import { readMusicApiBaseUrlFromEnv } from '../music-api-runtime.ts'
+import { createMainLogger } from '../logging/logger'
 import { resolveAppStoreDirectory } from '../storage/store-path.ts'
 import { parseCookiePairs, type AuthSession } from '../../shared/auth.ts'
 import { resolveAuthRequestHeaders } from './request-header.ts'
@@ -17,6 +18,7 @@ const Store =
     }
   ).default ?? ElectronStore
 const { session } = electron
+const authLogger = createMainLogger('auth')
 
 const DEFAULT_AUTH_STATE: AuthStoreSchema = {
   session: null,
@@ -66,7 +68,7 @@ function resolveAuthOrigin() {
   try {
     return new URL(baseURL).origin
   } catch (error) {
-    console.error('Failed to resolve auth origin:', error)
+    authLogger.error('Failed to resolve auth origin', { error })
     return undefined
   }
 }

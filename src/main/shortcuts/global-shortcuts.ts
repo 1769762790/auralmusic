@@ -7,9 +7,11 @@ import {
   type GlobalShortcutRegistrationStatuses,
 } from '../../shared/shortcut-keys'
 import { SHORTCUT_IPC_CHANNELS } from '../../shared/ipc/index.ts'
+import { createMainLogger } from '../logging/logger'
 
 const registeredAccelerators = new Set<string>()
 const { globalShortcut } = electron
+const shortcutLogger = createMainLogger('global-shortcut')
 let latestConfiguredGlobalShortcutStatuses =
   {} as GlobalShortcutRegistrationStatuses
 
@@ -55,15 +57,17 @@ export function syncConfiguredGlobalShortcuts(window: BrowserWindow | null) {
             }
           })
         } catch (error) {
-          console.warn(
-            `global shortcut registration failed: ${accelerator}`,
-            error
-          )
+          shortcutLogger.warn('global shortcut registration failed', {
+            accelerator,
+            error,
+          })
           return false
         }
 
         if (!registered) {
-          console.warn(`global shortcut registration failed: ${accelerator}`)
+          shortcutLogger.warn('global shortcut registration failed', {
+            accelerator,
+          })
           return false
         }
 

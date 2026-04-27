@@ -1,4 +1,5 @@
 import { getBuiltinTrackCover } from '../../services/music-metadata/platform-metadata.service.ts'
+import { createRendererLogger } from '../../lib/logger.ts'
 import { usePlaybackStore } from '../../stores/playback-store.ts'
 import { isLocalPlaybackTrack } from './player-lyrics-source.model.ts'
 import type { PlaybackTrack } from '../../../shared/playback.ts'
@@ -16,6 +17,7 @@ type EnsureCurrentTrackCoverDeps = {
 }
 
 const coverMissCache = new Set<string>()
+const coverLogger = createRendererLogger('cover')
 
 function hasCoverUrl(coverUrl: string | undefined) {
   return Boolean(coverUrl?.trim())
@@ -29,6 +31,15 @@ function createCoverMissKey(track: PlaybackTrack) {
     'wy'
 
   return `${source}:${track.id}`
+}
+
+function readCoverSource(track: PlaybackTrack) {
+  return (
+    track.lockedPlatform?.trim() ||
+    track.lockedLxSourceId?.trim() ||
+    track.lxInfo?.source?.trim() ||
+    'wy'
+  )
 }
 
 function patchCurrentTrackCover(trackId: number, coverUrl: string) {
@@ -55,25 +66,57 @@ export function createEnsureCurrentTrackCover(
       isLocalPlaybackTrack(currentTrack) ||
       hasCoverUrl(currentTrack.coverUrl)
     ) {
+      if (currentTrack) {
+        coverLogger.debug('cover resolve skipped', {
+          hasCover: hasCoverUrl(currentTrack.coverUrl),
+          isLocal: isLocalPlaybackTrack(currentTrack),
+          source: readCoverSource(currentTrack),
+          trackId: currentTrack.id,
+        })
+      }
       return
     }
 
     const missKey = createCoverMissKey(currentTrack)
     if (missCache.has(missKey)) {
+      coverLogger.debug('cover resolve skipped', {
+        reason: 'miss-cache',
+        source: readCoverSource(currentTrack),
+        trackId: currentTrack.id,
+      })
       return
     }
 
     try {
+      const source = readCoverSource(currentTrack)
+      coverLogger.debug('cover resolve start', {
+        source,
+        trackId: currentTrack.id,
+      })
+
       const result = await getBuiltinTrackCoverImpl(currentTrack)
       const coverUrl = result?.coverUrl?.trim()
       if (!coverUrl) {
+        coverLogger.info('cover resolve miss', {
+          reason: 'provider-empty',
+          source,
+          trackId: currentTrack.id,
+        })
         missCache.add(missKey)
         return
       }
 
       patchTrackCover(currentTrack.id, coverUrl)
+      coverLogger.info('cover resolve hit', {
+        source,
+        trackId: currentTrack.id,
+      })
     } catch (error) {
-      console.warn('[PlayerCover] resolve builtin cover failed', error)
+      coverLogger.warn('resolve builtin cover failed', {
+        error,
+        source: readCoverSource(currentTrack),
+        trackId: currentTrack.id,
+      })
       missCache.add(missKey)
     }
   }

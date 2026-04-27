@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { useIntersectionLoadMore } from '@/hooks/useLoadMore'
+import { createRendererLogger } from '@/lib/logger'
 import { searchSongsWithBuiltinProvider } from '@/services/music-source/builtin-search'
 import { useMvDrawerStore } from '@/stores/mv-drawer-store'
 import { usePlaybackStore } from '@/stores/playback-store'
@@ -35,6 +36,7 @@ import { Separator } from '../ui/separator'
 
 const PAGE_SIZE = 20
 const SEARCH_DEBOUNCE_MS = 350
+const searchLogger = createRendererLogger('search')
 
 const SearchDialog = () => {
   const navigate = useNavigate()
@@ -122,7 +124,11 @@ const SearchDialog = () => {
           hasMore: list.length >= limit,
         }
       } catch (fetchError) {
-        console.error('search dialog fetch failed', fetchError)
+        searchLogger.warn('search dialog fetch failed', {
+          error: fetchError,
+          keyword: activeQuery,
+          type,
+        })
         setError('搜索失败，请稍后重试')
         return {
           list: [],
@@ -210,7 +216,12 @@ const SearchDialog = () => {
           })
         })
         .catch(fetchError => {
-          console.error('builtin search dialog fetch failed', fetchError)
+          searchLogger.warn('builtin search dialog fetch failed', {
+            error: fetchError,
+            keyword: activeQuery,
+            page,
+            source: sourceTab.id,
+          })
 
           setPlatformStates(current => {
             const previous = current[sourceTab.id] ?? fallbackState

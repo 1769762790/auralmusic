@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { playbackRuntime } from '@/audio/playback-runtime/playback-runtime'
+import { createRendererLogger } from '@/lib/logger'
 import { resolvePlaybackSource } from '@/services/music-source/playback-source-resolver.ts'
 import { usePlaybackStore } from '@/stores/playback-store'
 import {
@@ -13,6 +14,8 @@ import {
   throwIfPlaybackRequestStale,
 } from './model'
 import type { PlaybackEngineTrackLoaderOptions } from './types'
+
+const playbackLogger = createRendererLogger('playback-engine')
 
 function getPlaybackRequestSnapshot() {
   const latestState = usePlaybackStore.getState()
@@ -137,7 +140,10 @@ export function usePlaybackEngineTrackLoader({
             if (error === STALE_PLAYBACK_REQUEST) {
               throw error
             }
-            console.error('resolve cached audio source failed', error)
+            playbackLogger.warn('resolve cached audio source failed', {
+              error,
+              trackId: track.id,
+            })
           }
         }
 
@@ -177,7 +183,11 @@ export function usePlaybackEngineTrackLoader({
             if (error === STALE_PLAYBACK_REQUEST) {
               throw error
             }
-            console.error('restore playback progress failed', error)
+            playbackLogger.warn('restore playback progress failed', {
+              error,
+              restoreProgress,
+              trackId: track.id,
+            })
             usePlaybackStore.getState().setProgress(0)
           } finally {
             if (
@@ -212,7 +222,10 @@ export function usePlaybackEngineTrackLoader({
           if (error === STALE_PLAYBACK_REQUEST) {
             throw error
           }
-          console.error('apply audio output device failed', error)
+          playbackLogger.warn('apply audio output device failed', {
+            error,
+            trackId: track.id,
+          })
           toast.error(OUTPUT_DEVICE_UNAVAILABLE_MESSAGE)
         }
 
@@ -256,7 +269,12 @@ export function usePlaybackEngineTrackLoader({
           return
         }
 
-        console.error('load song url failed', error)
+        playbackLogger.error('load song url failed', {
+          error,
+          lockedLxSourceId: track.lockedLxSourceId,
+          lockedPlatform: track.lockedPlatform,
+          trackId: track.id,
+        })
         usePlaybackStore
           .getState()
           .markPlaybackError(PLAYBACK_UNAVAILABLE_MESSAGE)

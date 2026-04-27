@@ -15,6 +15,8 @@ import type {
   WorkerHttpRequestMessage,
   WorkerToRunnerMessage,
 } from '@/types/core'
+import { createRendererLogger } from '../../lib/logger.ts'
+import { readLogUrlHost } from '../../../shared/logging.ts'
 
 const LX_QUALITY_FALLBACK_ORDER: LxQuality[] = [
   'flac24bit',
@@ -22,6 +24,7 @@ const LX_QUALITY_FALLBACK_ORDER: LxQuality[] = [
   '320k',
   '128k',
 ]
+const lxRunnerLogger = createRendererLogger('lx-source-runner')
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object'
@@ -438,9 +441,13 @@ export class LxMusicSourceRunner {
           message.options
         )
       } catch (mainProcessError) {
-        console.warn(
-          '[LxMusicRunner] main process HTTP request failed, trying renderer fetch fallback',
-          mainProcessError
+        lxRunnerLogger.debug(
+          'main process HTTP request failed, trying renderer fetch fallback',
+          {
+            error: mainProcessError,
+            sourceHost: readLogUrlHost(message.url),
+            sourceUrl: message.url,
+          }
         )
         response = await requestLxHttpWithRendererFetch(
           message.url,

@@ -11,6 +11,7 @@ import type {
   SongUrlV1Result,
 } from '../../../shared/playback.ts'
 import { getLxMusicRunner, initLxMusicRunner } from './LxMusicSourceRunner.ts'
+import { createRendererLogger } from '../../lib/logger.ts'
 import type { LxPlaybackResolverConfig } from '@/types/core'
 
 const AUDIO_QUALITY_TO_LX: Record<AudioQualityLevel, LxQuality> = {
@@ -32,6 +33,32 @@ const LX_PLAYBACK_SOURCE_PRIORITY: LxSourceKey[] = [
   'tx',
   'mg',
 ]
+const LX_PLAYBACK_FAILURE_DEDUP_WINDOW_MS = 8_000
+const lxPlaybackLogger = createRendererLogger('lx-playback')
+const recentLxPlaybackFailures = new Map<string, number>()
+
+function readErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error)
+}
+
+function shouldLogLxPlaybackFailure(key: string, now = Date.now()) {
+  const lastLoggedAt = recentLxPlaybackFailures.get(key)
+  if (
+    typeof lastLoggedAt === 'number' &&
+    now - lastLoggedAt < LX_PLAYBACK_FAILURE_DEDUP_WINDOW_MS
+  ) {
+    return false
+  }
+
+  recentLxPlaybackFailures.set(key, now)
+  for (const [cacheKey, loggedAt] of recentLxPlaybackFailures) {
+    if (now - loggedAt >= LX_PLAYBACK_FAILURE_DEDUP_WINDOW_MS) {
+      recentLxPlaybackFailures.delete(cacheKey)
+    }
+  }
+
+  return true
+}
 
 export function formatLxInterval(durationMs: number) {
   const totalSeconds = Math.max(0, Math.floor(durationMs / 1000))
@@ -223,10 +250,10 @@ async function resolveTrackWithLxMusicSourceScript(options: {
   const { script, musicInfo, track, quality } = options
   const scriptContent = await window.electronMusicSource.readLxScript(script.id)
   if (!scriptContent) {
-    console.warn(
-      '[LxPlaybackResolver] LX script content is missing',
-      script.name
-    )
+    lxPlaybackLogger.warn('LX script content is missing', {
+      scriptId: script.id,
+      scriptName: script.name,
+    })
     return null
   }
 
@@ -239,11 +266,11 @@ async function resolveTrackWithLxMusicSourceScript(options: {
     try {
       runner = await initLxMusicRunner(scriptContent)
     } catch (error) {
-      console.warn(
-        '[LxPlaybackResolver] init lx runner failed',
-        script.name,
-        error
-      )
+      lxPlaybackLogger.warn('init lx runner failed', {
+        error,
+        scriptId: script.id,
+        scriptName: script.name,
+      })
       return null
     }
   }
@@ -270,11 +297,22 @@ async function resolveTrackWithLxMusicSourceScript(options: {
       br: 0,
     }
   } catch (error) {
-    console.warn(
-      '[LxPlaybackResolver] resolve music url failed',
-      script.name,
-      error
-    )
+    const failureKey = [
+      script.id,
+      source,
+      track.id,
+      readErrorMessage(error),
+    ].join(':')
+
+    if (shouldLogLxPlaybackFailure(failureKey)) {
+      lxPlaybackLogger.warn('resolve music url failed', {
+        error,
+        scriptId: script.id,
+        scriptName: script.name,
+        source,
+        trackId: track.id,
+      })
+    }
     return null
   }
 }

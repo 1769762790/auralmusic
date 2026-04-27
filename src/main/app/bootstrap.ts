@@ -12,6 +12,7 @@ import { registerCacheIpc } from '../ipc/cache-ipc'
 import { registerConfigIpc } from '../ipc/config-ipc'
 import { registerDownloadIpc } from '../ipc/download-ipc'
 import { registerLocalLibraryIpc } from '../ipc/local-library-ipc'
+import { registerLoggingIpc } from '../ipc/logging-ipc'
 import { createRegisterMainIpc } from '../ipc/register-main-ipc'
 import { registerMusicSourceIpc } from '../ipc/music-source-ipc'
 import { registerShortcutIpc } from '../ipc/shortcut-ipc'
@@ -41,12 +42,15 @@ import { createMainAppState } from './app-state'
 import { loadDevelopmentDevToolsExtension } from './devtools-extension'
 import { registerMainAppLifecycle } from './lifecycle'
 import { createUpdateService } from '../updater/update-service'
+import { createMainLogger } from '../logging/logger'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const mainDirname = __dirname
 const { app, BrowserWindow, globalShortcut, nativeTheme, session } = electron
 const isDevelopment = process.env.NODE_ENV_ELECTRON_VITE === 'development'
+const bootstrapLogger = createMainLogger('bootstrap')
+const musicApiLogger = createMainLogger('music-api')
 
 export function bootstrapMainApp() {
   const state = createMainAppState()
@@ -135,6 +139,7 @@ export function bootstrapMainApp() {
       registerConfigIpc,
       registerDownloadIpc,
       registerLocalLibraryIpc,
+      registerLoggingIpc,
       registerMusicSourceIpc,
       registerShortcutIpc,
       registerSystemFontsIpc,
@@ -184,16 +189,26 @@ export function bootstrapMainApp() {
           })
 
           if (loadedExtensionPath) {
-            console.log(
-              `[devtools] loaded React DevTools extension from ${loadedExtensionPath}`
-            )
+            bootstrapLogger.debug('React DevTools extension loaded', {
+              targetPath: loadedExtensionPath,
+            })
           }
         } catch (error) {
-          console.warn('Failed to load development DevTools extension:', error)
+          bootstrapLogger.warn(
+            'Failed to load development DevTools extension',
+            {
+              error,
+            }
+          )
         }
       }
 
-      const musicApiRuntime = await startMusicApi()
+      const musicApiRuntime = await startMusicApi({
+        log: {
+          log: (message, meta) => musicApiLogger.info(message, meta),
+          error: (message, meta) => musicApiLogger.error(message, meta),
+        },
+      })
       state.setMusicApiRuntime(musicApiRuntime)
       applyMusicApiRuntimeEnv(musicApiRuntime)
       registerAuthRequestHeaderHook()
@@ -218,7 +233,7 @@ export function bootstrapMainApp() {
         }
       })
     } catch (error) {
-      console.error('Failed to bootstrap Music API runtime:', error)
+      bootstrapLogger.error('Failed to bootstrap Music API runtime', { error })
       app.quit()
     }
   })

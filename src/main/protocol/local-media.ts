@@ -8,9 +8,11 @@ import {
   LOCAL_MEDIA_PROTOCOL,
   parseLocalMediaUrl,
 } from '../../shared/local-media.ts'
+import { createMainLogger } from '../logging/logger.ts'
 
 let schemeRegistered = false
 let handlerRegistered = false
+const localMediaLogger = createMainLogger('local-media')
 
 type LocalMediaRange = {
   start: number
@@ -285,7 +287,10 @@ export function registerLocalMediaProtocol() {
         headers,
       })
     } catch (error) {
-      console.error('Failed to resolve local media request:', error)
+      localMediaLogger.error('Failed to resolve local media request', {
+        error,
+        targetPath,
+      })
       return new Response('Local media file not found.', { status: 404 })
     }
   })

@@ -20,8 +20,11 @@ import {
   decodeKwLyricResponse,
   type KwLyricDecodePayload,
 } from '../music-source/kw-lyric-decode'
+import { createMainLogger } from '../logging/logger'
+import { readLogUrlHost } from '../../shared/logging'
 
 const { ipcMain } = electron
+const musicSourceLogger = createMainLogger('lx-source')
 
 export function registerMusicSourceIpc() {
   ipcMain.handle(IPC_CHANNELS.MUSIC_SOURCE.SELECT_LX_SCRIPT, event => {
@@ -50,9 +53,9 @@ export function registerMusicSourceIpc() {
       try {
         return await requestLxHttpWithElectronNet(electron.net, url, options)
       } catch (error) {
-        console.warn(
-          '[MusicSourceIPC] electron.net LX request failed, trying node http fallback',
-          error
+        musicSourceLogger.debug(
+          'electron.net LX request failed, trying node http fallback',
+          { error, sourceHost: readLogUrlHost(url), sourceUrl: url }
         )
         return requestLxHttpWithNode(url, options)
       }
