@@ -51,6 +51,9 @@ const PlayerScene = () => {
   const playerBackgroundMode = useConfigStore(
     state => state.config.playerBackgroundMode
   )
+  const playerArtworkStyle = useConfigStore(
+    state => state.config.playerArtworkStyle
+  )
   const immersivePlayerControls = useConfigStore(
     state => state.config.immersivePlayerControls
   )
@@ -233,6 +236,7 @@ const PlayerScene = () => {
                 isPlaying={isPlaying}
                 dynamicCoverEnabled={dynamicCoverEnabled}
                 retroCoverPreset={retroCoverPreset}
+                playerArtworkStyle={playerArtworkStyle}
                 isSceneOpen={isOpen}
               />
               <PlayerSceneControls

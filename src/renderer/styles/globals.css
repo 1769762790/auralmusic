@@ -308,10 +308,29 @@
   animation: bgScroll 20s linear infinite;
 }
 
+.player-vinyl-record {
+  animation: player-vinyl-spin 18s linear infinite;
+  animation-play-state: paused;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.player-vinyl-record.is-spinning {
+  animation-play-state: running;
+}
+
+@keyframes player-vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 :root[data-animation-effect='reduced'] .bg-animate,
 :root[data-animation-effect='off'] .bg-animate,
 :root[data-animation-effect='reduced'] .player-scene-artwork-shell.is-breathing,
-:root[data-animation-effect='off'] .player-scene-artwork-shell.is-breathing {
+:root[data-animation-effect='off'] .player-scene-artwork-shell.is-breathing,
+:root[data-animation-effect='reduced'] .player-vinyl-record,
+:root[data-animation-effect='off'] .player-vinyl-record {
   animation: none !important;
 }
 

@@ -61,6 +61,16 @@ export type EnhancedSourceModule = (typeof ENHANCED_SOURCE_MODULES)[number]
 export type CloseBehavior = 'ask' | 'minimize' | 'quit'
 export type PlayerBackgroundMode = 'off' | 'static' | 'dynamic'
 
+export const PLAYER_ARTWORK_STYLE_OPTIONS = [
+  { label: '默认封面', value: 'default' },
+  { label: '黑胶唱片', value: 'vinylRecord' },
+] as const
+export type PlayerArtworkStyle =
+  (typeof PLAYER_ARTWORK_STYLE_OPTIONS)[number]['value']
+export const PLAYER_ARTWORK_STYLES = PLAYER_ARTWORK_STYLE_OPTIONS.map(
+  option => option.value
+) as readonly PlayerArtworkStyle[]
+
 // 复古预设只保留一份元数据，避免设置页和 schema 长期各自维护一套枚举。
 export const RETRO_COVER_PRESET_OPTIONS = [
   { label: '关闭', value: 'off' },
@@ -138,6 +148,7 @@ export interface AppConfig {
   closeBehavior: CloseBehavior
   rememberCloseChoice: boolean
   playerBackgroundMode: PlayerBackgroundMode
+  playerArtworkStyle: PlayerArtworkStyle
   animationEffect: AnimationEffectLevel
   immersivePlayerControls: boolean
   playbackFadeEnabled: boolean
@@ -191,6 +202,7 @@ export const defaultConfig: AppConfig = {
   closeBehavior: 'ask',
   rememberCloseChoice: false,
   playerBackgroundMode: 'static',
+  playerArtworkStyle: 'default',
   animationEffect: 'standard',
   immersivePlayerControls: false,
   playbackFadeEnabled: false,
@@ -218,6 +230,15 @@ export function normalizeRetroCoverPreset(value: unknown): RetroCoverPreset {
     RETRO_COVER_PRESETS.includes(value as RetroCoverPreset)
     ? (value as RetroCoverPreset)
     : defaultConfig.retroCoverPreset
+}
+
+export function normalizePlayerArtworkStyle(
+  value: unknown
+): PlayerArtworkStyle {
+  return typeof value === 'string' &&
+    PLAYER_ARTWORK_STYLES.includes(value as PlayerArtworkStyle)
+    ? (value as PlayerArtworkStyle)
+    : defaultConfig.playerArtworkStyle
 }
 
 export function normalizeShowLocalLibraryMenu(value: unknown) {

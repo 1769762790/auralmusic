@@ -28,6 +28,7 @@ import {
   normalizePlaybackFadeEnabled,
   normalizeLyricsKaraokeEnabled,
   normalizePlaybackSpeed,
+  normalizePlayerArtworkStyle,
   normalizePlayerBackgroundMode,
   normalizeRememberPlaybackSession,
   normalizeShowLocalLibraryMenu,
@@ -172,6 +173,7 @@ function normalizeConfig(config: AppConfig): AppConfig {
     playerBackgroundMode: normalizePlayerBackgroundMode(
       config.playerBackgroundMode
     ),
+    playerArtworkStyle: normalizePlayerArtworkStyle(config.playerArtworkStyle),
     animationEffect: normalizeAnimationEffect(config.animationEffect),
     immersivePlayerControls: normalizeImmersivePlayerControls(
       config.immersivePlayerControls
