@@ -106,65 +106,45 @@ test('tx builtin lyric provider reads plain lyric payloads from qq lyric endpoin
   })
 })
 
-test('kw builtin lyric provider converts lrclist entries into lrc text', async () => {
+test('kw builtin lyric provider requests openapi lyric with a fresh reqId and converts lrclist entries', async () => {
+  const requestedUrls: string[] = []
   const provider = createKwBuiltinLyricProvider({
-    requestJson: async () => ({
-      data: {
-        lrclist: [
-          { time: '0.0', lineLyric: '第一句' },
-          { time: '12.34', lineLyric: '第二句' },
-        ],
-      },
-    }),
-  })
-
-  const result = await provider.getLyric(
-    createTrack({
-      lockedPlatform: 'kw',
-      lxInfo: {
-        songmid: '156483846',
-        source: 'kw',
-      },
-    })
-  )
-
-  assert.deepEqual(result, {
-    lyric: '[00:00.00]第一句\n[00:12.34]第二句',
-  })
-})
-
-test('kw builtin lyric provider prefers encrypted newlyric response decoding', async () => {
-  const provider = createKwBuiltinLyricProvider({
-    requestRaw: async url => {
-      assert.match(url, /^http:\/\/newlyric\.kuwo\.cn\/newlyric\.lrc\?/)
+    createReqId: () => `req-${requestedUrls.length + 1}`,
+    requestJson: async url => {
+      requestedUrls.push(url)
       return {
-        statusCode: 200,
-        statusMessage: 'OK',
-        headers: {},
-        bytes: 3,
-        raw: new Uint8Array([1, 2, 3]),
-        body: '',
+        data: {
+          lrclist: [
+            { time: '0.12', lineLyric: '第一句' },
+            { time: '12.34', lineLyric: '第二句' },
+          ],
+        },
       }
     },
-    decodeKwLyricResponse: async payload => {
-      assert.equal(payload.lrcBase64, 'AQID')
-      assert.equal(payload.isGetLyricx, true)
-      return '[ti:测试]\n[00:01.00]第一句\n[00:02.00]<0,100>第二句'
-    },
   })
 
-  const result = await provider.getLyric(
-    createTrack({
-      lockedPlatform: 'kw',
-      lxInfo: {
-        songmid: '156483846',
-        source: 'kw',
-      },
-    })
+  const track = createTrack({
+    lockedPlatform: 'kw',
+    lxInfo: {
+      songmid: '389528329',
+      source: 'kw',
+    },
+  })
+  const result = await provider.getLyric(track)
+  await provider.getLyric(track)
+
+  assert.equal(requestedUrls.length, 2)
+  assert.equal(
+    requestedUrls[0],
+    'https://kuwo.cn/openapi/v1/www/lyric/getlyric?musicId=389528329&httpsStatus=1&reqId=req-1&plat=web_www&from='
+  )
+  assert.equal(
+    requestedUrls[1],
+    'https://kuwo.cn/openapi/v1/www/lyric/getlyric?musicId=389528329&httpsStatus=1&reqId=req-2&plat=web_www&from='
   )
 
   assert.deepEqual(result, {
-    lyric: '[ti:测试]\n[00:01.00]第一句\n[00:02.00]第二句',
+    lyric: '[00:00.12]第一句\n[00:12.34]第二句',
   })
 })
 

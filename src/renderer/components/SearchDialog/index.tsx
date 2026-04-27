@@ -22,6 +22,7 @@ import {
   createBuiltinSearchSourceTabs,
   createSystemSearchSourceTab,
   createEmptySearchPlatformStates,
+  createSearchResultRowIdentity,
   mergeSearchPlatformPage,
   normalizeBuiltinSearchResults,
   normalizeSearchResults,
@@ -202,14 +203,18 @@ const SearchDialog = () => {
             const nextStates = updateSearchPlatformState(
               current,
               sourceTab.id,
-              mergeSearchPlatformPage(previous, {
-                keyword: activeQuery,
-                page: response.page,
-                limit: response.limit,
-                total: response.total,
-                items: nextItems,
-                requestKey,
-              })
+              mergeSearchPlatformPage(
+                previous,
+                {
+                  keyword: activeQuery,
+                  page: response.page,
+                  limit: response.limit,
+                  total: response.total,
+                  items: nextItems,
+                  requestKey,
+                },
+                createSearchResultRowIdentity
+              )
             )
             platformStatesRef.current = nextStates
             return nextStates

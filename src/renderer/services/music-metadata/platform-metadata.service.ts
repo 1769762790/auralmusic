@@ -49,7 +49,6 @@ export async function getBuiltinTrackLyric(
   if (!track) {
     return null
   }
-
   const source = resolveTrackPlatformMetadataSource(track) ?? 'wy'
   const provider = readBuiltinLyricProvider(builtinLyricProviders, source)
   if (!provider) {

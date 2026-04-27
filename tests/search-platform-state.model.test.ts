@@ -116,6 +116,55 @@ test('mergeSearchPlatformPage replaces first page and appends next pages', () =>
   assert.equal(secondPage.hasMore, false)
 })
 
+test('mergeSearchPlatformPage can remove duplicate result identities across pages', () => {
+  const initial = createEmptySearchPlatformStates<{ id: number; key: string }>([
+    'kg',
+  ]).kg
+  const firstPage = mergeSearchPlatformPage(
+    initial,
+    {
+      keyword: '张韶涵',
+      page: 1,
+      limit: 3,
+      total: 5,
+      items: [
+        { id: 1, key: 'kg:audio-1' },
+        { id: 1, key: 'kg:audio-1' },
+        { id: 2, key: 'kg:audio-2' },
+      ],
+      requestKey: createSearchPlatformRequestKey('kg', '张韶涵', 1),
+    },
+    item => item.key
+  )
+
+  assert.deepEqual(firstPage.items, [
+    { id: 1, key: 'kg:audio-1' },
+    { id: 2, key: 'kg:audio-2' },
+  ])
+
+  const secondPage = mergeSearchPlatformPage(
+    firstPage,
+    {
+      keyword: '张韶涵',
+      page: 2,
+      limit: 3,
+      total: 5,
+      items: [
+        { id: 2, key: 'kg:audio-2' },
+        { id: 3, key: 'kg:audio-3' },
+      ],
+      requestKey: createSearchPlatformRequestKey('kg', '张韶涵', 2),
+    },
+    item => item.key
+  )
+
+  assert.deepEqual(secondPage.items, [
+    { id: 1, key: 'kg:audio-1' },
+    { id: 2, key: 'kg:audio-2' },
+    { id: 3, key: 'kg:audio-3' },
+  ])
+})
+
 test('next page requests require same keyword, idle state, and hasMore', () => {
   const state = mergeSearchPlatformPage(
     createEmptySearchPlatformStates<{ id: number }>(['tx']).tx,

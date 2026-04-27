@@ -4,6 +4,7 @@ import type {
 } from '../types/search-dialog.types.ts'
 
 const DEFAULT_SEARCH_PLATFORM_LIMIT = 20
+type SearchPlatformItemKeyResolver<T> = (item: T) => string | null | undefined
 
 function createEmptySearchPlatformState<T>(): SearchPlatformState<T> {
   return {
@@ -77,11 +78,36 @@ export function mergeSearchPlatformPage<T>(
     total: number
     items: T[]
     requestKey: string
-  }
+  },
+  getItemKey?: SearchPlatformItemKeyResolver<T>
 ): SearchPlatformState<T> {
   const normalizedKeyword = payload.keyword.trim()
-  const nextItems =
-    payload.page <= 1 ? payload.items : [...state.items, ...payload.items]
+  const existingItems = payload.page <= 1 ? [] : state.items
+  const seenKeys = new Set<string>()
+  const nextItems: T[] = []
+
+  const appendUnique = (item: T) => {
+    const itemKey = getItemKey?.(item)
+
+    if (itemKey) {
+      if (seenKeys.has(itemKey)) {
+        return false
+      }
+      seenKeys.add(itemKey)
+    }
+
+    nextItems.push(item)
+    return true
+  }
+
+  existingItems.forEach(item => appendUnique(item))
+
+  let addedItemCount = 0
+  payload.items.forEach(item => {
+    if (appendUnique(item)) {
+      addedItemCount += 1
+    }
+  })
 
   return {
     keywordSnapshot: normalizedKeyword,
@@ -89,7 +115,7 @@ export function mergeSearchPlatformPage<T>(
     page: payload.page,
     limit: payload.limit,
     total: payload.total,
-    hasMore: nextItems.length < payload.total && payload.items.length > 0,
+    hasMore: nextItems.length < payload.total && addedItemCount > 0,
     requestKey: null,
     loading: false,
     error: null,

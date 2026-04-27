@@ -137,6 +137,50 @@ test('normalizeKgSearchResult flattens groups and preserves hash ids', () => {
   assert.equal(result.list[1]?.lxInfo?.hash, 'hash-12')
 })
 
+test('normalizeKgSearchResult removes duplicate audio ids from grouped results', () => {
+  const result = normalizeKgSearchResult(
+    {
+      data: {
+        total: 3,
+        lists: [
+          {
+            Audioid: '705674',
+            FileHash: 'hash-main',
+            SongName: '淋雨一直走',
+            Singers: [{ name: '张韶涵' }],
+            AlbumName: '有形的翅膀',
+            Duration: 204,
+            Grp: [
+              {
+                Audioid: '705674',
+                FileHash: 'hash-live',
+                SongName: '淋雨一直走',
+                Singers: [{ name: '张韶涵' }],
+                AlbumName: '有形的翅膀',
+                Duration: 204,
+              },
+            ],
+          },
+          {
+            Audioid: '705674',
+            FileHash: 'hash-page-duplicate',
+            SongName: '淋雨一直走',
+            Singers: [{ name: '张韶涵' }],
+            AlbumName: '有形的翅膀',
+            Duration: 204,
+          },
+        ],
+      },
+    },
+    1,
+    20
+  )
+
+  assert.equal(result.list.length, 1)
+  assert.equal(result.list[0]?.id, 705674)
+  assert.equal(result.list[0]?.lxInfo?.hash, 'hash-main')
+})
+
 test('createMgSignature returns stable sign metadata shape', () => {
   const signature = createMgSignature('1700000000000', '晴天')
   assert.equal(typeof signature.sign, 'string')

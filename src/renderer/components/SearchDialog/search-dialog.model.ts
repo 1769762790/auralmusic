@@ -76,6 +76,37 @@ function formatDurationLabel(duration: number | undefined) {
     .padStart(2, '0')}`
 }
 
+function stringifyIdentityPart(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return String(value)
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim()
+  }
+
+  return ''
+}
+
+export function createSearchResultRowIdentity(item: SearchResultRowItem) {
+  const lxInfo = item.playbackTrack?.lxInfo
+  const source =
+    item.searchSourceId ||
+    item.playbackTrack?.lockedPlatform ||
+    lxInfo?.source ||
+    'system'
+  const sourceIdentity =
+    stringifyIdentityPart(lxInfo?.audioId) ||
+    stringifyIdentityPart(lxInfo?.songId) ||
+    stringifyIdentityPart(lxInfo?.songmid) ||
+    stringifyIdentityPart(lxInfo?.copyrightId) ||
+    stringifyIdentityPart(lxInfo?.hash) ||
+    stringifyIdentityPart(item.targetId) ||
+    stringifyIdentityPart(item.id)
+
+  return `${item.type}:${source}:${sourceIdentity}`
+}
+
 export function normalizeBuiltinSearchResults(
   response: BuiltinSongSearchResult,
   sourceTab: SearchSourceTab

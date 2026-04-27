@@ -87,7 +87,7 @@ function normalizeKgSearchResult(
       return []
     }
 
-    const key = `${normalized.id}:${normalized.lxInfo?.hash}`
+    const key = String(normalized.lxInfo?.audioId || normalized.id)
     if (dedupe.has(key)) {
       return []
     }
@@ -102,7 +102,9 @@ function normalizeKgSearchResult(
       if (!normalizedChild) {
         return []
       }
-      const childKey = `${normalizedChild.id}:${normalizedChild.lxInfo?.hash}`
+      const childKey = String(
+        normalizedChild.lxInfo?.audioId || normalizedChild.id
+      )
       if (dedupe.has(childKey)) {
         return []
       }

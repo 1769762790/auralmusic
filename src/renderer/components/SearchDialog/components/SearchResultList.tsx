@@ -1,5 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton'
-import { SEARCH_TYPE_LABEL_MAP } from '../search-dialog.model'
+import {
+  createSearchResultRowIdentity,
+  SEARCH_TYPE_LABEL_MAP,
+} from '../search-dialog.model'
 import type { SearchResultListProps } from '../types'
 import SearchResultRow from './SearchResultRow'
 
@@ -61,7 +64,7 @@ const SearchResultList = ({
       </div> */}
       {items.map(item => (
         <SearchResultRow
-          key={`${item.type}-${item.id}`}
+          key={createSearchResultRowIdentity(item)}
           item={item}
           onSelect={onSelect}
         />
