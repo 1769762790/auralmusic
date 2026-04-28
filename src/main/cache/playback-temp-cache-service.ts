@@ -16,6 +16,7 @@ type ResolvePlaybackTempAudioSourceParams = {
   sourceUrl: string
 }
 
+/** 临时缓存 id 同时包含业务 key 和源地址，避免同一歌曲不同音质/地址互相覆盖。 */
 function buildTempCacheId(cacheKey: string, sourceUrl: string) {
   return createHash('sha256')
     .update(cacheKey)
@@ -24,6 +25,7 @@ function buildTempCacheId(cacheKey: string, sourceUrl: string) {
     .digest('hex')
 }
 
+/** 优先从 URL 路径推断扩展名，失败时再依赖响应 content-type。 */
 function getUrlExtension(sourceUrl: string) {
   try {
     const extension = path.extname(new URL(sourceUrl).pathname)
@@ -37,6 +39,7 @@ function getUrlExtension(sourceUrl: string) {
   return '.bin'
 }
 
+/** 根据音频 content-type 选择文件扩展名，保证 local-media 协议能推断正确 MIME。 */
 function getContentTypeExtension(contentType: string | null) {
   if (!contentType) {
     return '.bin'
@@ -76,6 +79,12 @@ async function fileExists(filePath: string) {
   }
 }
 
+/**
+ * 播放会话级临时缓存服务。
+ *
+ * 当用户关闭磁盘缓存但播放器需要稳定的本地媒体 URL 时使用；缓存目录会在启动和退出时清理，
+ * 不参与长期磁盘缓存容量管理。
+ */
 export class PlaybackTempCacheService {
   private readonly defaultRootDir: string
   private readonly fetcher: typeof fetch
@@ -93,6 +102,7 @@ export class PlaybackTempCacheService {
   async resolveAudioSource(
     params: ResolvePlaybackTempAudioSourceParams
   ): Promise<ResolveAudioSourceResult> {
+    // 清理正在进行时等待完成，避免刚删除目录又写入旧文件造成竞态。
     await this.clearInFlight
 
     const audioDir = path.join(this.defaultRootDir, AUDIO_DIR_NAME)
@@ -112,6 +122,7 @@ export class PlaybackTempCacheService {
     for (const extension of knownExtensions) {
       const cachedPath = path.join(audioDir, `${id}${extension}`)
       if (await fileExists(cachedPath)) {
+        // 已缓存文件直接返回 local-media URL，避免重复下载同一临时资源。
         return { url: createLocalMediaUrl(cachedPath), fromCache: true }
       }
     }
@@ -119,6 +130,7 @@ export class PlaybackTempCacheService {
     try {
       const response = await this.fetcher(params.sourceUrl)
       if (!response.ok) {
+        // 临时缓存失败不阻断播放，回退远程地址让播放器继续尝试。
         return { url: params.sourceUrl, fromCache: false }
       }
 
@@ -134,11 +146,13 @@ export class PlaybackTempCacheService {
 
       return { url: createLocalMediaUrl(absolutePath), fromCache: true }
     } catch {
+      // 网络/写盘异常都降级为原始 URL，避免缓存层影响播放主链路。
       return { url: params.sourceUrl, fromCache: false }
     }
   }
 
   async clear() {
+    // 保存清理 promise，让 resolveAudioSource 能等待目录状态稳定后再写入。
     this.clearInFlight = this.clearAudioDir()
     await this.clearInFlight
   }

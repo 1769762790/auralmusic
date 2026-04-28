@@ -1,3 +1,4 @@
+/** 下载 IPC 通道，命令类通道和任务快照广播通道集中定义在这里。 */
 export const DOWNLOAD_IPC_CHANNELS = {
   GET_DEFAULT_DIRECTORY: 'download:get-default-directory',
   SELECT_DIRECTORY: 'download:select-directory',

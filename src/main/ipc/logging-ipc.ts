@@ -17,6 +17,11 @@ type LoggingIpcRegistrationOptions = {
   }
 }
 
+/**
+ * 注册日志 IPC。
+ *
+ * renderer 日志先经过 payload 归一化，再写入主进程日志文件，避免 renderer 构造任意日志路径。
+ */
 export function registerLoggingIpc(
   options: LoggingIpcRegistrationOptions = {}
 ) {

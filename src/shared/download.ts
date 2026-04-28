@@ -6,8 +6,10 @@ import type {
 } from './config.ts'
 import type { LxMusicInfo, LxSourceKey } from './lx-music-source.ts'
 
+/** 下载 IPC 通道复导出，下载服务和 renderer store 共享同一契约。 */
 export { DOWNLOAD_IPC_CHANNELS } from './ipc/download.ts'
 
+/** 下载质量降级链，从高到低排列，fallback 策略按该顺序向后尝试。 */
 export const DOWNLOAD_QUALITY_FALLBACK_CHAIN = [
   'jymaster',
   'dolby',
@@ -20,6 +22,7 @@ export const DOWNLOAD_QUALITY_FALLBACK_CHAIN = [
   'standard',
 ] as const satisfies readonly AudioQualityLevel[]
 
+/** 下载源提供方标识，用于记录最终直链来自官方、解灰、LX 或自定义 API。 */
 export type DownloadSourceProvider =
   | 'official-download'
   | 'official-playback'
@@ -34,6 +37,7 @@ export type DownloadTaskStatus =
   | 'failed'
   | 'skipped'
 
+/** 下载文件可写入标签或旁路歌词的补充元数据。 */
 export type DownloadTaskMetadata = {
   albumName?: string
   coverUrl?: string
@@ -42,6 +46,7 @@ export type DownloadTaskMetadata = {
   durationMs?: number
 }
 
+/** 创建下载任务时 renderer 传给主进程的业务载荷。 */
 export type SongDownloadPayload = {
   songId: number | string
   songName: string
@@ -74,6 +79,7 @@ export type SongDownloadPayload = {
   metadata?: DownloadTaskMetadata
 }
 
+/** 下载任务快照，主进程持久化后广播给 renderer。 */
 export type DownloadTask = {
   id: string
   songId: number | string
@@ -98,6 +104,7 @@ export type DownloadTask = {
   completedAt: number | null
 }
 
+/** 解析指定任务/音质直链时传入解析器的上下文。 */
 export type ResolveSongUrlInput = {
   taskId: string
   payload: SongDownloadPayload
@@ -105,12 +112,14 @@ export type ResolveSongUrlInput = {
   songId: number | string
 }
 
+/** 音源解析器返回的下载直链结果。 */
 export type ResolvedSongDownload = {
   url: string
   quality?: AudioQualityLevel
   fileExtension?: string | null
 }
 
+/** 下载服务运行时配置，每次任务执行前从配置 store 读取最新值。 */
 export type DownloadRuntimeConfig = {
   musicSourceEnabled: boolean
   musicSourceProviders?: MusicSourceProvider[]
@@ -128,6 +137,7 @@ export type DownloadRuntimeConfig = {
   downloadEmbedTranslatedLyrics: boolean
 }
 
+/** 根据请求音质生成降级尝试链，非法音质回退 standard。 */
 export function createDownloadQualityFallbackChain(
   requestedQuality: AudioQualityLevel
 ) {

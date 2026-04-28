@@ -47,6 +47,7 @@ export function normalizeLxSearchResult(
   }
 
   if (Array.isArray(result.list)) {
+    // 标准 LX 脚本直接返回 list；保持原始条目，避免破坏第三方脚本扩展字段。
     return {
       list: result.list,
       total:
@@ -65,6 +66,7 @@ export function normalizeLxSearchResult(
     return emptyResult
   }
 
+  // 兼容部分平台脚本直接透传搜索接口响应，统一归一化成播放器可消费的 LX 列表结构。
   const list = nestedSongs.flatMap((song): LxSearchResultItem[] => {
     if (!isRecord(song)) {
       return []
@@ -249,7 +251,7 @@ async function requestLxHttpWithRendererFetch(
     try {
       body = JSON.parse(rawBody)
     } catch {
-      // keep raw response text
+      // 非 JSON 响应保留原文，部分 LX 脚本会直接从文本里提取播放地址。
     }
 
     return {
@@ -338,6 +340,7 @@ export class LxMusicSourceRunner {
       { type: 'module' }
     )
 
+    // 第三方 LX 脚本隔离在 worker 内执行，主线程只负责 HTTP 代理和结果归一化。
     worker.onmessage = (event: MessageEvent<WorkerToRunnerMessage>) => {
       void this.handleWorkerMessage(event.data)
     }
@@ -449,6 +452,7 @@ export class LxMusicSourceRunner {
             sourceUrl: message.url,
           }
         )
+        // 主进程代理失败时降级到 renderer fetch，兼容少量只允许浏览器 CORS 路径的源。
         response = await requestLxHttpWithRendererFetch(
           message.url,
           message.options
@@ -457,6 +461,7 @@ export class LxMusicSourceRunner {
 
       const url = readLxResponseBodyUrl(response.body)
       if (url) {
+        // 部分 LX 脚本只通过 httpRequest 回包携带真实地址，后续 musicUrl 结果需要兜底读取。
         this.lastMusicUrl = url
       }
 
@@ -491,6 +496,7 @@ export class LxMusicSourceRunner {
         reject(new Error('LX script request timed out'))
       }, timeoutMs)
 
+      // 以 callId 关联 worker 异步响应，避免多个搜索/取链请求并发时串包。
       this.pendingInvocations.set(callId, { resolve, reject, timeoutId })
       this.postToWorker({
         type: 'invoke-request',

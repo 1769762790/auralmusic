@@ -158,6 +158,7 @@ const LocalLibrary = () => {
 
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const autoScanRootKeyRef = useRef<string | null>(null)
+  // 各分区独立请求序号，避免搜索词/标签切换时旧响应覆盖当前列表。
   const overviewRequestIdRef = useRef(0)
   const trackQueryRequestIdRef = useRef(0)
   const albumQueryRequestIdRef = useRef(0)
@@ -274,6 +275,7 @@ const LocalLibrary = () => {
 
       const requestId = ++trackQueryRequestIdRef.current
 
+      // append 只锁歌曲列表自身，其他分区仍可并行刷新，避免整页加载态互相牵连。
       setTracksState(previousState => ({
         ...previousState,
         isLoading: true,

@@ -71,10 +71,12 @@ const CONTENT_TYPE_EXTENSION_MAP: Record<string, string> = {
   'audio/x-wav': '.wav',
 }
 
+/** 创建默认任务 id，避免持久化任务在重启后和新任务冲突。 */
 function createDefaultTaskId() {
   return `download-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
 }
 
+/** 对外返回任务副本，避免调用方直接修改内部 Map 中的任务对象。 */
 function cloneTask(task: DownloadTask): DownloadTask {
   return { ...task }
 }
@@ -83,6 +85,7 @@ function cloneTasks(tasks: DownloadTask[]) {
   return tasks.map(cloneTask)
 }
 
+/** 清理文件名中的系统非法字符，避免下载写盘失败。 */
 function sanitizeFileName(value: string) {
   const filtered = Array.from(value, character => {
     const codePoint = character.charCodeAt(0)
@@ -97,6 +100,7 @@ function sanitizeFileName(value: string) {
   return normalized || 'download'
 }
 
+/** 配置目录为空时回退系统默认下载目录。 */
 function normalizeDirectory(value: string | undefined, fallback: string) {
   if (!value?.trim()) {
     return fallback
@@ -105,6 +109,7 @@ function normalizeDirectory(value: string | undefined, fallback: string) {
   return value
 }
 
+/** 判断是否有可写入文件标签或旁路歌词的补充元数据。 */
 function hasMetadata(metadata?: DownloadTaskMetadata) {
   return Boolean(
     metadata?.albumName ||
@@ -114,6 +119,7 @@ function hasMetadata(metadata?: DownloadTaskMetadata) {
   )
 }
 
+/** 统一扩展名格式，后续拼接文件名时都带点且小写。 */
 function normalizeExtension(extension: string | null | undefined) {
   if (!extension) {
     return ''
@@ -124,6 +130,7 @@ function normalizeExtension(extension: string | null | undefined) {
     : `.${extension.toLowerCase()}`
 }
 
+/** 用户文件名模板已经带扩展名时不再追加推断扩展名。 */
 function hasExplicitFileExtension(fileName: string) {
   return /^\.[a-z0-9]{1,8}$/i.test(path.extname(fileName))
 }
@@ -147,6 +154,7 @@ function sanitizeEmbeddedLyricText(value: string) {
     .join('\n')
 }
 
+/** 判断候选音质是否低于用户请求音质，用于降级策略标记。 */
 function isLowerQuality(
   candidate: AudioQualityLevel,
   requested: AudioQualityLevel
@@ -161,6 +169,7 @@ function isLowerQuality(
   )
 }
 
+/** 从下载 URL 推断扩展名，URL 无法解析时回退普通路径解析。 */
 function inferExtensionFromUrl(sourceUrl: string) {
   try {
     const parsedUrl = new URL(sourceUrl)
@@ -170,11 +179,13 @@ function inferExtensionFromUrl(sourceUrl: string) {
   }
 }
 
+/** 从响应 content-type 推断音频扩展名。 */
 function inferExtensionFromContentType(contentType: string | null) {
   const normalizedType = contentType?.split(';')[0]?.trim().toLowerCase() ?? ''
   return CONTENT_TYPE_EXTENSION_MAP[normalizedType] || ''
 }
 
+/** 清理歌词空行。 */
 function collectNonEmptyLines(text: string) {
   return text
     .split(/\r?\n/)
@@ -182,11 +193,13 @@ function collectNonEmptyLines(text: string) {
     .filter(Boolean)
 }
 
+/** 提取 LRC 时间戳 key，用于原文/翻译歌词对齐。 */
 function readLrcTimestampKey(line: string) {
   const matchedTimestamp = line.match(/^(?:\[\d{1,2}:\d{2}(?:\.\d{1,3})?\])+/)
   return matchedTimestamp?.[0] ?? ''
 }
 
+/** 构造旁路 .lrc 文本，翻译歌词按相同时间戳插入原文后。 */
 function buildSidecarLrcText(metadata: DownloadTaskMetadata) {
   const originalLines = collectNonEmptyLines(
     sanitizeEmbeddedLyricText(metadata.lyric ?? '')
@@ -229,6 +242,7 @@ function buildSidecarLrcText(metadata: DownloadTaskMetadata) {
   return mergedLines.join('\n')
 }
 
+/** 写入同名 .lrc 文件，非 mp3 或嵌入失败时作为可靠兜底。 */
 async function writeSidecarLrcFile(
   targetPath: string,
   metadata: DownloadTaskMetadata
@@ -246,6 +260,7 @@ async function writeSidecarLrcFile(
   return true
 }
 
+/** 根据文件名模板生成最终下载文件名。 */
 function buildFileName(
   payload: SongDownloadPayload,
   pattern: DownloadRuntimeConfig['downloadFileNamePattern'],
@@ -265,6 +280,7 @@ function buildFileName(
   return `${sanitized}${extension}`
 }
 
+/** 将未知异常转换为可展示的任务错误信息。 */
 function toErrorMessage(error: unknown) {
   if (error instanceof Error) {
     return error.message
@@ -273,6 +289,7 @@ function toErrorMessage(error: unknown) {
   return String(error)
 }
 
+/** 归一化持久化任务，丢弃缺少必要字段或状态非法的历史数据。 */
 function normalizePersistedTask(task: unknown): DownloadTask | null {
   const value = task as Partial<DownloadTask> | null | undefined
 
@@ -363,6 +380,7 @@ function normalizePersistedTask(task: unknown): DownloadTask | null {
   }
 }
 
+/** 应用重启后，未完成任务标记为失败，避免恢复为“下载中”但没有真实网络任务。 */
 function restorePersistedTask(
   task: DownloadTask,
   now: () => number
@@ -384,6 +402,7 @@ function restorePersistedTask(
   }
 }
 
+/** 从歌曲详情响应中提取专辑、封面和时长。 */
 function readSongDetailMetadata(payload: unknown): DownloadTaskMetadata {
   const root = payload as
     | {
@@ -421,6 +440,7 @@ function readSongDetailMetadata(payload: unknown): DownloadTaskMetadata {
   }
 }
 
+/** 从歌词响应中提取原文/翻译歌词。 */
 function readLyricMetadata(payload: unknown): DownloadTaskMetadata {
   const root = payload as
     | {
@@ -441,6 +461,7 @@ function readLyricMetadata(payload: unknown): DownloadTaskMetadata {
   }
 }
 
+/** 读取下载响应体并持续回报进度；没有 stream reader 时回退一次性读取。 */
 async function responseToBuffer(
   response: Response,
   onProgress: (progress: number) => void
@@ -480,6 +501,11 @@ async function responseToBuffer(
   return Buffer.concat(chunks)
 }
 
+/**
+ * 下载服务。
+ *
+ * 负责下载任务队列、并发控制、音源解析、文件写入、元数据写入、任务持久化和状态广播。
+ */
 export class DownloadService {
   private readonly defaultRootDir: string
   private readonly fixedConcurrency: number | undefined
@@ -524,10 +550,12 @@ export class DownloadService {
     this.restorePersistedTasks()
   }
 
+  /** 获取当前下载目录，配置为空时回退系统默认下载目录。 */
   getDefaultDirectory(configuredDir = '') {
     return normalizeDirectory(configuredDir, this.defaultRootDir)
   }
 
+  /** 打开下载目录，不存在时先创建。 */
   async openDirectory(configuredDir = '') {
     if (!this.openPath) {
       return false
@@ -538,6 +566,7 @@ export class DownloadService {
     return (await this.openPath(targetDir)) === ''
   }
 
+  /** 创建下载任务并放入队列，随后异步触发队列泵。 */
   async enqueueSongDownload(payload: SongDownloadPayload) {
     const runtimeConfig = this.getRuntimeConfig()
     const createdAt = this.now()
@@ -582,12 +611,14 @@ export class DownloadService {
     return cloneTask(task)
   }
 
+  /** 返回按创建时间倒序排列的任务快照。 */
   getTasks() {
     return Array.from(this.tasks.values())
       .sort((left, right) => right.createdAt - left.createdAt)
       .map(cloneTask)
   }
 
+  /** 移除非下载中的任务，下载中任务不允许删除以避免写盘状态不一致。 */
   removeTask(taskId: string) {
     const task = this.tasks.get(taskId)
     if (!task || task.status === 'downloading') {
@@ -605,6 +636,7 @@ export class DownloadService {
     return true
   }
 
+  /** 使用系统默认应用打开已完成的下载文件。 */
   async openDownloadedFile(taskId: string) {
     if (!this.openPath) {
       return false
@@ -618,6 +650,7 @@ export class DownloadService {
     return (await this.openPath(task.targetPath)) === ''
   }
 
+  /** 在文件管理器中定位下载文件。 */
   async openDownloadedFileFolder(taskId: string) {
     const task = this.tasks.get(taskId)
     if (!task?.targetPath || !this.showItemInFolder) {
@@ -628,6 +661,7 @@ export class DownloadService {
     return true
   }
 
+  /** 订阅任务列表快照变化，返回取消订阅函数。 */
   subscribe(listener: (tasks: DownloadTask[]) => void) {
     this.listeners.add(listener)
     return () => {
@@ -635,6 +669,7 @@ export class DownloadService {
     }
   }
 
+  /** 每次任务执行时读取最新配置，让并发数、目录和嵌入策略实时生效。 */
   private getRuntimeConfig(): DownloadRuntimeConfig {
     const config = this.readConfig?.() || {}
 
@@ -660,6 +695,7 @@ export class DownloadService {
     }
   }
 
+  /** 广播并持久化任务快照。 */
   private emitTasksChanged() {
     const tasks = this.getTasks()
     this.writePersistedTasks?.(cloneTasks(tasks))
@@ -668,6 +704,7 @@ export class DownloadService {
     }
   }
 
+  /** 启动时恢复历史任务，并补齐已完成任务的播放元数据。 */
   private restorePersistedTasks() {
     const persistedTasks = this.readPersistedTasks?.() ?? []
     if (!persistedTasks.length) {
@@ -688,6 +725,7 @@ export class DownloadService {
     void this.hydratePersistedTaskPlaybackMetadata()
   }
 
+  /** 判断任务是否需要重新读取文件大小、时长或歌词。 */
   private needsPlaybackMetadataHydration(task: DownloadTask) {
     return !task.targetPath ||
       (task.status !== 'completed' && task.status !== 'skipped')
@@ -697,6 +735,7 @@ export class DownloadService {
           (!task.lyricText && !task.translatedLyricText)
   }
 
+  /** 将文件读取到的播放元数据合并进任务，已有值优先保留。 */
   private applyPlaybackMetadata(
     task: DownloadTask,
     metadata: Partial<DownloadFilePlaybackMetadata> & {
@@ -736,6 +775,7 @@ export class DownloadService {
     return didUpdate
   }
 
+  /** 并行读取文件大小和播放器元数据。 */
   private async readTaskPlaybackMetadata(targetPath: string) {
     const [fileSizeBytes, playbackMetadata] = await Promise.all([
       this.readFileSizeBytes(targetPath),
@@ -752,6 +792,7 @@ export class DownloadService {
     }
   }
 
+  /** 后台修复历史任务缺失的播放元数据。 */
   private async hydratePersistedTaskPlaybackMetadata() {
     let didUpdate = false
 
@@ -769,6 +810,7 @@ export class DownloadService {
     }
   }
 
+  /** 手动补齐单个任务的播放元数据，供 UI 在需要播放下载文件时调用。 */
   async hydrateTaskPlaybackMetadata(taskId: string) {
     const task = this.tasks.get(taskId)
     if (!task || !this.needsPlaybackMetadataHydration(task)) {
@@ -783,6 +825,7 @@ export class DownloadService {
     return cloneTask(task)
   }
 
+  /** 统一更新任务并触发持久化/广播。 */
   private updateTask(taskId: string, updater: (task: DownloadTask) => void) {
     const task = this.tasks.get(taskId)
     if (!task) {
@@ -794,6 +837,7 @@ export class DownloadService {
     this.emitTasksChanged()
   }
 
+  /** 按当前并发配置推进下载队列。 */
   private async pumpQueue() {
     const concurrency = Math.max(
       1,
@@ -814,6 +858,7 @@ export class DownloadService {
     }
   }
 
+  /** 执行单个下载任务的完整流程。 */
   private async processTask(taskId: string) {
     const task = this.tasks.get(taskId)
     if (!task) {
@@ -865,6 +910,7 @@ export class DownloadService {
         runtimeConfig.downloadSkipExisting &&
         (await this.pathExists(targetPath))
       ) {
+        // 跳过已有文件时也读取播放元数据，让下载列表仍能直接播放本地文件。
         const existingMetadata = await this.readTaskPlaybackMetadata(targetPath)
         this.finishTask(taskId, currentTask => {
           currentTask.status = 'skipped'
@@ -887,6 +933,7 @@ export class DownloadService {
         initialExtension ||
         inferExtensionFromContentType(response.headers.get('content-type'))
       if (responseExtension && !hasExplicitFileExtension(targetPath)) {
+        // 部分接口只有响应头能确认格式，收到响应后再修正最终文件名。
         targetPath = path.join(
           targetDirectory,
           buildFileName(
@@ -962,6 +1009,7 @@ export class DownloadService {
     }
   }
 
+  /** 完成类状态统一写 completedAt。 */
   private finishTask(taskId: string, updater: (task: DownloadTask) => void) {
     this.updateTask(taskId, task => {
       updater(task)
@@ -969,6 +1017,7 @@ export class DownloadService {
     })
   }
 
+  /** 读取文件大小，失败返回 null 让任务仍能完成。 */
   private async readFileSizeBytes(targetPath: string) {
     try {
       const fileStat = await stat(targetPath)
@@ -978,6 +1027,7 @@ export class DownloadService {
     }
   }
 
+  /** 按质量策略解析下载直链，fallback 模式会逐级尝试低音质。 */
   private async resolveDownloadSource(taskId: string) {
     const payload = this.taskPayloads.get(taskId)
     if (!payload) {
@@ -1012,6 +1062,7 @@ export class DownloadService {
     throw new Error('无可用音质')
   }
 
+  /** 解析指定音质的下载源，优先使用 payload 直链，再走注入解析器或默认解析器。 */
   private async resolveSongUrlForQuality(
     taskId: string,
     payload: SongDownloadPayload,
@@ -1046,6 +1097,7 @@ export class DownloadService {
     })
   }
 
+  /** 下载完成后按配置写入封面/歌词/专辑等元数据。 */
   private async applyMetadata(
     targetPath: string,
     payload: SongDownloadPayload,
@@ -1157,6 +1209,7 @@ export class DownloadService {
     }
   }
 
+  /** 合并 payload 自带元数据和 Music API 拉取的详情/歌词。 */
   private async resolveMetadata(payload: SongDownloadPayload) {
     const mergedMetadata: DownloadTaskMetadata = {
       ...(payload.metadata || {}),
@@ -1219,6 +1272,7 @@ export class DownloadService {
     }
   }
 
+  /** 判断目标文件是否存在。 */
   private async pathExists(targetPath: string) {
     try {
       await access(targetPath)
@@ -1228,6 +1282,7 @@ export class DownloadService {
     }
   }
 
+  /** 为元数据请求补充登录 Cookie，支持会员歌曲详情和歌词。 */
   private createMusicApiRequestHeaders(requestUrl: string) {
     const baseURL = readMusicApiBaseUrlFromEnv()
     if (!baseURL) {

@@ -52,8 +52,16 @@ const isDevelopment = process.env.NODE_ENV_ELECTRON_VITE === 'development'
 const bootstrapLogger = createMainLogger('bootstrap')
 const musicApiLogger = createMainLogger('music-api')
 
+/**
+ * 启动 Electron 主进程应用。
+ *
+ * 这里负责串联所有主进程基础设施：应用生命周期、托盘、IPC、协议、权限、内置 Music API、
+ * 鉴权恢复、主题同步和窗口创建。初始化顺序很关键，renderer 加载前必须先准备好 preload
+ * 会调用到的 IPC handler 和本地协议。
+ */
 export function bootstrapMainApp() {
   const state = createMainAppState()
+  // macOS activate 事件可能在 ready 前触发，启动完成前不允许重复创建窗口。
   let isStartupReady = false
   const updateService = createUpdateService({
     platform: process.platform,
@@ -67,6 +75,7 @@ export function bootstrapMainApp() {
     state.getMainWindow()?.hide()
   }
 
+  // 托盘回调只持有函数，不直接依赖窗口实例，窗口重建后仍能拿到最新引用。
   const trayController = createTrayController({
     showMainWindow: () => {
       showMainWindow(state.getMainWindow())
@@ -83,6 +92,7 @@ export function bootstrapMainApp() {
   })
 
   const createWindow = () => {
+    // 窗口创建依赖当前配置和运行态，封装成函数便于 lifecycle activate 时复用。
     return createMainWindow({
       BrowserWindow,
       globalShortcut,
@@ -126,6 +136,7 @@ export function bootstrapMainApp() {
   })
 
   app.whenReady().then(async () => {
+    // 更新服务先初始化并订阅，窗口创建后可立即收到最新快照。
     updateService.initialize()
     updateService.subscribe(snapshot => {
       state
@@ -152,9 +163,11 @@ export function bootstrapMainApp() {
 
     registerRuntimeMainIpc({
       onShortcutConfigChange: () => {
+        // 快捷键配置持久化后立即重注册，避免需要重启应用才生效。
         syncConfiguredGlobalShortcuts(state.getMainWindow())
       },
       onAutoStartConfigChange: (enabled: boolean) => {
+        // 开机自启属于系统级副作用，跟随配置写入即时同步到 Electron。
         app.setLoginItemSettings({
           openAtLogin: enabled,
           openAsHidden: false,
@@ -166,6 +179,7 @@ export function bootstrapMainApp() {
         state.setIsQuitting(true)
       },
     })
+    // 本地媒体协议必须在 renderer 使用 local-media:// 地址前注册。
     registerLocalMediaProtocol()
     registerWindowPermissionHandlers({
       session,
@@ -177,6 +191,7 @@ export function bootstrapMainApp() {
     try {
       if (isDevelopment) {
         try {
+          // DevTools 扩展只在开发环境加载，生产包不依赖本机 Chrome 扩展路径。
           const loadExtension =
             session.defaultSession.extensions?.loadExtension?.bind(
               session.defaultSession.extensions
@@ -210,12 +225,15 @@ export function bootstrapMainApp() {
         },
       })
       state.setMusicApiRuntime(musicApiRuntime)
+      // 将内置 API 运行时写入 env，供主进程请求封装和 preload runtime API 读取。
       applyMusicApiRuntimeEnv(musicApiRuntime)
+      // 鉴权请求头 hook 依赖 Music API 地址，必须在 runtime env 写入之后注册。
       registerAuthRequestHeaderHook()
       await bootstrapAuthSession()
       syncNativeThemeSource(getConfig('theme'))
 
       const autoStartEnabled = getConfig('autoStartEnabled')
+      // 启动时也同步一次开机自启，修正用户在外部修改登录项导致的漂移。
       app.setLoginItemSettings({
         openAtLogin: autoStartEnabled,
         openAsHidden: false,
@@ -227,6 +245,7 @@ export function bootstrapMainApp() {
       isStartupReady = true
 
       nativeTheme.on('updated', () => {
+        // Linux titleBarOverlay 颜色不会自动跟随系统主题，需要手动同步。
         const mainWindow = state.getMainWindow()
         if (mainWindow) {
           applyWindowTitleBarTheme(mainWindow)

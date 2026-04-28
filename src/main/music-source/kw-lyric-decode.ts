@@ -9,6 +9,7 @@ export type KwLyricDecodePayload = {
 const KUWO_LYRIC_KEY = Buffer.from('yeelion')
 const KUWO_LYRIC_HEADER = 'tp=content'
 
+/** zlib.inflate 的 Promise 封装，方便歌词解码流程顺序表达。 */
 function inflateBuffer(input: Buffer) {
   return new Promise<Buffer>((resolve, reject) => {
     inflate(input, (error, result) => {
@@ -22,6 +23,11 @@ function inflateBuffer(input: Buffer) {
   })
 }
 
+/**
+ * 构造酷我新版歌词接口参数。
+ *
+ * 酷我接口要求 yeelion key 做异或后再 base64，这里和响应解码使用同一把 key。
+ */
 export function buildKwNewLyricParams(id: string | number, isGetLyricx = true) {
   let params = `user=12345,web,web,web&requester=localhost&req=1&rid=MUSIC_${id}`
   if (isGetLyricx) {
@@ -44,10 +50,12 @@ export function buildKwNewLyricParams(id: string | number, isGetLyricx = true) {
   return Buffer.from(output).toString('base64')
 }
 
+/** 酷我歌词内容通常是 GB18030 编码，不能按 UTF-8 直接解码。 */
 function decodeGb18030(buffer: Buffer) {
   return new TextDecoder('gb18030').decode(buffer)
 }
 
+/** lyricx 响应体需要用 yeelion key 再做一次异或还原。 */
 function xorDecodeLyricx(buffer: Buffer) {
   const output = new Uint8Array(buffer.length)
   let index = 0
@@ -64,6 +72,7 @@ function xorDecodeLyricx(buffer: Buffer) {
   return Buffer.from(output)
 }
 
+/** 解码酷我歌词响应，异常格式返回空字符串，让上层可以继续尝试其它歌词来源。 */
 export async function decodeKwLyricResponse({
   lrcBase64,
   isGetLyricx = true,

@@ -1,3 +1,4 @@
+/** 本地曲库 IPC 通道，包含查询、扫描、歌单变更、文件打开和在线歌词匹配。 */
 export const LOCAL_LIBRARY_IPC_CHANNELS = {
   GET_OVERVIEW: 'local-library:get-overview',
   GET_SNAPSHOT: 'local-library:get-snapshot',

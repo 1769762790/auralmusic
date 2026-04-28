@@ -58,6 +58,7 @@ export function usePlaybackEngineTrackLoader({
     const track = currentTrack
     const expectedTrackId = track.id
 
+    // 播放链路跨越解析、缓存、设备切换和自动播放，每个 await 后都要校验请求是否仍然有效。
     const loadAndPlay = async () => {
       if (usePlaybackStore.getState().shouldAutoPlayOnLoad) {
         usePlaybackStore.getState().markPlaybackLoading()
@@ -120,6 +121,7 @@ export function usePlaybackEngineTrackLoader({
           try {
             const cacheKey = `audio:${track.id}:${qualityRef.current}:${result.url}`
             resolvedAudioCacheKey = cacheKey
+            // 均衡器需要可 seek 的本地/代理音频源，必要时强制刷新缓存以避开远端流兼容问题。
             const cachedResult = await window.electronCache.resolveAudioSource(
               cacheKey,
               result.url,
@@ -171,6 +173,7 @@ export function usePlaybackEngineTrackLoader({
         const restoreProgress = latestState.pendingRestoreProgress
         if (restoreProgress > 0) {
           try {
+            // 恢复进度必须等音频元数据就绪，否则部分浏览器内核会忽略 currentTime 写入。
             await applyPersistedProgress(audio, restoreProgress)
             throwIfPlaybackRequestStale(
               expectedRequestId,

@@ -26,6 +26,12 @@ import { readLogUrlHost } from '../../shared/logging'
 const { ipcMain } = electron
 const musicSourceLogger = createMainLogger('lx-source')
 
+/**
+ * 注册 LX 音源相关 IPC。
+ *
+ * 音源脚本涉及文件选择、远程下载、脚本存储和跨域请求代理，全部放在主进程执行；
+ * renderer 只拿到受控结果，不能直接访问 Node 文件系统或任意网络能力。
+ */
 export function registerMusicSourceIpc() {
   ipcMain.handle(IPC_CHANNELS.MUSIC_SOURCE.SELECT_LX_SCRIPT, event => {
     return selectLxMusicSourceScript(
@@ -51,12 +57,14 @@ export function registerMusicSourceIpc() {
     IPC_CHANNELS.MUSIC_SOURCE.LX_HTTP_REQUEST,
     async (_event, url: string, options: LxHttpRequestOptions = {}) => {
       try {
+        // electron.net 复用 Chromium 网络栈，优先获得和 Electron 应用一致的代理/证书行为。
         return await requestLxHttpWithElectronNet(electron.net, url, options)
       } catch (error) {
         musicSourceLogger.debug(
           'electron.net LX request failed, trying node http fallback',
           { error, sourceHost: readLogUrlHost(url), sourceUrl: url }
         )
+        // 部分音源站点对 electron.net 兼容性较差，失败时回退到 Node http/https。
         return requestLxHttpWithNode(url, options)
       }
     }

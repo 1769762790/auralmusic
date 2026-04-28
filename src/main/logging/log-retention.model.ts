@@ -18,11 +18,17 @@ type CleanupLogDirectoryDeps = {
   remove?: (targetPath: string) => void
 }
 
+/** 生成第 N 个轮转日志文件路径，例如 main.log -> main.1.log。 */
 function readRotatedLogPath(logFilePath: string, index: number) {
   const parsed = path.parse(logFilePath)
   return path.join(parsed.dir, `${parsed.name}.${index}${parsed.ext}`)
 }
 
+/**
+ * 轮转当前日志文件。
+ *
+ * electron-log 触发 maxSize 后调用这里，项目只保留有限数量归档，避免日志无限增长。
+ */
 export function rotateLogFile(
   logFilePath: string,
   deps: RotateLogFileDeps = {}
@@ -54,6 +60,7 @@ export function rotateLogFile(
   }
 }
 
+/** 删除超过保留天数的日志文件，启动时执行一次即可控制长期磁盘占用。 */
 export function cleanupOldLogFiles(
   logDirectory: string,
   deps: CleanupLogDirectoryDeps = {}

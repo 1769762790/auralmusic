@@ -1,3 +1,4 @@
+/** 本地曲库实体类型，页面 tab、路由和查询入口共用。 */
 export const LOCAL_LIBRARY_ENTITY_TYPES = [
   'songs',
   'albums',
@@ -7,6 +8,7 @@ export const LOCAL_LIBRARY_ENTITY_TYPES = [
 
 export type LocalLibraryEntityType = (typeof LOCAL_LIBRARY_ENTITY_TYPES)[number]
 
+/** 本地曲库歌曲记录，coverPath 是主进程本地路径，coverUrl 是 renderer 可访问 URL。 */
 export interface LocalLibraryTrackRecord {
   id: number
   rootId: number
@@ -27,6 +29,7 @@ export interface LocalLibraryTrackRecord {
   discNo: number | null
 }
 
+/** 本地专辑聚合记录。 */
 export interface LocalLibraryAlbumRecord {
   id: number
   name: string
@@ -35,6 +38,7 @@ export interface LocalLibraryAlbumRecord {
   coverUrl: string
 }
 
+/** 本地歌手聚合记录。 */
 export interface LocalLibraryArtistRecord {
   id: number
   name: string
@@ -42,6 +46,7 @@ export interface LocalLibraryArtistRecord {
   coverUrl: string
 }
 
+/** 本地歌单记录，containsTrack 用于收藏到歌单弹窗标记当前歌曲是否已存在。 */
 export interface LocalLibraryPlaylistRecord {
   id: number
   name: string
@@ -52,6 +57,7 @@ export interface LocalLibraryPlaylistRecord {
   containsTrack?: boolean
 }
 
+/** 本地歌单列表查询参数。 */
 export interface LocalLibraryPlaylistQueryInput {
   keyword: string
   trackFilePath?: string | null
@@ -81,6 +87,7 @@ export interface LocalLibraryPlaylistDetailQueryResult {
   limit: number
 }
 
+/** 创建本地歌单参数。 */
 export interface LocalLibraryPlaylistCreateInput {
   name: string
 }
@@ -100,6 +107,7 @@ export interface LocalLibraryPlaylistUpdateResult {
   playlist: LocalLibraryPlaylistRecord | null
 }
 
+/** 删除本地歌单参数。 */
 export interface LocalLibraryPlaylistDeleteInput {
   playlistId: number
 }
@@ -117,12 +125,14 @@ export interface LocalLibraryPlaylistTrackMutationResult {
   status: 'ok' | 'duplicate' | 'not-found'
 }
 
+/** 本地曲库根目录记录。 */
 export interface LocalLibraryRootRecord {
   id: number
   path: string
   createdAt: number
 }
 
+/** 在线歌词匹配输入，必须包含足够信息做保守匹配。 */
 export interface LocalLibraryOnlineLyricMatchInput {
   filePath: string
   title: string
@@ -132,12 +142,14 @@ export interface LocalLibraryOnlineLyricMatchInput {
   coverUrl: string
 }
 
+/** 在线匹配写回后的歌词和封面结果。 */
 export interface LocalLibraryOnlineLyricMatchResult {
   lyricText: string
   translatedLyricText: string
   coverUrl: string
 }
 
+/** library-only 只删索引，permanent 同时删除音频和同名歌词文件。 */
 export type LocalLibraryTrackDeleteMode = 'library-only' | 'permanent'
 
 export interface LocalLibraryTrackDeleteInput {
@@ -157,11 +169,13 @@ export interface LocalLibraryStats {
   lastScannedAt: number | null
 }
 
+/** 首页/侧边栏使用的轻量曲库概览。 */
 export interface LocalLibraryOverviewSnapshot {
   roots: LocalLibraryRootRecord[]
   stats: LocalLibraryStats
 }
 
+/** 本地曲库完整快照，用于页面初始化。 */
 export interface LocalLibrarySnapshot {
   roots: LocalLibraryRootRecord[]
   stats: LocalLibraryStats
@@ -171,6 +185,7 @@ export interface LocalLibrarySnapshot {
   playlists: LocalLibraryPlaylistRecord[]
 }
 
+/** 本地歌曲查询参数，scope 用于从专辑/歌手详情页复用同一查询。 */
 export interface LocalLibraryTrackQueryInput {
   keyword: string
   scopeType: 'all' | 'album' | 'artist'
@@ -213,6 +228,7 @@ export interface LocalLibraryArtistQueryResult {
   limit: number
 }
 
+/** 本地曲库扫描结果摘要。 */
 export interface LocalLibraryScanSummary {
   rootCount: number
   importedCount: number

@@ -23,6 +23,7 @@ const EMPTY_LYRIC_BUNDLE = {
   tlyric: '',
 }
 
+/** music-metadata 返回秒，这里转换成播放器内部统一使用的毫秒。 */
 function normalizeDurationMs(durationSeconds: number | undefined) {
   if (!Number.isFinite(durationSeconds)) {
     return 0

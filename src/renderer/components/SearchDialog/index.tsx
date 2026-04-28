@@ -312,6 +312,7 @@ const SearchDialog = () => {
       return
     }
 
+    // 仅内置平台歌曲搜索启用无限滚动，其他类型分页由远端接口/结果面板自行控制。
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0]?.isIntersecting) {

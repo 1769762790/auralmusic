@@ -33,6 +33,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object'
 }
 
+/** 兼容 /song/download/url/v1 可能返回 data 包裹或平铺结构。 */
 function normalizeSongDownloadUrlResponse(
   payload: unknown
 ): ResolvedSongDownload | null {
@@ -59,6 +60,7 @@ function normalizeSongDownloadUrlResponse(
   }
 }
 
+/** 从 Music API baseURL 中解析鉴权同源地址，非法 URL 时不注入 Cookie。 */
 function resolveAuthOrigin(baseURL: string) {
   try {
     return new URL(baseURL).origin
@@ -67,6 +69,7 @@ function resolveAuthOrigin(baseURL: string) {
   }
 }
 
+/** 为下载解析请求补充鉴权 header，VIP/付费资源解析依赖登录态。 */
 function createRequestHeaders(
   requestUrl: string,
   authOrigin: string | undefined,
@@ -82,6 +85,7 @@ function createRequestHeaders(
   )
 }
 
+/** 构建下载场景的音源解析上下文，供 shared resolver policy 决定解析顺序。 */
 function buildResolveContext(
   runtimeConfig: DownloadRuntimeConfig,
   authSession: AuthSession | null,
@@ -107,6 +111,12 @@ function buildResolveContext(
   }
 }
 
+/**
+ * 创建下载源解析器。
+ *
+ * 下载优先使用 payload.sourceUrl；没有直链时按策略尝试内置解灰和官方下载接口，
+ * 并携带当前登录态 Cookie 以支持会员/付费资源。
+ */
 export function createDownloadSourceResolver(
   options: CreateDownloadSourceResolverOptions = {}
 ) {
@@ -120,6 +130,7 @@ export function createDownloadSourceResolver(
     runtimeConfig,
   }: ResolveDownloadSourceInput): Promise<ResolvedSongDownload | null> {
     if (payload.sourceUrl) {
+      // 调用方已给出直链时不再请求 Music API，避免多余网络和可能的质量降级。
       return {
         url: payload.sourceUrl,
         quality,
@@ -143,6 +154,7 @@ export function createDownloadSourceResolver(
 
     for (const resolverId of resolverPolicy.resolverOrder) {
       if (resolverId === 'builtinUnblock') {
+        // 内置解灰使用 /song/url/v1?unblock=true，适合官方接口无直链时兜底。
         const playbackUrl = new URL('/song/url/v1', `${baseURL}/`)
         playbackUrl.searchParams.set('id', String(payload.songId))
         playbackUrl.searchParams.set('level', quality)
@@ -207,6 +219,7 @@ export function createDownloadSourceResolver(
       }
 
       const playbackUrl = new URL('/song/url/v1', `${baseURL}/`)
+      // 官方下载接口失败后回退普通播放 URL，尽量保证用户仍能下载可播放资源。
       playbackUrl.searchParams.set('id', String(payload.songId))
       playbackUrl.searchParams.set('level', quality)
       playbackUrl.searchParams.set('unblock', 'false')

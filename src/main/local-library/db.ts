@@ -30,6 +30,7 @@ import type {
   LocalLibraryTrackRecord,
 } from '../../shared/local-library.ts'
 
+/** 扫描器写入/更新歌曲索引时使用的完整输入。 */
 export interface LocalLibraryTrackUpsertInput {
   rootId: number
   filePath: string
@@ -48,6 +49,7 @@ export interface LocalLibraryTrackUpsertInput {
   discNo: number | null
 }
 
+/** 本地曲库数据库配置。 */
 export interface LocalLibraryDatabaseOptions {
   dbPath: string
 }
@@ -122,10 +124,12 @@ const LOCAL_TRACK_TEXT_COLUMNS = [
   "ALTER TABLE local_tracks ADD COLUMN translated_lyric_text TEXT NOT NULL DEFAULT ''",
 ]
 
+/** 封面本地路径转换为 renderer 可访问的 local-media URL。 */
 function toNullableLocalMediaUrl(coverPath: string | null) {
   return coverPath ? createLocalMediaUrl(coverPath) : ''
 }
 
+/** 将 SQLite 歌曲行转换为 shared 曲库歌曲记录。 */
 function toLocalLibraryTrackRecord(row: Record<string, unknown>) {
   const trackRow = row as Omit<LocalLibraryTrackRecord, 'coverUrl'>
 
@@ -135,6 +139,7 @@ function toLocalLibraryTrackRecord(row: Record<string, unknown>) {
   } satisfies LocalLibraryTrackRecord
 }
 
+/** 将 SQLite 专辑聚合行转换为 shared 专辑记录。 */
 function toLocalLibraryAlbumRecord(row: Record<string, unknown>) {
   const typedRow = row as {
     id: number
@@ -153,6 +158,7 @@ function toLocalLibraryAlbumRecord(row: Record<string, unknown>) {
   } satisfies LocalLibraryAlbumRecord
 }
 
+/** 将 SQLite 歌手聚合行转换为 shared 歌手记录。 */
 function toLocalLibraryArtistRecord(row: Record<string, unknown>) {
   const typedRow = row as {
     id: number
@@ -169,6 +175,7 @@ function toLocalLibraryArtistRecord(row: Record<string, unknown>) {
   } satisfies LocalLibraryArtistRecord
 }
 
+/** 将 SQLite 歌单聚合行转换为 shared 歌单记录。 */
 function toLocalLibraryPlaylistRecord(row: Record<string, unknown>) {
   const typedRow = row as {
     id: number
@@ -191,15 +198,23 @@ function toLocalLibraryPlaylistRecord(row: Record<string, unknown>) {
   } satisfies LocalLibraryPlaylistRecord
 }
 
+/** 生成 LIKE 查询 pattern，空关键词返回 null 以便跳过 where 条件。 */
 function createKeywordPattern(keyword: string) {
   const trimmedKeyword = keyword.trim()
   return trimmedKeyword ? `%${trimmedKeyword}%` : null
 }
 
+/** 歌单名统一 trim 后再做唯一性判断。 */
 function normalizePlaylistName(name: string) {
   return name.trim()
 }
 
+/**
+ * 本地曲库 SQLite 封装。
+ *
+ * 负责 schema 初始化、兼容迁移、歌曲索引、聚合查询和本地歌单写操作；
+ * 对外只返回 shared 类型，避免 SQL 行结构泄漏到 IPC/renderer。
+ */
 export class LocalLibraryDatabase {
   private readonly database: BetterSqliteDatabase
 
@@ -220,10 +235,12 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 关闭 SQLite 连接，测试或应用退出清理时使用。 */
   close() {
     this.database.close()
   }
 
+  /** 同步曲库根目录，删除根目录会级联删除其歌曲索引。 */
   replaceRoots(paths: string[]) {
     const currentRows = this.database
       .prepare(
@@ -243,6 +260,7 @@ export class LocalLibraryDatabase {
     )
 
     const syncRoots = this.database.transaction(() => {
+      // 根目录同步必须原子化，避免删除旧根后插入新根失败导致整库索引失联。
       for (const path of paths) {
         if (!currentPathSet.has(path)) {
           insertRoot.run(path, now)
@@ -261,6 +279,7 @@ export class LocalLibraryDatabase {
     return this.getRoots()
   }
 
+  /** 读取已登记曲库根目录。 */
   getRoots() {
     return this.database
       .prepare(
@@ -269,6 +288,7 @@ export class LocalLibraryDatabase {
       .all() as LocalLibraryRootRecord[]
   }
 
+  /** 按文件路径读取歌曲记录。 */
   getTrackByFilePath(filePath: string) {
     const row = this.database
       .prepare(
@@ -306,6 +326,7 @@ export class LocalLibraryDatabase {
     } satisfies LocalLibraryTrackRecord
   }
 
+  /** 读取根目录和统计信息概览。 */
   getOverviewSnapshot(): LocalLibraryOverviewSnapshot {
     return {
       roots: this.getRoots(),
@@ -313,6 +334,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 查询歌曲分页列表，支持关键词、专辑和歌手作用域。 */
   queryTracks(
     input: LocalLibraryTrackQueryInput
   ): LocalLibraryTrackQueryResult {
@@ -389,6 +411,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 查询专辑聚合分页列表。 */
   queryAlbums(
     input: LocalLibraryAlbumQueryInput
   ): LocalLibraryAlbumQueryResult {
@@ -441,6 +464,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 查询歌手聚合分页列表。 */
   queryArtists(
     input: LocalLibraryArtistQueryInput
   ): LocalLibraryArtistQueryResult {
@@ -492,6 +516,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 查询本地歌单分页列表，并可标记目标歌曲是否已存在于歌单。 */
   queryPlaylists(
     input: LocalLibraryPlaylistQueryInput
   ): LocalLibraryPlaylistQueryResult {
@@ -567,6 +592,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 查询歌单详情和歌单内歌曲分页。 */
   queryPlaylistDetail(
     input: LocalLibraryPlaylistDetailQueryInput
   ): LocalLibraryPlaylistDetailQueryResult {
@@ -667,6 +693,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 插入或更新歌曲索引，文件路径是唯一键。 */
   upsertTrack(input: LocalLibraryTrackUpsertInput) {
     const now = Date.now()
 
@@ -735,6 +762,7 @@ export class LocalLibraryDatabase {
       })
   }
 
+  /** 更新在线匹配写回的歌词/翻译/封面信息。 */
   updateTrackSupplementalMetadata(input: {
     filePath: string
     lyricText: string
@@ -759,6 +787,7 @@ export class LocalLibraryDatabase {
       })
   }
 
+  /** 从曲库索引中移除指定文件路径。 */
   removeTrackByFilePath(filePath: string) {
     const result = this.database
       .prepare('DELETE FROM local_tracks WHERE file_path = ?')
@@ -767,6 +796,7 @@ export class LocalLibraryDatabase {
     return result.changes > 0
   }
 
+  /** 创建本地歌单，重名返回 duplicate。 */
   createPlaylist(
     input: LocalLibraryPlaylistCreateInput
   ): LocalLibraryPlaylistCreateResult {
@@ -816,6 +846,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 更新本地歌单名称，重名返回 duplicate。 */
   updatePlaylist(
     input: LocalLibraryPlaylistUpdateInput
   ): LocalLibraryPlaylistUpdateResult {
@@ -859,6 +890,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 删除本地歌单，关联歌曲关系通过外键级联清理。 */
   deletePlaylist(
     input: LocalLibraryPlaylistDeleteInput
   ): LocalLibraryPlaylistDeleteResult {
@@ -871,6 +903,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 将歌曲加入歌单，先校验歌单和歌曲都存在。 */
   addTrackToPlaylist(
     input: LocalLibraryPlaylistTrackMutationInput
   ): LocalLibraryPlaylistTrackMutationResult {
@@ -920,6 +953,7 @@ export class LocalLibraryDatabase {
     return { status: 'ok' }
   }
 
+  /** 从歌单移除歌曲，并刷新歌单更新时间。 */
   removeTrackFromPlaylist(
     input: LocalLibraryPlaylistTrackMutationInput
   ): LocalLibraryPlaylistTrackMutationResult {
@@ -943,6 +977,7 @@ export class LocalLibraryDatabase {
     return { status: 'ok' }
   }
 
+  /** 按 id 读取歌单聚合信息。 */
   private getPlaylistById(playlistId: number) {
     const row = this.database
       .prepare(
@@ -972,6 +1007,7 @@ export class LocalLibraryDatabase {
     return row ? toLocalLibraryPlaylistRecord(row) : null
   }
 
+  /** 删除某个根目录下已经不存在于扫描结果中的旧歌曲索引。 */
   removeTracksMissingFromRoot(rootId: number, existingFilePaths: string[]) {
     if (existingFilePaths.length === 0) {
       this.database
@@ -988,6 +1024,7 @@ export class LocalLibraryDatabase {
       .run(rootId, ...existingFilePaths)
   }
 
+  /** 记录最近扫描时间。 */
   setLastScannedAt(timestamp: number) {
     this.database
       .prepare(
@@ -1000,6 +1037,7 @@ export class LocalLibraryDatabase {
       .run(String(timestamp))
   }
 
+  /** 统计曲库歌曲、专辑、歌手和最近扫描时间。 */
   private getStats(): LocalLibraryStats {
     const totalRow = this.database
       .prepare(
@@ -1033,6 +1071,7 @@ export class LocalLibraryDatabase {
     }
   }
 
+  /** 读取完整曲库快照，主要用于页面初始化。 */
   getSnapshot(): LocalLibrarySnapshot {
     const overview = this.getOverviewSnapshot()
     const tracks = this.queryTracks({
@@ -1070,6 +1109,7 @@ export class LocalLibraryDatabase {
   }
 }
 
+/** 创建本地曲库数据库实例。 */
 export function createLocalLibraryDatabase(
   options: LocalLibraryDatabaseOptions
 ) {

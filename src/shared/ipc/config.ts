@@ -1,3 +1,4 @@
+/** 通用 IPC 通道集合：配置读写和 LX 音源脚本能力都从这里复用。 */
 export const IPC_CHANNELS = {
   CONFIG: {
     GET: 'config:get',

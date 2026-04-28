@@ -7,9 +7,11 @@ import { useEffect, useState } from 'react'
  * @returns 防抖后的值
  */
 export function useDebouncedValue<T>(value: T, delay = 250): T {
+  // 初始值直接使用原始值，避免首帧出现空值或旧值。
   const [debouncedValue, setDebouncedValue] = useState(value)
 
   useEffect(() => {
+    // 每次 value/delay 变化都会重置计时，只提交最后一次稳定输入。
     const timer = window.setTimeout(() => {
       setDebouncedValue(value)
     }, delay)
